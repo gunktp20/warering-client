@@ -1,35 +1,31 @@
-import Wrapper from "../assets/wrappers/Login";
+import Wrapper from "../../assets/wrappers/Login";
 import { useState, FunctionComponent, useEffect } from "react";
-import { FormRow } from "../components";
+import { FormRow } from "../../components";
 import { Link } from "react-router-dom";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
-  setupUserSuccess,
-  setupUserError,
+  register,
   clearAlert,
-} from "../app/features/auth/authSlice";
+  displayAlert,
+} from "../../features/auth/authSlice";
+import { TermAndCondition } from ".";
+import { IValue } from "./types";
+import { Alert } from "../../components";
+import { validateEmail } from "../../utils/validateEmail";
 
 const Register: FunctionComponent = () => {
-  const { showAlert, alertText, alertType } = useAppSelector(
+  const { isLoading, showAlert, alertText, alertType } = useAppSelector(
     (state) => state.auth
   );
   const dispatch = useAppDispatch();
 
-  interface IValue {
-    username: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    confirm_password: string;
-  }
   const initialState: IValue = {
-    username: "",
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirm_password: "",
+    username: "gunktp14",
+    firstName: "kuttapat",
+    lastName: "somwang",
+    email: "arrliver@gmail.com",
+    password: "!Kuttapatz1",
+    confirm_password: "!Kuttapatz1",
   };
 
   const [values, setValues] = useState(initialState);
@@ -41,10 +37,10 @@ const Register: FunctionComponent = () => {
   const clearValue = () => {
     setTimeout(() => {
       dispatch(clearAlert());
-    }, 3000);
+    }, 8000);
   };
 
-  const onSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const onSubmit = async () => {
     const { username, firstName, lastName, email, password, confirm_password } =
       values;
     if (
@@ -56,24 +52,21 @@ const Register: FunctionComponent = () => {
       !confirm_password
     ) {
       dispatch(
-        setupUserError({
-          endPoint: "register",
-          msg: "Please provide all value",
+        displayAlert({
+          alertType: "error",
+          alertText: "Please provide all value",
         })
       );
       clearValue();
       return;
     }
-    dispatch(
-      setupUserSuccess({
-        endPoint: "register",
-        msg: "Created your account already",
-      })
-    );
-  };
 
+    await dispatch(register(values));
+    clearValue();
+  };
+  
   useEffect(() => {
-    dispatch(clearAlert());
+    clearValue();
   }, []);
 
   return (
@@ -82,12 +75,18 @@ const Register: FunctionComponent = () => {
         <h3 className="text-left text-[27px] mt-1 font-bold mb-3 text-[#1D4469]">
           Sign Up
         </h3>
-        {showAlert && alertType === "danger" && (
-          <div className="alert alert-danger">{alertText}</div>
+        {showAlert && alertType === "info" && (
+          <Alert alertText={alertText} alertType="info" />
         )}
+
+        {showAlert && alertType === "error" && (
+          <Alert alertText={alertText} alertType="error" />
+        )}
+
         {showAlert && alertType === "success" && (
-          <div className="alert alert-success">{alertText}</div>
+          <Alert alertText={alertText} alertType="success" />
         )}
+
         <FormRow
           type="text"
           name="username"
@@ -112,7 +111,7 @@ const Register: FunctionComponent = () => {
         />
 
         <FormRow
-          type="text"
+          type="email"
           name="email"
           value={values.email}
           handleChange={handleChange}
@@ -131,30 +130,14 @@ const Register: FunctionComponent = () => {
           labelText="confirm password"
         />
 
-        <div className="flex items-center">
-          <input
-            id="link-checkbox"
-            type="checkbox"
-            value=""
-            className="w-[13px] h-[13px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#fff] dark:focus:ring-[#2CB1BC] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-          />
-          <label
-            htmlFor="link-checkbox"
-            className="ms-2 text-[11.5px] font-medium text-gray-900 dark:text-gray-300"
-          >
-            I agree with the{" "}
-            <a
-              href="#"
-              className="text-[#3173B1] dark:text-[#3173B1] hover:underline"
-            >
-              terms and conditions
-            </a>
-            .
-          </label>
-        </div>
+        <TermAndCondition />
 
-        <button onClick={onSubmit} className="btn btn-primary">
-          Sign Up
+        <button
+          onClick={onSubmit}
+          className="btn btn-primary"
+          disabled={isLoading}
+        >
+          {isLoading ? "Loading..." : "Sign Up"}
         </button>
         <div className="flex mt-5 justify-end pr-2">
           <p className="text-[12px] text-[#333]">Already a member?</p>

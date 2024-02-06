@@ -2,10 +2,7 @@ import Wrapper from "../assets/wrappers/Login";
 import React, { useState, FunctionComponent, useEffect } from "react";
 import { FormRow } from "../components";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import {
-  setupUserError,
-  clearAlert,
-} from "../app/features/auth/authSlice";
+import { clearAlert, displayAlert } from "../features/auth/authSlice";
 
 const ForgetPass: FunctionComponent = () => {
   const { isLoading, showAlert, alertText, alertType } = useAppSelector(
@@ -24,13 +21,9 @@ const ForgetPass: FunctionComponent = () => {
     }, 3000);
   };
 
-  const onSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!email) {
-      dispatch(
-        setupUserError({ endPoint: "login", msg: "Please provide all value" })
-      );
-      clearValue();
-      return;
+  const onSubmit = () => {
+    if(!email){
+      
     }
   };
 
@@ -47,9 +40,7 @@ const ForgetPass: FunctionComponent = () => {
         <div className="text-[12px] text-[#0000009d]">
           Please enter your E-mail address
         </div>
-        {showAlert && alertType === "danger" && (
-          <div className="alert alert-danger">{alertText}</div>
-        )}
+      
         {showAlert && alertType === "success" && (
           <div className="alert alert-success">{alertText}</div>
         )}

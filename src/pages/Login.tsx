@@ -4,10 +4,8 @@ import { FormRow } from "../components";
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
-  setupUserSuccess,
-  setupUserError,
   clearAlert,
-} from "../app/features/auth/authSlice";
+} from "../features/auth/authSlice";
 
 const Login: FunctionComponent = () => {
   const { isLoading, showAlert, alertText, alertType } = useAppSelector(
