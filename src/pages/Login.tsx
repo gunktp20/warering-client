@@ -3,16 +3,10 @@ import { useState, useEffect, FunctionComponent } from "react";
 import { FormRow } from "../components";
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import {
-  setupUserSuccess,
-  setupUserError,
-  clearAlert,
-} from "../app/features/auth/authSlice";
+import { clearAlert } from "../features/auth/authSlice";
 
 const Login: FunctionComponent = () => {
-  const { isLoading, showAlert, alertText, alertType } = useAppSelector(
-    (state) => state.auth
-  );
+
   const dispatch = useAppDispatch();
   interface IValue {
     username: string;
@@ -39,16 +33,12 @@ const Login: FunctionComponent = () => {
   const onSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     const { username, password } = values;
     if (!username || !password) {
-      dispatch(
-        setupUserError({ endPoint: "login", msg: "Please provide all value" })
-      );
       clearValue();
       return;
     }
-    dispatch(
-      setupUserSuccess({ endPoint: "login", msg: "Login successfully!" })
-    );
+
     clearValue();
+    return;
   };
 
   useEffect(() => {
@@ -61,12 +51,7 @@ const Login: FunctionComponent = () => {
         <h3 className="text-left text-[27px] mt-1 font-bold mb-3 text-[#1D4469]">
           Sign In
         </h3>
-        {showAlert && alertType === "danger" && (
-          <div className="alert alert-danger">{alertText}</div>
-        )}
-        {showAlert && alertType === "success" && (
-          <div className="alert alert-success">{alertText}</div>
-        )}
+
         <FormRow
           type="text"
           name="username"

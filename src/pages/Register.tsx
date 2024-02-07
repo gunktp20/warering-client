@@ -4,10 +4,9 @@ import { FormRow } from "../components";
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
-  setupUserSuccess,
-  setupUserError,
   clearAlert,
-} from "../app/features/auth/authSlice";
+  displayAlert,
+} from "../features/auth/authSlice"
 
 const Register: FunctionComponent = () => {
   const { showAlert, alertText, alertType } = useAppSelector(
@@ -55,21 +54,12 @@ const Register: FunctionComponent = () => {
       !password ||
       !confirm_password
     ) {
-      dispatch(
-        setupUserError({
-          endPoint: "register",
-          msg: "Please provide all value",
-        })
-      );
+  
       clearValue();
       return;
     }
-    dispatch(
-      setupUserSuccess({
-        endPoint: "register",
-        msg: "Created your account already",
-      })
-    );
+
+  
   };
 
   useEffect(() => {

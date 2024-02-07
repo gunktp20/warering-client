@@ -3,14 +3,11 @@ import React, { useState, FunctionComponent, useEffect } from "react";
 import { FormRow } from "../components";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
-  setupUserError,
   clearAlert,
-} from "../app/features/auth/authSlice";
+} from "../features/auth/authSlice"
 
 const ForgetPass: FunctionComponent = () => {
-  const { isLoading, showAlert, alertText, alertType } = useAppSelector(
-    (state) => state.auth
-  );
+
   const dispatch = useAppDispatch();
   const [email, setEmail] = useState<string>("");
 
@@ -26,9 +23,7 @@ const ForgetPass: FunctionComponent = () => {
 
   const onSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!email) {
-      dispatch(
-        setupUserError({ endPoint: "login", msg: "Please provide all value" })
-      );
+      return;
       clearValue();
       return;
     }
@@ -47,12 +42,7 @@ const ForgetPass: FunctionComponent = () => {
         <div className="text-[12px] text-[#0000009d]">
           Please enter your E-mail address
         </div>
-        {showAlert && alertType === "danger" && (
-          <div className="alert alert-danger">{alertText}</div>
-        )}
-        {showAlert && alertType === "success" && (
-          <div className="alert alert-success">{alertText}</div>
-        )}
+      
         <FormRow
           type="text"
           name="email"
