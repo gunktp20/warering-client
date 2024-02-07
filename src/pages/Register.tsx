@@ -3,10 +3,7 @@ import { useState, FunctionComponent, useEffect } from "react";
 import { FormRow } from "../components";
 import { Link } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import {
-  clearAlert,
-  displayAlert,
-} from "../features/auth/authSlice"
+import { clearAlert, displayAlert } from "../features/auth/authSlice";
 
 const Register: FunctionComponent = () => {
   const { showAlert, alertText, alertType } = useAppSelector(
@@ -54,12 +51,9 @@ const Register: FunctionComponent = () => {
       !password ||
       !confirm_password
     ) {
-  
       clearValue();
       return;
     }
-
-  
   };
 
   useEffect(() => {

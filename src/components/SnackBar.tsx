@@ -7,10 +7,10 @@ function MuiSnackBar() {
     event?: React.SyntheticEvent | Event,
     reason?: string
   ) => {
-    if(reason === 'clickaway'){
-        return 
+    if (reason === "clickaway") {
+      return;
     }
-    setOpen(false)
+    setOpen(false);
   };
   return (
     <div>
