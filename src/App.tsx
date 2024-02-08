@@ -1,6 +1,6 @@
 import './App.css'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
-import { Register, Login, ForgetPass , Landing} from './pages'
+import { Register, Login, ForgetPass , Landing , ResetPass} from './pages'
 
 function App() {
   return (
@@ -10,6 +10,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forget-pass" element={<ForgetPass />} />
+        <Route path="/reset-password/:token" element={<ResetPass/>} />
       </Routes>
     </BrowserRouter>
   )
