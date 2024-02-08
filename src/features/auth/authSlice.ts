@@ -68,10 +68,11 @@ export const resetPassword = createAsyncThunk(
       });
       return response.data;
     } catch (err: any) {
+      console.log(err)
       const msg =
-        typeof err?.response?.data?.msg === "object"
-          ? err?.response?.data?.msg[0]
-          : err?.response?.data?.msg;
+        typeof err?.response?.data?.message === "object"
+          ? err?.response?.data?.message[0]
+          : err?.response?.data?.message;
       return thunkApi.rejectWithValue(msg);
     }
   }
@@ -144,6 +145,21 @@ const AuthSlice = createSlice({
         state.alertType = "success";
       }),
       builder.addCase(forgetPassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.showAlert = true;
+        state.alertText = action.payload as string;
+        state.alertType = "error";
+      }),
+      builder.addCase(resetPassword.pending, (state, action) => {
+        state.isLoading = true;
+      }),
+      builder.addCase(resetPassword.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.showAlert = true;
+        state.alertText = "Your password has been reset . Try with new password";
+        state.alertType = "success";
+      }),
+      builder.addCase(resetPassword.rejected, (state, action) => {
         state.isLoading = false;
         state.showAlert = true;
         state.alertText = action.payload as string;
