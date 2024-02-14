@@ -1,12 +1,18 @@
 import React from "react";
 import { BigNavbar } from "../Landing";
 import Wrapper from "../../assets/wrappers/TermAndCondition";
+import { useNavigate } from "react-router-dom";
 
 function TermAndCondition() {
+  
+  const navigate = useNavigate();
+
   return (
     <Wrapper>
       <div className="bg-white p-[2rem] w-[700px]">
-        <div className="text-[#3173b1] font-bold text-[25px] mb-8">Terms and Conditions</div>
+        <div className="text-[#3173b1] font-bold text-[25px] mb-8">
+          Terms and Conditions
+        </div>
         <div className="bg-[#fcfcfc] p-5 overflow-y-auto h-[400px]">
           <div className="font-bold text-[16px] text-[#7a7a7a] mb-3">
             Privacy Policy
@@ -40,9 +46,21 @@ function TermAndCondition() {
           </div>
 
           <p className="text-[#7a7a7a] mb-5 text-sm">
-           Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod cupiditate error animi dolorem veniam officia distinctio quam rem cumque earum, dolor, sit vero minima. Sint at, quas, maiores impedit debitis eaque quis voluptatibus libero ex fugit animi unde ipsum esse veritatis qui accusamus. Qui a sapiente ex velit? Voluptates, velit?
+            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod
+            cupiditate error animi dolorem veniam officia distinctio quam rem
+            cumque earum, dolor, sit vero minima. Sint at, quas, maiores impedit
+            debitis eaque quis voluptatibus libero ex fugit animi unde ipsum
+            esse veritatis qui accusamus. Qui a sapiente ex velit? Voluptates,
+            velit?
           </p>
         </div>
+        <button
+          onClick={() => {
+            navigate("/");
+          }}
+        >
+          Back to Home Page
+        </button>
       </div>
     </Wrapper>
   );

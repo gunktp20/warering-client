@@ -84,7 +84,11 @@ const ResetPass = () => {
           value={values.newPassword}
           handleChange={handleChange}
         />
-        <button className="btn btn-primary text-[12px]" onClick={onSubmit}>
+        <button
+          className="btn btn-primary text-[12px]"
+          onClick={onSubmit}
+          id="reset-password-submit"
+        >
           {isLoading ? "Loading..." : "Reset Password"}
         </button>
         <button
