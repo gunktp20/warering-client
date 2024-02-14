@@ -1,8 +1,8 @@
 function Footer() {
   return (
     <div className="bg-[#1D4469] w-[100%] flex flex-col justify-center items-center pt-10 pb-10">
-      <div className=" flex w-[70%] justify-between pb-10">
-        <div className="flex flex-col w-[200px]">
+      <div className=" flex w-[70%] justify-between pb-10 sm:flex-col sm: sm:items-center">
+        <div className="flex flex-col w-[200px] sm:w-[300px] sm:mb-5">
           <div className=" text-[19px] text-white mb-5 font-bold">WR</div>
           <div className="text-[12.5px] text-[#fff]">
             Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam
@@ -10,7 +10,7 @@ function Footer() {
             Aliquid, vero laudantium.
           </div>
         </div>
-        <div className="flex flex-col w-[200px]">
+        <div className="flex flex-col w-[200px] sm:w-[300px] sm:mb-5">
           <div className=" text-[19px] text-white mb-5 font-bold">Services</div>
           <div className="text-[12.5px] mb-3 text-[#fff] w-[200px]">
             Website Designing
@@ -19,7 +19,7 @@ function Footer() {
             Website Development
           </div>
         </div>
-        <div className="flex flex-col w-[200px]">
+        <div className="flex flex-col w-[200px] sm:w-[300px]">
           <div className=" text-[19px] text-white mb-5 font-bold">Languages</div>
           <div className="text-[12.5px] mb-3 text-[#fff] w-[200px]">Thai</div>
           <div className="text-[12.5px] mb-3 text-[#fff] w-[200px]">

@@ -3,6 +3,7 @@ import { FormRow } from "../../components";
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { displayAlert, clearAlert, register, login, forgetPassword } from "../../features/auth/authSlice";
+import { Link } from "react-router-dom";
 
 interface IDrawer {
   isDrawerOpen: boolean;
@@ -65,11 +66,8 @@ function SetupUserDrawer(props: IDrawer) {
         return;
       }
       await dispatch(forgetPassword(email))
-      setTimeout(() => {
-        dispatch(clearAlert());
-      }, 4000);
       return;
-      return;
+
     }
 
     if (
@@ -89,25 +87,18 @@ function SetupUserDrawer(props: IDrawer) {
       return;
     }
 
-    if (!isAcceptTerm) {
+    if (!isMember && !isAcceptTerm) {
       showDisplayAlert("error", "You must accept term and condition before");
       return;
     }
 
     if (isMember) {
       dispatch(login(values))
-      setTimeout(() => {
-        dispatch(clearAlert());
-      }, 4000);
       return;
     } else {
       dispatch(register(values))
-      setTimeout(() => {
-        dispatch(clearAlert());
-      }, 4000);
       return;
     }
-
 
   };
 
@@ -193,12 +184,12 @@ function SetupUserDrawer(props: IDrawer) {
                       className="ms-2 text-[11.5px] font-medium text-gray-900 dark:text-gray-300"
                     >
                       I agree with the{" "}
-                      <a
-                        href="#"
+                      <Link
+                        to="/term-condition"
                         className="text-[#3173B1] dark:text-[#3173B1] hover:underline"
                       >
                         terms and conditions
-                      </a>
+                      </Link>
                     </label>
                   </div>
                 )}

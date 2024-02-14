@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BigNavbar, Introduction, WeDoItem, Footer, SetupUserDrawer } from ".";
+import { BigNavbar, Introduction, WeDoItem, Footer, SetupUserDrawer , SmallNavbar} from ".";
 import Wrapper from "../../assets/wrappers/Landing/Landing";
 import whatWeDo from "../../utils/whatWeDo";
 
@@ -11,6 +11,7 @@ function Landing() {
   return (
     <Wrapper>
       <BigNavbar setIsMember={setIsMember} setIsDrawerOpen={setIsDrawerOpen} />
+      <SmallNavbar/>
       <SetupUserDrawer
         isDrawerOpen={isDrawerOpen}
         setIsDrawerOpen={setIsDrawerOpen}
@@ -18,18 +19,17 @@ function Landing() {
         isMember={isMember}
       />
       <Introduction />
-      <div className="bg-white w-[100%] flex justify-center mt-[4.5rem] mb-[4.5rem]">
-        <div className="wwd-container bg-red w-[75%] flex justify-between gap-5 ">
-          {whatWeDo.length > 0 &&
+      <div className="w-[100%] justify-center mt-[4.5rem] mb-[4.5rem] flex">
+        <div className="w-[75%] flex justify-between items-center gap-5 bg-white lg:flex-col md:flex-col sm:flex-col">
+          {whatWeDo.length > 0
+           &&
             whatWeDo.map((item) => {
               return (
-                <div>
                   <WeDoItem
                     img={item.img}
                     title={item.title}
                     description={item.description}
                   />
-                </div>
               );
             })}
         </div>

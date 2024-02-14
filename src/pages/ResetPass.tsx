@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Alert } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FormRow } from "../components";
 import Wrapper from "../assets/wrappers/ResetPass";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
@@ -21,6 +21,8 @@ const ResetPass = () => {
     (state) => state.auth
   );
 
+  const navigate = useNavigate();
+
   const showDisplayAlert = (
     alertType: "warning" | "error" | "info" | "success",
     alertText: string
@@ -34,6 +36,10 @@ const ResetPass = () => {
     setTimeout(() => {
       dispatch(clearAlert());
     }, 4000);
+  };
+
+  const backHomePage = () => {
+    navigate("/")
   };
 
   const { token } = useParams();
@@ -56,7 +62,7 @@ const ResetPass = () => {
 
   return (
     <Wrapper>
-      <div className="p-10 rounded-md w-[400px] bg-white shadow-lg">
+      <div className="relative top-[13rem] h-fit p-10 rounded-md w-[400px] bg-white shadow-lg">
         <h3 className="text-left text-[27px] mt-1 font-bold mb-2 text-[#1D4469]">
           Reset your password
         </h3>
@@ -80,6 +86,12 @@ const ResetPass = () => {
         />
         <button className="btn btn-primary text-[12px]" onClick={onSubmit}>
           Reset Password
+        </button>
+        <button
+          onClick={backHomePage}
+          className="transition-[0.2s] w-full h-[38px] rounded-md mt-5 text-[12px] border-[#1966fb] border-[1px] text-[#1966fb]"
+        >
+          Back to Home Page
         </button>
       </div>
     </Wrapper>

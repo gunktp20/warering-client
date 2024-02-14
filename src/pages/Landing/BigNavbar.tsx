@@ -1,5 +1,4 @@
 import { FunctionComponent } from "react";
-import { Link } from "react-router-dom";
 import Wrapper from "../../assets/wrappers/Landing/BigNavbar";
 import { useAppDispatch } from "../../app/hooks";
 import { clearAlert } from "../../features/auth/authSlice";
@@ -22,7 +21,7 @@ const BigNavbar: FunctionComponent<IBigNavbar> = (props: IBigNavbar) => {
 
   return (
     <Wrapper className="w-[100%] fixed h-fit flex justify-center bg-white p-5 shadow-md z-10">
-      <div className="flex justify-between w-[70%]">
+      <div className="flex justify-between w-[70%] item-center">
         <div className="flex items-center">
           <div className="font-bold text-[20px] text-[#1D4469] mr-6">WR</div>
         </div>
