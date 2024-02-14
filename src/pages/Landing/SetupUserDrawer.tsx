@@ -2,7 +2,13 @@ import { Drawer, Box, Typography, Alert } from "@mui/material";
 import { FormRow } from "../../components";
 import React, { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { displayAlert, clearAlert, register, login, forgetPassword } from "../../features/auth/authSlice";
+import {
+  displayAlert,
+  clearAlert,
+  register,
+  login,
+  forgetPassword,
+} from "../../features/auth/authSlice";
 import { Link } from "react-router-dom";
 
 interface IDrawer {
@@ -19,6 +25,7 @@ interface IValue {
   email: string | undefined;
   password: string;
   confirm_password: string | undefined;
+  email_forget_password: string | undefined;
 }
 
 const initialState: IValue = {
@@ -28,6 +35,7 @@ const initialState: IValue = {
   email: "",
   password: "",
   confirm_password: "",
+  email_forget_password: "",
 };
 
 function SetupUserDrawer(props: IDrawer) {
@@ -37,37 +45,48 @@ function SetupUserDrawer(props: IDrawer) {
   );
 
   const [values, setValues] = useState<IValue>(initialState);
-  const [isForgetPassword, setIsForgetPassword] = useState<boolean>(false)
-  const [isAcceptTerm, setIsAcceptTerm] = useState<boolean>(false)
+  const [isForgetPassword, setIsForgetPassword] = useState<boolean>(false);
+  const [isAcceptTerm, setIsAcceptTerm] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
 
-  const showDisplayAlert = (alertType: "warning" | "error" | "info" | "success", alertText: string) => {
-    dispatch(displayAlert({
-      alertType,
-      alertText,
-    }))
+  const showDisplayAlert = (
+    alertType: "warning" | "error" | "info" | "success",
+    alertText: string
+  ) => {
+    dispatch(
+      displayAlert({
+        alertType,
+        alertText,
+      })
+    );
     setTimeout(() => {
       dispatch(clearAlert());
     }, 4000);
-  }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
   const onSubmit = async () => {
-    const { username, firstName, lastName, email, password, confirm_password } =
-      values;
+    const {
+      username,
+      firstName,
+      lastName,
+      email,
+      password,
+      confirm_password,
+      email_forget_password,
+    } = values;
 
     if (isForgetPassword) {
-      if (!email) {
+      if (!email_forget_password) {
         showDisplayAlert("error", "Please provide an email");
         return;
       }
-      await dispatch(forgetPassword(email))
+      await dispatch(forgetPassword(email_forget_password));
       return;
-
     }
 
     if (
@@ -93,17 +112,16 @@ function SetupUserDrawer(props: IDrawer) {
     }
 
     if (isMember) {
-      dispatch(login(values))
+      dispatch(login(values));
       return;
     } else {
-      dispatch(register(values))
+      dispatch(register(values));
       return;
     }
-
   };
 
   useEffect(() => {
-    dispatch(clearAlert())
+    dispatch(clearAlert());
   }, []);
 
   return (
@@ -113,52 +131,103 @@ function SetupUserDrawer(props: IDrawer) {
         open={isDrawerOpen}
         onClose={() => {
           setIsDrawerOpen(false);
-          setIsForgetPassword(false)
+          setIsForgetPassword(false);
         }}
         className="sm:hidden"
       >
         <Box p={2} width="420px" textAlign="left" role="presentation">
           <Typography variant="h6" component="div" className="p-5 pb-0">
-            {isForgetPassword ? <div>
-              <h3 className="text-left text-[27px] mt-1 font-bold mb-2 text-[#1D4469]">
-                Forget your password ?
-              </h3>
-              <div className="text-[12px] text-[#0000009d] mb-3">
-                Input your e-mail address of your account
+            {isForgetPassword ? (
+              <div>
+                <h3 className="text-left text-[27px] mt-1 font-bold mb-2 text-[#1D4469]">
+                  Forget your password ?
+                </h3>
+                <div className="text-[12px] text-[#0000009d] mb-3">
+                  Input your e-mail address of your account
+                </div>
+
+                {showAlert && alertType && (
+                  <Alert
+                    severity={alertType}
+                    sx={{ fontSize: "11.8px", alignItems: "center" }}
+                  >
+                    {alertText}
+                  </Alert>
+                )}
+
+                <FormRow
+                  type="text"
+                  name="email_forget_password"
+                  labelText="Email"
+                  value={values.email_forget_password}
+                  handleChange={handleChange}
+                />
+
+                <button
+                  className="btn btn-primary text-[12px]"
+                  id="forget-pass-submit"
+                  onClick={onSubmit}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Loading..." : "Continue"}
+                </button>
               </div>
-
-              {(showAlert && alertType) && (
-                <Alert severity={alertType} sx={{ fontSize: "11.8px", alignItems: "center" }}>{alertText}</Alert>
-              )}
-
-              <FormRow
-                type="text"
-                name="email"
-                labelText="Email"
-                value={values.email}
-                handleChange={handleChange}
-              />
-
-              <button className="btn btn-primary text-[12px]" onClick={onSubmit} disabled={isLoading}>
-                {isLoading ? "Loading..." : "Continue"}
-              </button>
-            </div> :
+            ) : (
               <div>
                 <h3 className="text-left text-[27px] mt-1 font-bold mb-3 text-[#1D4469]">
                   {isMember ? "Sign In" : "Sign Up"}
                 </h3>
 
-                {(showAlert && alertType) && (
-                  <Alert severity={alertType} sx={{ fontSize: "11.8px", alignItems: "center" }}>{alertText}</Alert>
+                {showAlert && alertType && (
+                  <Alert
+                    severity={alertType}
+                    sx={{ fontSize: "11.8px", alignItems: "center" }}
+                  >
+                    {alertText}
+                  </Alert>
                 )}
 
-                <FormRow type="text" name="username" value={values.username} handleChange={handleChange} />
+                <FormRow
+                  type="text"
+                  name="username"
+                  value={values.username}
+                  handleChange={handleChange}
+                />
 
-                {!isMember && <FormRow type="text" name="firstName" labelText="firstname" value={values.firstName} handleChange={handleChange} />}
-                {!isMember && <FormRow type="text" name="lastName" labelText="lastname" value={values.lastName} handleChange={handleChange} />}
-                {!isMember && <FormRow type="text" name="email" labelText="email" value={values.email} handleChange={handleChange} />}
+                {!isMember && (
+                  <FormRow
+                    type="text"
+                    name="firstName"
+                    labelText="firstname"
+                    value={values.firstName}
+                    handleChange={handleChange}
+                  />
+                )}
+                {!isMember && (
+                  <FormRow
+                    type="text"
+                    name="lastName"
+                    labelText="lastname"
+                    value={values.lastName}
+                    handleChange={handleChange}
+                  />
+                )}
+                {!isMember && (
+                  <FormRow
+                    type="text"
+                    name="email"
+                    labelText="email"
+                    value={values.email}
+                    handleChange={handleChange}
+                  />
+                )}
 
-                <FormRow type="password" name="password" value={values.password} handleChange={handleChange} />
+                <FormRow
+                  type="password"
+                  name="password"
+                  value={values.password}
+                  handleChange={handleChange}
+                />
 
                 {!isMember && (
                   <FormRow
@@ -173,7 +242,7 @@ function SetupUserDrawer(props: IDrawer) {
                 {!isMember && (
                   <div className="flex items-center">
                     <input
-                      id="link-checkbox"
+                      id="accept-term-btn"
                       type="checkbox"
                       value=""
                       onClick={() => setIsAcceptTerm(!isAcceptTerm)}
@@ -212,10 +281,14 @@ function SetupUserDrawer(props: IDrawer) {
                       </label>
                     </div>
                     <div className="flex items-center">
-                      <div onClick={() => {
-                        setIsForgetPassword(true)
-                        dispatch(clearAlert())
-                      }} className="cursor-pointer ms-2 text-[11.5px] text-[#3173B1] font-bold">
+                      <div
+                        onClick={() => {
+                          setIsForgetPassword(true);
+                          dispatch(clearAlert());
+                        }}
+                        className="cursor-pointer ms-2 text-[11.5px] text-[#3173B1] font-bold"
+                        id="forget-pass-btn"
+                      >
                         Forget Password ?
                       </div>
                     </div>
@@ -228,6 +301,7 @@ function SetupUserDrawer(props: IDrawer) {
                   }}
                   className="btn btn-primary text-[14px]"
                   disabled={isLoading}
+                  id="setup-user-submit"
                 >
                   {isLoading ? "Loading..." : isMember ? "Sign In" : "Sign Up"}
                 </button>
@@ -239,15 +313,16 @@ function SetupUserDrawer(props: IDrawer) {
                     className="text-[12px] ml-2 text-[#3173B1] bg-none cursor-pointer"
                     onClick={() => {
                       setIsMember(!isMember);
-                      dispatch(clearAlert())
+                      dispatch(clearAlert());
                     }}
+                    id="toggle-endpoint"
                   >
                     {isMember ? "SignUp" : "SignIn"}
-
+                    
                   </button>
                 </div>
               </div>
-            }
+            )}
           </Typography>
         </Box>
       </Drawer>

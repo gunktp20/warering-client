@@ -39,7 +39,7 @@ const ResetPass = () => {
   };
 
   const backHomePage = () => {
-    navigate("/")
+    navigate("/");
   };
 
   const { token } = useParams();
@@ -85,11 +85,12 @@ const ResetPass = () => {
           handleChange={handleChange}
         />
         <button className="btn btn-primary text-[12px]" onClick={onSubmit}>
-          Reset Password
+          {isLoading ? "Loading..." : "Reset Password"}
         </button>
         <button
           onClick={backHomePage}
           className="transition-[0.2s] w-full h-[38px] rounded-md mt-5 text-[12px] border-[#1966fb] border-[1px] text-[#1966fb]"
+          id="back-home-btn"
         >
           Back to Home Page
         </button>

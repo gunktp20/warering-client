@@ -26,7 +26,8 @@ const BigNavbar: FunctionComponent<IBigNavbar> = (props: IBigNavbar) => {
           <div className="font-bold text-[20px] text-[#1D4469] mr-6">WR</div>
         </div>
         <div className="flex items-center">
-          <div
+          <button
+            id="open-big-register-drawer"
             className="text-[#20476b] cursor-pointer border-r-[#20476b] border-solid border-r-[2px] h-[60%] rp-[0.5rem] pl-[2rem] pr-[1.8rem] transition-[0.1s]"
             onClick={() => {
               onSelectEndpoint("register")
@@ -35,8 +36,9 @@ const BigNavbar: FunctionComponent<IBigNavbar> = (props: IBigNavbar) => {
             }
           >
             Sign Up
-          </div>
-          <div
+          </button>
+          <button
+            id="open-big-login-drawer"
             className="text-[#20476b] cursor-pointer border-solid border-[1px] ml-5 border-[#20476b] p-[0.4rem] pl-[1.8rem] pr-[1.8rem] rounded-[100px] hover:bg-[#20476b] hover:text-[#fff] transition-[0.1s]"
             onClick={() => {
               onSelectEndpoint("login")
@@ -44,7 +46,7 @@ const BigNavbar: FunctionComponent<IBigNavbar> = (props: IBigNavbar) => {
             }
           >
             Sign In
-          </div>
+          </button>
         </div>
       </div>
     </Wrapper>
