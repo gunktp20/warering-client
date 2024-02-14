@@ -5,7 +5,7 @@ import Wrapper from "../../assets/wrappers/TermAndCondition";
 function TermAndCondition() {
   return (
     <Wrapper>
-      <div className="bg-white p-[2rem] shadow-md w-[700px]">
+      <div className="bg-white p-[2rem] w-[700px]">
         <div className="text-[#3173b1] font-bold text-[25px] mb-8">Terms and Conditions</div>
         <div className="bg-[#fcfcfc] p-5 overflow-y-auto h-[400px]">
           <div className="font-bold text-[16px] text-[#7a7a7a] mb-3">

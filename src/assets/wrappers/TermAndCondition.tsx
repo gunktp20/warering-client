@@ -5,7 +5,7 @@ const Wrapper = styled.article`
     align-items:center;
     position: relative;
     display:flex;
-    background-color:#f7f7f7;
+    background-color:#fff;
     width:100%;
     height:100vh;
 `

@@ -107,7 +107,7 @@ function SetupUserDrawer(props: IDrawer) {
   }, []);
 
   return (
-    <React.Fragment>
+    <div>
       <Drawer
         anchor="right"
         open={isDrawerOpen}
@@ -115,6 +115,7 @@ function SetupUserDrawer(props: IDrawer) {
           setIsDrawerOpen(false);
           setIsForgetPassword(false)
         }}
+        className="sm:hidden"
       >
         <Box p={2} width="420px" textAlign="left" role="presentation">
           <Typography variant="h6" component="div" className="p-5 pb-0">
@@ -250,7 +251,7 @@ function SetupUserDrawer(props: IDrawer) {
           </Typography>
         </Box>
       </Drawer>
-    </React.Fragment>
+    </div>
   );
 }
 
