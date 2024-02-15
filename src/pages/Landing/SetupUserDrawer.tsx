@@ -134,6 +134,7 @@ function SetupUserDrawer(props: IDrawer) {
           setIsForgetPassword(false);
         }}
         className="sm:hidden"
+        PaperProps={{ id: "setup-user-drawer" }}
       >
         <Box p={2} width="420px" textAlign="left" role="presentation">
           <Typography variant="h6" component="div" className="p-5 pb-0">
@@ -318,7 +319,6 @@ function SetupUserDrawer(props: IDrawer) {
                     id="toggle-endpoint"
                   >
                     {isMember ? "SignUp" : "SignIn"}
-                    
                   </button>
                 </div>
               </div>
