@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../services/api";
 import { IAuthState, ILogin, IRegister, IResetPass } from "./types";
@@ -16,6 +17,7 @@ export const register = createAsyncThunk(
   async (userInfo: IRegister, thunkApi) => {
     try {
       const response = await api.post("/auth/register", userInfo);
+
       return response.data;
     } catch (err: any) {
       const msg =
@@ -31,6 +33,8 @@ export const login = createAsyncThunk(
   async (userInfo: ILogin, thunkApi) => {
     try {
       const response = await api.post("/auth/login", userInfo);
+      console.log(response.data);
+
       return response.data;
     } catch (err: any) {
       const msg =
@@ -68,7 +72,7 @@ export const resetPassword = createAsyncThunk(
       });
       return response.data;
     } catch (err: any) {
-      console.log(err)
+      console.log(err);
       const msg =
         typeof err?.response?.data?.message === "object"
           ? err?.response?.data?.message[0]
@@ -100,15 +104,24 @@ const AuthSlice = createSlice({
         alertType: alertType,
       };
     },
+    setCredentials: (state, action) => {
+      const { user, token } = action.payload;
+      if (user) {
+        state.user = user;
+      }
+      if (token) {
+        state.token = token;
+      }
+    },
   },
   extraReducers: (builder) => {
-    builder.addCase(register.pending, (state, action) => {
+    builder.addCase(register.pending, (state) => {
       state.isLoading = true;
       state.showAlert = true;
       state.alertText = "Creating your account...";
       state.alertType = "info";
     }),
-      builder.addCase(register.fulfilled, (state, action) => {
+      builder.addCase(register.fulfilled, (state) => {
         state.isLoading = false;
         state.showAlert = true;
         state.alertText = "Created your account and Please verify your email";
@@ -120,10 +133,10 @@ const AuthSlice = createSlice({
         state.alertText = action.payload as string;
         state.alertType = "error";
       }),
-      builder.addCase(login.pending, (state, action) => {
+      builder.addCase(login.pending, (state) => {
         state.isLoading = true;
       }),
-      builder.addCase(login.fulfilled, (state, action) => {
+      builder.addCase(login.fulfilled, (state) => {
         state.isLoading = false;
         state.showAlert = true;
         state.alertText = "Login successfully";
@@ -135,10 +148,10 @@ const AuthSlice = createSlice({
         state.alertText = action.payload as string;
         state.alertType = "error";
       }),
-      builder.addCase(forgetPassword.pending, (state, action) => {
+      builder.addCase(forgetPassword.pending, (state) => {
         state.isLoading = true;
       }),
-      builder.addCase(forgetPassword.fulfilled, (state, action) => {
+      builder.addCase(forgetPassword.fulfilled, (state) => {
         state.isLoading = false;
         state.showAlert = true;
         state.alertText = "Reset password was check in your email";
@@ -150,13 +163,14 @@ const AuthSlice = createSlice({
         state.alertText = action.payload as string;
         state.alertType = "error";
       }),
-      builder.addCase(resetPassword.pending, (state, action) => {
+      builder.addCase(resetPassword.pending, (state) => {
         state.isLoading = true;
       }),
-      builder.addCase(resetPassword.fulfilled, (state, action) => {
+      builder.addCase(resetPassword.fulfilled, (state) => {
         state.isLoading = false;
         state.showAlert = true;
-        state.alertText = "Your password has been reset . Try with new password";
+        state.alertText =
+          "Your password has been reset . Try with new password";
         state.alertType = "success";
       }),
       builder.addCase(resetPassword.rejected, (state, action) => {
@@ -168,6 +182,6 @@ const AuthSlice = createSlice({
   },
 });
 
-export const { clearAlert, displayAlert } = AuthSlice.actions;
+export const { clearAlert, displayAlert, setCredentials } = AuthSlice.actions;
 
 export default AuthSlice.reducer;

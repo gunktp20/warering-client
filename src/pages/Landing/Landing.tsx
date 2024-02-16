@@ -23,7 +23,7 @@ function Landing() {
           {whatWeDo.length > 0 &&
             whatWeDo.map((item) => {
               return (
-                <div>
+                <div key={item.title}>
                   <WeDoItem
                     img={item.img}
                     title={item.title}
