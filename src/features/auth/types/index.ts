@@ -1,9 +1,12 @@
+type role = "user" | "admin";
+
 export interface IAuthState {
   user: {
     username: string;
     firstname: string;
     lastname: string;
     email: string;
+    roles: role[];
   } | null;
   token: string | null;
   isLoading: boolean;

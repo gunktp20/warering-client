@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import Wrapper from '../../assets/wrappers/NotFound';
-// import img from '../assets/images/not-found.svg';
 import img from "../../assets/images/404 Error Page not Found with people connecting a plug-amico.svg"
 const NotFound = () => {
 

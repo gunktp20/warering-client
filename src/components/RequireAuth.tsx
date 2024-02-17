@@ -1,34 +1,29 @@
-import { useLocation, Navigate, Outlet } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
+import { useNavigate, Outlet } from "react-router-dom";
 import { useAppSelector } from "../app/hooks";
-import { Role, Roles } from "../constant/types/Role";
-import React from "react";
+import { Role } from "../constant/types/Role";
+import { useEffect } from "react";
 
-interface AccessTokenPayload {
-  sub: string;
-  username: string;
-  roles: [];
-  iat: number;
-  exp: number;
-}
 interface Props {
-  allowedRoles: Roles;
+  allow: Role;
 }
-const RequireAuth = ({ allowedRoles }: Props) => {
-  const location = useLocation();
-  const decoded: AccessTokenPayload | undefined = token
-    ? jwtDecode(token)
-    : undefined;
+const RequireAuth = ({ allow }: Props) => {
+  const navigate = useNavigate();
+  const { user } = useAppSelector((state) => state.auth);
 
-  const roles = decoded?.roles || [];
-  console.log(decoded);
+  useEffect(() => {
+    if (!user) {
+      navigate("/landing");
+      return;
+    }
+    const isAllowed = user?.roles.filter((role) => {
+      return role === allow;
+    }).length;
+    if (!isAllowed) {
+      navigate("/unauthorized");
+      return;
+    }
+  }, []);
 
-  return roles.find((role: Role) => allowedRoles.includes(role)) ? (
-    <Outlet />
-  ) : token ? (
-    <Navigate to="/unauthorized" state={{ from: location }} replace />
-  ) : (
-    <Navigate to="/landing" state={{ from: location }} replace />
-  );
+  return <Outlet />;
 };
 export default RequireAuth;

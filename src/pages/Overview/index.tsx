@@ -1,37 +1,33 @@
-import { jwtDecode } from "jwt-decode";
-import { useAppDispatch, useAppSelector } from "../../app/hooks"
-import { logout } from "../../features/auth/authSlice";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useNavigate } from "react-router-dom";
-
-interface AccessTokenPayload {
-  sub: string;
-  username: string;
-  roles: [];
-  iat: number;
-  exp: number;
-}
+import { logout } from "../../features/auth/authSlice";
 
 function Overview() {
-  const navigate = useNavigate()
   const dispatch = useAppDispatch();
-  const { token } = useAppSelector((state) => state.auth);
-  const decoded: AccessTokenPayload | undefined = token
-    ? jwtDecode(token)
-    : undefined;
-
-  const roles = decoded?.roles || [];
-  
+  const navigate = useNavigate()
+  const { user } = useAppSelector((state) => state.auth);
   return (
     <div className="flex flex-col">
-      <div className="mb-5 mt-5">
-        Overview
+      <div className="mb-5 mt-5">Overview</div>
+      <div>
+        Role :{" "}
+        {user?.roles.map((role) => {
+          return role;
+        })}
       </div>
-      <button id="logout-btn" onClick={() => {
-        dispatch(logout())
-        return;
-      }} className="bg-red-500 text-white px-5 w-[200px] py-2 rounded-md">Logout</button>
+      <button
+        id="logout-btn"
+        onClick={async () => {
+          await dispatch(logout());
+          navigate('/landing')
+          return;
+        }}
+        className="bg-red-500 text-white px-5 w-[200px] py-2 rounded-md"
+      >
+        Logout
+      </button>
     </div>
-  )
+  );
 }
 
-export default Overview
+export default Overview;

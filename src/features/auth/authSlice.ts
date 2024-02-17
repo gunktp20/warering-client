@@ -8,7 +8,7 @@ import {
   IRegister,
   IResetPass,
   AddUserFunc,
-  AccessTokenPayload
+  AccessTokenPayload,
 } from "./types";
 import { Role } from "../../constant/types/Role";
 
@@ -51,12 +51,6 @@ export const register = createAsyncThunk(
 export const login = createAsyncThunk(
   "auth/login",
   async (userInfo: ILogin, thunkApi) => {
-    const decoded: AccessTokenPayload | undefined = token
-    ? jwtDecode(token)
-    : undefined;
-    const roles = decoded?.roles || [];
-    const isRole = await roles.filter((role: Role) => role === "admin")
-    console.log("isRole",isRole)
     try {
       const response = await api.post("/auth/login", userInfo);
       const { username } = userInfo;
@@ -127,23 +121,20 @@ export const refreshToken = createAsyncThunk(
   }
 );
 
-export const logout = createAsyncThunk(
-  "auth/logout",
-  async (_: void, ) => {
-    // try {
-    //   const response = await api.post(`/auth/logout`);
-      removeUserFromLocalStorage()
-    //   return response.data;
-    // } catch (err: any) {
-    //   console.log(err)
-    //   const msg =
-    //     typeof err?.response?.data?.message === "object"
-    //       ? err?.response?.data?.message[0]
-    //       : err?.response?.data?.message;
-    //   return thunkApi.rejectWithValue(msg);
-    // }
-  }
-);
+export const logout = createAsyncThunk("auth/logout", async (_: void) => {
+  // try {
+  //   const response = await api.post(`/auth/logout`);
+  removeUserFromLocalStorage();
+  //   return response.data;
+  // } catch (err: any) {
+  //   console.log(err)
+  //   const msg =
+  //     typeof err?.response?.data?.message === "object"
+  //       ? err?.response?.data?.message[0]
+  //       : err?.response?.data?.message;
+  //   return thunkApi.rejectWithValue(msg);
+  // }
+});
 
 const AuthSlice = createSlice({
   name: "auth",
@@ -192,6 +183,11 @@ const AuthSlice = createSlice({
       }),
       builder.addCase(login.fulfilled, (state, action) => {
         const { user, access_token } = action.payload;
+        const decoded: AccessTokenPayload | undefined = access_token
+          ? jwtDecode(access_token)
+          : undefined;
+        const roles = decoded?.roles || [];
+        user.roles = roles;
         state.isLoading = false;
         state.user = user;
         state.token = access_token;
@@ -234,9 +230,9 @@ const AuthSlice = createSlice({
         state.alertText = action.payload as string;
         state.alertType = "error";
       });
-      builder.addCase(refreshToken.pending, (state) => {
-        state.isLoading = true;
-      }),
+    builder.addCase(refreshToken.pending, (state) => {
+      state.isLoading = true;
+    }),
       builder.addCase(refreshToken.fulfilled, (state, action) => {
         console.log(action.payload);
         state.isLoading = false;
@@ -251,15 +247,16 @@ const AuthSlice = createSlice({
         state.alertText = action.payload as string;
         state.alertType = "error";
       });
-      builder.addCase(logout.pending, (state) => {
-        state.isLoading = true;
-      }),
+    builder.addCase(logout.pending, (state) => {
+      state.isLoading = true;
+    }),
       builder.addCase(logout.fulfilled, (state) => {
         state.isLoading = false;
         state.showAlert = false;
         state.alertText = "";
         state.alertType = "";
         state.token = "";
+        state.user = null;
       }),
       builder.addCase(logout.rejected, (state, action) => {
         state.isLoading = false;
