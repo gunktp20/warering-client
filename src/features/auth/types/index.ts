@@ -38,3 +38,5 @@ export interface IResetPass {
   token: string | undefined;
   newPassword: string | undefined;
 }
+
+export type AddUserFunc = (user: { username: string }, token: string) => void;

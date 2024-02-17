@@ -1,6 +1,8 @@
 import { Drawer, Box, Typography, Alert } from "@mui/material";
 import { FormRow } from "../../components";
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   displayAlert,
@@ -8,6 +10,7 @@ import {
   register,
   login,
   forgetPassword,
+  refreshToken,
 } from "../../features/auth/authSlice";
 import { Link } from "react-router-dom";
 
@@ -39,6 +42,9 @@ const initialState: IValue = {
 };
 
 function SetupUserDrawer(props: IDrawer) {
+
+  const navigate = useNavigate();
+
   const { isDrawerOpen, setIsDrawerOpen, setIsMember, isMember } = props;
   const { isLoading, showAlert, alertText, alertType } = useAppSelector(
     (state) => state.auth
@@ -98,30 +104,36 @@ function SetupUserDrawer(props: IDrawer) {
       (!confirm_password && !isMember)
     ) {
       showDisplayAlert("error", "Please provide all value");
+
       return;
     }
 
     if (!isMember && confirm_password !== password) {
       showDisplayAlert("error", "Confirm password should be the same password");
+
       return;
     }
 
     if (!isMember && !isAcceptTerm) {
       showDisplayAlert("error", "You must accept term and condition before");
+
       return;
     }
 
     if (isMember) {
-      dispatch(login(values));
+      const responseLogin = await dispatch(login(values));
+      if (responseLogin.meta.requestStatus === "fulfilled") {
+        navigate("/");
+      }
       return;
     } else {
-      dispatch(register(values));
+      await dispatch(register(values));
       return;
     }
   };
 
   useEffect(() => {
-    dispatch(clearAlert());
+
   }, []);
 
   return (
@@ -305,6 +317,7 @@ function SetupUserDrawer(props: IDrawer) {
                 >
                   {isLoading ? "Loading..." : isMember ? "Sign In" : "Sign Up"}
                 </button>
+               
                 <div className="flex mt-4 justify-end pr-2">
                   <p className="text-[12px] text-[#333]">
                     {isMember ? "Not a member yet?" : "Already a member?"}
@@ -318,9 +331,18 @@ function SetupUserDrawer(props: IDrawer) {
                     id="toggle-endpoint"
                   >
                     {isMember ? "SignUp" : "SignIn"}
-                    
+
                   </button>
                 </div>
+                <button
+                  onClick={() => {
+                      dispatch(refreshToken());
+                  }}
+                  className="btn border-[#1966fb] border-[1.5px] text-[12px] shadow-none text-[#1966fb]"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Loading..." :"Request Refresh Token"}
+                </button>
               </div>
             )}
           </Typography>

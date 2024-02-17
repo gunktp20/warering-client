@@ -11,10 +11,7 @@ function Introduction() {
         </Fade>
         <Fade direction="up">
           <div className="platform-intro text-[13.5px] text-[#ffffffd0]">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quidem
-            perspiciatis sint sit, omnis inventore magni! Ex magnam aut
-            exercitationem, nam magni at, iusto placeat nostrum vitae, ratione
-            in dignissimos impedit sapiente! Asperiores at autem veritatis?
+            Develop the IoT Platform system with the concept of agile software development. It presents a system that can efficiently provide IoT services in education through cloud computing on a web browser.
           </div>
         </Fade>
       </div>

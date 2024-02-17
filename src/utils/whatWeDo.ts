@@ -7,19 +7,19 @@ const whatWeDo = [
     img: storage,
     title: "Storage",
     description:
-      "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nostrum, architecto.",
+      "Data Storage (Data Storage) The process used to collect data from IoT devices so that they can be used later.",
   },
   {
     img: control,
     title: "Control",
     description:
-      "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nostrum, architecto.",
+      "Device Control Manage and control IoT devices through a web browser or application.",
   },
   {
     img: display,
     title: "Display",
     description:
-      "Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nostrum, architecto.",
+      "The developed system has the ability to manage data display devices through graphics.",
   },
 ];
 

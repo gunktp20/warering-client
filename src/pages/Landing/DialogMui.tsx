@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
-import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
 import { login, register, forgetPassword, clearAlert, displayAlert } from '../../features/auth/authSlice';
@@ -119,10 +116,6 @@ export default function AlertDialogSlide(props: IDrawer
             return;
         }
 
-    };
-
-    const handleClickOpen = () => {
-        setIsDrawerOpen(true);
     };
 
     const handleClose = () => {

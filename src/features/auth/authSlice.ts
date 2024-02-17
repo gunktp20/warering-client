@@ -1,14 +1,33 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../services/api";
-import { IAuthState, ILogin, IRegister, IResetPass } from "./types";
+import {
+  IAuthState,
+  ILogin,
+  IRegister,
+  IResetPass,
+  AddUserFunc,
+} from "./types";
+
+const user = localStorage.getItem("user");
+const token = localStorage.getItem("token");
 
 const initialState: IAuthState = {
-  user: null,
-  token: "",
+  user: user ? JSON.parse(user) : null,
+  token: token || null,
   isLoading: false,
   showAlert: false,
   alertText: "",
   alertType: "",
+};
+
+const addUserToLocalStorage: AddUserFunc = (user, token) => {
+  localStorage.setItem("user", JSON.stringify(user));
+  localStorage.setItem("token", token);
+};
+const removeUserFromLocalStorage = () => {
+  localStorage.removeItem("user");
+  localStorage.removeItem("token");
 };
 
 export const register = createAsyncThunk(
@@ -31,7 +50,13 @@ export const login = createAsyncThunk(
   async (userInfo: ILogin, thunkApi) => {
     try {
       const response = await api.post("/auth/login", userInfo);
-      return response.data;
+      const { username } = userInfo;
+      return {
+        ...response.data,
+        user: {
+          username,
+        },
+      };
     } catch (err: any) {
       const msg =
         typeof err?.response?.data?.message === "object"
@@ -68,13 +93,46 @@ export const resetPassword = createAsyncThunk(
       });
       return response.data;
     } catch (err: any) {
-      console.log(err)
       const msg =
         typeof err?.response?.data?.message === "object"
           ? err?.response?.data?.message[0]
           : err?.response?.data?.message;
       return thunkApi.rejectWithValue(msg);
     }
+  }
+);
+
+export const refreshToken = createAsyncThunk(
+  "auth/refresh-token",
+  async (_: void, thunkApi: any) => {
+    try {
+      const response = await api.get(`/auth/refresh`);
+      return response.data;
+    } catch (err: any) {
+      const msg =
+        typeof err?.response?.data?.message === "object"
+          ? err?.response?.data?.message[0]
+          : err?.response?.data?.message;
+      return thunkApi.rejectWithValue(msg);
+    }
+  }
+);
+
+export const logout = createAsyncThunk(
+  "auth/logout",
+  async (_: void, ) => {
+    // try {
+    //   const response = await api.post(`/auth/logout`);
+      removeUserFromLocalStorage()
+    //   return response.data;
+    // } catch (err: any) {
+    //   console.log(err)
+    //   const msg =
+    //     typeof err?.response?.data?.message === "object"
+    //       ? err?.response?.data?.message[0]
+    //       : err?.response?.data?.message;
+    //   return thunkApi.rejectWithValue(msg);
+    // }
   }
 );
 
@@ -102,13 +160,13 @@ const AuthSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(register.pending, (state, action) => {
+    builder.addCase(register.pending, (state) => {
       state.isLoading = true;
       state.showAlert = true;
       state.alertText = "Creating your account...";
       state.alertType = "info";
     }),
-      builder.addCase(register.fulfilled, (state, action) => {
+      builder.addCase(register.fulfilled, (state) => {
         state.isLoading = false;
         state.showAlert = true;
         state.alertText = "Created your account and Please verify your email";
@@ -120,14 +178,15 @@ const AuthSlice = createSlice({
         state.alertText = action.payload as string;
         state.alertType = "error";
       }),
-      builder.addCase(login.pending, (state, action) => {
+      builder.addCase(login.pending, (state) => {
         state.isLoading = true;
       }),
       builder.addCase(login.fulfilled, (state, action) => {
+        const { user, access_token } = action.payload;
         state.isLoading = false;
-        state.showAlert = true;
-        state.alertText = "Login successfully";
-        state.alertType = "success";
+        state.user = user;
+        state.token = access_token;
+        addUserToLocalStorage(user, access_token);
       }),
       builder.addCase(login.rejected, (state, action) => {
         state.isLoading = false;
@@ -135,10 +194,10 @@ const AuthSlice = createSlice({
         state.alertText = action.payload as string;
         state.alertType = "error";
       }),
-      builder.addCase(forgetPassword.pending, (state, action) => {
+      builder.addCase(forgetPassword.pending, (state) => {
         state.isLoading = true;
       }),
-      builder.addCase(forgetPassword.fulfilled, (state, action) => {
+      builder.addCase(forgetPassword.fulfilled, (state) => {
         state.isLoading = false;
         state.showAlert = true;
         state.alertText = "Reset password was check in your email";
@@ -150,16 +209,50 @@ const AuthSlice = createSlice({
         state.alertText = action.payload as string;
         state.alertType = "error";
       }),
-      builder.addCase(resetPassword.pending, (state, action) => {
+      builder.addCase(resetPassword.pending, (state) => {
         state.isLoading = true;
       }),
-      builder.addCase(resetPassword.fulfilled, (state, action) => {
+      builder.addCase(resetPassword.fulfilled, (state) => {
         state.isLoading = false;
         state.showAlert = true;
-        state.alertText = "Your password has been reset . Try with new password";
+        state.alertText =
+          "Your password has been reset . Try with new password";
         state.alertType = "success";
       }),
       builder.addCase(resetPassword.rejected, (state, action) => {
+        state.isLoading = false;
+        state.showAlert = true;
+        state.alertText = action.payload as string;
+        state.alertType = "error";
+      });
+      builder.addCase(refreshToken.pending, (state) => {
+        state.isLoading = true;
+      }),
+      builder.addCase(refreshToken.fulfilled, (state, action) => {
+        console.log(action.payload);
+        state.isLoading = false;
+        state.showAlert = true;
+        state.alertText = `Your access token is : ${action.payload.access_token}`;
+        state.alertType = "success";
+        state.token = action.payload.access_token;
+      }),
+      builder.addCase(refreshToken.rejected, (state, action) => {
+        state.isLoading = false;
+        state.showAlert = true;
+        state.alertText = action.payload as string;
+        state.alertType = "error";
+      });
+      builder.addCase(logout.pending, (state) => {
+        state.isLoading = true;
+      }),
+      builder.addCase(logout.fulfilled, (state) => {
+        state.isLoading = false;
+        state.showAlert = false;
+        state.alertText = "";
+        state.alertType = "";
+        state.token = "";
+      }),
+      builder.addCase(logout.rejected, (state, action) => {
         state.isLoading = false;
         state.showAlert = true;
         state.alertText = action.payload as string;
