@@ -2,7 +2,6 @@ import { jwtDecode } from "jwt-decode";
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { logout } from "../../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
 
 interface AccessTokenPayload {
   sub: string;
