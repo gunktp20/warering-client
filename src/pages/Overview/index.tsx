@@ -21,16 +21,7 @@ function Overview() {
     : undefined;
 
   const roles = decoded?.roles || [];
-  console.log(roles)
-  const isAdmin = roles.filter((role)=>{ return role == "admin"})
-  console.log(isAdmin)
   
-  useEffect(()=>{
-    if(isAdmin){
-      navigate("/admin")
-    }
-  })
-
   return (
     <div className="flex flex-col">
       <div className="mb-5 mt-5">
