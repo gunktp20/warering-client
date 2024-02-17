@@ -39,4 +39,12 @@ export interface IResetPass {
   newPassword: string | undefined;
 }
 
+export interface AccessTokenPayload {
+  sub: string;
+  username: string;
+  roles: [];
+  iat: number;
+  exp: number;
+}
+
 export type AddUserFunc = (user: { username: string }, token: string) => void;

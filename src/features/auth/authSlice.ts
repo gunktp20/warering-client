@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../services/api";
+import { jwtDecode } from "jwt-decode";
 import {
   IAuthState,
   ILogin,
   IRegister,
   IResetPass,
   AddUserFunc,
+  AccessTokenPayload
 } from "./types";
+import { Role } from "../../constant/types/Role";
 
 const user = localStorage.getItem("user");
 const token = localStorage.getItem("token");
@@ -48,6 +51,12 @@ export const register = createAsyncThunk(
 export const login = createAsyncThunk(
   "auth/login",
   async (userInfo: ILogin, thunkApi) => {
+    const decoded: AccessTokenPayload | undefined = token
+    ? jwtDecode(token)
+    : undefined;
+    const roles = decoded?.roles || [];
+    const isRole = await roles.filter((role: Role) => role === "admin")
+    console.log("isRole",isRole)
     try {
       const response = await api.post("/auth/login", userInfo);
       const { username } = userInfo;

@@ -1,8 +1,8 @@
 import { useLocation, Navigate, Outlet } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-
 import { useAppSelector } from "../app/hooks";
 import { Role, Roles } from "../constant/types/Role";
+import React from "react";
 
 interface AccessTokenPayload {
   sub: string;
@@ -15,7 +15,6 @@ interface Props {
   allowedRoles: Roles;
 }
 const RequireAuth = ({ allowedRoles }: Props) => {
-  const { token } = useAppSelector((state) => state.auth);
   const location = useLocation();
   const decoded: AccessTokenPayload | undefined = token
     ? jwtDecode(token)
