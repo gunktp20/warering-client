@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import Wrapper from '../../assets/wrappers/Unauthorized';
 import img from "../../assets/images/401 Error Unauthorized-rafiki.svg"
 const NotFound = () => {
-
     return (
         <Wrapper>
             <div>

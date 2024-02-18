@@ -1,4 +1,4 @@
-import { Drawer, Box, Typography, Alert } from "@mui/material";
+import { Drawer, Box, Typography, Alert, Button } from "@mui/material";
 import { FormRow } from "../../components";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -42,7 +42,6 @@ const initialState: IValue = {
 };
 
 function SetupUserDrawer(props: IDrawer) {
-
   const navigate = useNavigate();
 
   const { isDrawerOpen, setIsDrawerOpen, setIsMember, isMember } = props;
@@ -132,9 +131,7 @@ function SetupUserDrawer(props: IDrawer) {
     }
   };
 
-  useEffect(() => {
-
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <div>
@@ -176,14 +173,23 @@ function SetupUserDrawer(props: IDrawer) {
                   handleChange={handleChange}
                 />
 
-                <button
-                  className="btn btn-primary text-[12px]"
-                  id="forget-pass-submit"
-                  onClick={onSubmit}
+                <Button
+                  onClick={() => {
+                    onSubmit();
+                  }}
+                  style={{
+                    backgroundColor: "#1966fb",
+                    textTransform: "none",
+                    width: "100%",
+                    height: "39px",
+                    marginTop: "1rem",
+                  }}
+                  variant="contained"
                   disabled={isLoading}
+                  id="forget-pass-submit"
                 >
                   {isLoading ? "Loading..." : "Continue"}
-                </button>
+                </Button>
               </div>
             ) : (
               <div>
@@ -294,7 +300,7 @@ function SetupUserDrawer(props: IDrawer) {
                       </label>
                     </div>
                     <div className="flex items-center">
-                      <div
+                      <button
                         onClick={() => {
                           setIsForgetPassword(true);
                           dispatch(clearAlert());
@@ -303,26 +309,34 @@ function SetupUserDrawer(props: IDrawer) {
                         id="forget-pass-btn"
                       >
                         Forget Password ?
-                      </div>
+                      </button>
                     </div>
                   </div>
                 )}
 
-                <button
+                <Button
                   onClick={() => {
                     onSubmit();
                   }}
-                  className="btn btn-primary text-[14px]"
+                  style={{
+                    backgroundColor: "#1966fb",
+                    textTransform: "none",
+                    width: "100%",
+                    height: "39px",
+                    marginTop: "1.5rem",
+                  }}
+                  variant="contained"
                   disabled={isLoading}
                   id="setup-user-submit"
                 >
                   {isLoading ? "Loading..." : isMember ? "Sign In" : "Sign Up"}
-                </button>
-               
+                </Button>
+
                 <div className="flex mt-4 justify-end pr-2">
                   <p className="text-[12px] text-[#333]">
                     {isMember ? "Not a member yet?" : "Already a member?"}
                   </p>
+
                   <button
                     className="text-[12px] ml-2 text-[#3173B1] bg-none cursor-pointer"
                     onClick={() => {
@@ -332,18 +346,8 @@ function SetupUserDrawer(props: IDrawer) {
                     id="toggle-endpoint"
                   >
                     {isMember ? "SignUp" : "SignIn"}
-
                   </button>
                 </div>
-                <button
-                  onClick={() => {
-                      dispatch(refreshToken());
-                  }}
-                  className="btn border-[#1966fb] border-[1.5px] text-[12px] shadow-none text-[#1966fb]"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Loading..." :"Request Refresh Token"}
-                </button>
               </div>
             )}
           </Typography>

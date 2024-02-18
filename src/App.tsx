@@ -9,7 +9,7 @@ import {
   Overview,
   AdminDashboard,
 } from "./pages";
-import RequireAuth from "./components/RequireAuth";
+import { RequireAdmin , RequireUser} from "./components";
 
 function App() {
   return (
@@ -18,10 +18,10 @@ function App() {
         <Route path="/landing" element={<Landing />} />
         <Route path="/reset-password/:token" element={<ResetPass />} />
         <Route path="/term-condition" element={<TermAndCondition />} />
-        <Route element={<RequireAuth allow="user" />}>
+        <Route element={<RequireUser/>}>
           <Route path="/" element={<Overview />} />
         </Route>
-        <Route element={<RequireAuth allow="admin" />}>
+        <Route element={<RequireAdmin/>}>
           <Route path="/admin" element={<AdminDashboard />} />
         </Route>
         <Route path="/unauthorized" element={<Unauthorized />} />

@@ -1,30 +1,24 @@
 import { useEffect } from "react";
 import { useAppSelector } from "../app/hooks";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Outlet } from "react-router-dom";
 
-type Prop = {
-  children: string | JSX.Element;
-};
-
-const isAllowed = "admin";
-
-function RequireAdmin(props: Prop) {
+function RequireAdmin() {
   const navigate = useNavigate();
   const { user } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     if (!user) {
-      navigate("/unauthorized");
+      navigate("/landing");
     }
     const isAdmin = user?.roles.filter((role) => {
-      return role === isAllowed;
+      return role === "admin";
     }).length;
     if (!isAdmin) {
       navigate("/unauthorized");
     }
   }, []);
 
-  return props.children;
+  return <Outlet />;
 }
 
 export default RequireAdmin;
