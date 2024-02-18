@@ -145,6 +145,8 @@ export default function AlertDialogSlide(props: IDrawer) {
           <DialogContentText
             id="alert-dialog-slide-description"
             className="p-3 "
+            component={"div"}
+            variant={"body2"}
           >
             <div
               onClick={handleClose}
