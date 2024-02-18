@@ -10,7 +10,6 @@ import {
   AddUserFunc,
   AccessTokenPayload,
 } from "./types";
-import { Role } from "../../constant/types/Role";
 
 const user = localStorage.getItem("user");
 const token = localStorage.getItem("token");
@@ -121,20 +120,29 @@ export const refreshToken = createAsyncThunk(
   }
 );
 
-export const logout = createAsyncThunk("auth/logout", async (_: void) => {
-  // try {
-  //   const response = await api.post(`/auth/logout`);
-  removeUserFromLocalStorage();
-  //   return response.data;
-  // } catch (err: any) {
-  //   console.log(err)
-  //   const msg =
-  //     typeof err?.response?.data?.message === "object"
-  //       ? err?.response?.data?.message[0]
-  //       : err?.response?.data?.message;
-  //   return thunkApi.rejectWithValue(msg);
-  // }
-});
+export const logout = createAsyncThunk(
+  "auth/logout",
+  async (token: string | null | void, thunkApi) => {
+    try {
+      const response = await api.post(
+        `/auth/logout`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      removeUserFromLocalStorage();
+      return response.data;
+    } catch (err: any) {
+      console.log(err);
+      const msg =
+        typeof err?.response?.data?.message === "object"
+          ? err?.response?.data?.message[0]
+          : err?.response?.data?.message;
+      return thunkApi.rejectWithValue(msg);
+    }
+  }
+);
 
 const AuthSlice = createSlice({
   name: "auth",
@@ -234,11 +242,10 @@ const AuthSlice = createSlice({
       state.isLoading = true;
     }),
       builder.addCase(refreshToken.fulfilled, (state, action) => {
-        console.log(action.payload);
         state.isLoading = false;
         state.showAlert = true;
-        state.alertText = `Your access token is : ${action.payload.access_token}`;
-        state.alertType = "success";
+        state.alertText = "";
+        state.alertType = "";
         state.token = action.payload.access_token;
       }),
       builder.addCase(refreshToken.rejected, (state, action) => {

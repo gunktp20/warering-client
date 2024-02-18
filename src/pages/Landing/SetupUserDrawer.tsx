@@ -131,8 +131,6 @@ function SetupUserDrawer(props: IDrawer) {
     }
   };
 
-  useEffect(() => {}, []);
-
   return (
     <div>
       <Drawer

@@ -16,7 +16,7 @@ function RequireAdmin() {
     if (!isAdmin) {
       navigate("/unauthorized");
     }
-  }, []);
+  }, [user]);
 
   return <Outlet />;
 }

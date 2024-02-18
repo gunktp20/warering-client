@@ -12,7 +12,7 @@ import {
   displayAlert,
 } from "../../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FormRow } from "../../components";
 import { Alert, Button } from "@mui/material";
 
@@ -39,6 +39,7 @@ interface IValue {
   email: string | undefined;
   password: string;
   confirm_password: string | undefined;
+  email_forget_password: string | undefined;
 }
 
 const initialState: IValue = {
@@ -48,6 +49,7 @@ const initialState: IValue = {
   email: "",
   password: "",
   confirm_password: "",
+  email_forget_password: "",
 };
 
 export default function AlertDialogSlide(props: IDrawer) {
@@ -55,6 +57,8 @@ export default function AlertDialogSlide(props: IDrawer) {
   const { isLoading, showAlert, alertText, alertType } = useAppSelector(
     (state) => state.auth
   );
+  
+  const navigate = useNavigate();
 
   const [values, setValues] = useState<IValue>(initialState);
   const [isForgetPassword, setIsForgetPassword] = useState<boolean>(false);
@@ -82,15 +86,22 @@ export default function AlertDialogSlide(props: IDrawer) {
   };
 
   const onSubmit = async () => {
-    const { username, firstName, lastName, email, password, confirm_password } =
-      values;
+    const {
+      username,
+      firstName,
+      lastName,
+      email,
+      password,
+      confirm_password,
+      email_forget_password,
+    } = values;
 
     if (isForgetPassword) {
-      if (!email) {
+      if (!email_forget_password) {
         showDisplayAlert("error", "Please provide an email");
         return;
       }
-      await dispatch(forgetPassword(email));
+      await dispatch(forgetPassword(email_forget_password));
       return;
     }
 
@@ -103,24 +114,30 @@ export default function AlertDialogSlide(props: IDrawer) {
       (!confirm_password && !isMember)
     ) {
       showDisplayAlert("error", "Please provide all value");
+
       return;
     }
 
     if (!isMember && confirm_password !== password) {
       showDisplayAlert("error", "Confirm password should be the same password");
+
       return;
     }
 
     if (!isMember && !isAcceptTerm) {
       showDisplayAlert("error", "You must accept term and condition before");
+
       return;
     }
 
     if (isMember) {
-      dispatch(login(values));
+      const responseLogin = await dispatch(login(values));
+      if (responseLogin.meta.requestStatus === "fulfilled") {
+        navigate("/");
+      }
       return;
     } else {
-      dispatch(register(values));
+      await dispatch(register(values));
       return;
     }
   };
@@ -174,11 +191,12 @@ export default function AlertDialogSlide(props: IDrawer) {
 
                 <FormRow
                   type="text"
-                  name="email"
+                  name="email_forget_password"
                   labelText="Email"
-                  value={values.email}
+                  value={values.email_forget_password}
                   handleChange={handleChange}
                 />
+
                 <Button
                   onClick={() => {
                     onSubmit();

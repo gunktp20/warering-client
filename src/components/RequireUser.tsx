@@ -17,7 +17,7 @@ function RequireUser() {
     if (isAdmin) {
       navigate("/admin");
     }
-  }, []);
+  }, [user]);
 
   return <Outlet />;
 }

@@ -1,9 +1,4 @@
 import axios from "axios";
-// import { useAppDispatch } from "../app/hooks";
-// import { refreshToken } from "../features/auth/authSlice";
-
-// const dispatch = useAppDispatch();
-// const { token } = useAppSelector(state => state.auth)
 
 const api = axios.create({
   baseURL: "http://localhost:3000/",
@@ -13,23 +8,12 @@ const api = axios.create({
   },
 });
 
-// api.interceptors.request.use(
-//   (config) => {
-//     config.headers["Authorization"] = `Bearer ${token}`;
-
-//     return config;
-//   },
-//   (err) => {
-//     return Promise.reject(err);
-//   }
-// );
-
 // api.interceptors.response.use(
 //   (response) => {
 //     return response;
 //   },
 //   (err) => {
-//     if (err.response.status === 401) {
+//     if (err.response.status === 403) {
 //       dispatch(refreshToken())
 //       return
 //     }

@@ -1,15 +1,13 @@
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import {
-  Landing,
-  ResetPass,
-  TermAndCondition,
-  NotFound,
-  Unauthorized,
-  Overview,
-  AdminDashboard,
-} from "./pages";
-import { RequireAdmin , RequireUser} from "./components";
+import { RequireAdmin, RequireUser } from "./components";
+import Landing from "./pages/Landing";
+import ResetPass from "./pages/ResetPass";
+import TermAndCondition from "./pages/TermAndCondition";
+import Overview from "./pages/Overview";
+import AdminDashboard from "./pages/AdminDashboard";
+import Unauthorized from "./pages/Unauthorized";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -18,10 +16,10 @@ function App() {
         <Route path="/landing" element={<Landing />} />
         <Route path="/reset-password/:token" element={<ResetPass />} />
         <Route path="/term-condition" element={<TermAndCondition />} />
-        <Route element={<RequireUser/>}>
+        <Route element={<RequireUser />}>
           <Route path="/" element={<Overview />} />
         </Route>
-        <Route element={<RequireAdmin/>}>
+        <Route element={<RequireAdmin />}>
           <Route path="/admin" element={<AdminDashboard />} />
         </Route>
         <Route path="/unauthorized" element={<Unauthorized />} />
