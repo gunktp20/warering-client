@@ -13,7 +13,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/landing" element={<Landing />} />
+        <Route path="/home" element={<Landing />} />
         <Route path="/reset-password/:token" element={<ResetPass />} />
         <Route path="/term-condition" element={<TermAndCondition />} />
         <Route element={<RequireUser />}>

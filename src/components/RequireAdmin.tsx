@@ -8,13 +8,16 @@ function RequireAdmin() {
 
   useEffect(() => {
     if (!user) {
-      navigate("/landing");
+      console.log("!user")
+      navigate("/home");
+      return
     }
     const isAdmin = user?.roles.filter((role) => {
       return role === "admin";
     }).length;
     if (!isAdmin) {
       navigate("/unauthorized");
+      return
     }
   }, [user]);
 

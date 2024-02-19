@@ -8,7 +8,8 @@ function RequireUser() {
 
   useEffect(() => {
     if (!user) {
-      navigate("/landing");
+      navigate("/home");
+      return
     }
   
     const isAdmin = user?.roles.filter((role) => {
@@ -16,6 +17,7 @@ function RequireUser() {
     }).length;
     if (isAdmin) {
       navigate("/admin");
+      return
     }
   }, [user]);
 

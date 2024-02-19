@@ -134,7 +134,18 @@ export const logout = createAsyncThunk(
       removeUserFromLocalStorage();
       return response.data;
     } catch (err: any) {
-      console.log(err);
+      if(err.response.status){
+        try {
+          const response = await api.get(`/auth/refresh`);
+          return response.data;
+        } catch (err: any) {
+          const msg =
+            typeof err?.response?.data?.message === "object"
+              ? err?.response?.data?.message[0]
+              : err?.response?.data?.message;
+          return thunkApi.rejectWithValue(msg);
+        }
+      }
       const msg =
         typeof err?.response?.data?.message === "object"
           ? err?.response?.data?.message[0]

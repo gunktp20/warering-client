@@ -1,5 +1,4 @@
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { useNavigate } from "react-router-dom";
 import { logout, refreshToken } from "../../features/auth/authSlice";
 
 function Overview() {
@@ -18,10 +17,6 @@ function Overview() {
         id="logout-btn"
         onClick={async () => {
           const responseLogout = await dispatch(logout(token));
-          if (responseLogout.payload === "Forbidden") {
-            await dispatch(refreshToken());
-            await dispatch(logout(token));
-          }
         }}
         className="bg-red-500 text-white px-5 w-[200px] py-2 rounded-md"
       >
