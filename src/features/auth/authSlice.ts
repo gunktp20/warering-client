@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../services/api";
 import { jwtDecode } from "jwt-decode";
 import {
@@ -120,40 +120,35 @@ export const refreshToken = createAsyncThunk(
   }
 );
 
-export const logout = createAsyncThunk(
-  "auth/logout",
-  async (token: string | null | void, thunkApi) => {
-    try {
-      const response = await api.post(
-        `/auth/logout`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      removeUserFromLocalStorage();
-      return response.data;
-    } catch (err: any) {
-      if(err.response.status){
-        try {
-          const response = await api.get(`/auth/refresh`);
-          return response.data;
-        } catch (err: any) {
-          const msg =
-            typeof err?.response?.data?.message === "object"
-              ? err?.response?.data?.message[0]
-              : err?.response?.data?.message;
-          return thunkApi.rejectWithValue(msg);
-        }
-      }
-      const msg =
-        typeof err?.response?.data?.message === "object"
-          ? err?.response?.data?.message[0]
-          : err?.response?.data?.message;
-      return thunkApi.rejectWithValue(msg);
-    }
-  }
-);
+// export const logout = createAsyncThunk(
+//   "auth/logout",
+//   async (token: string | null | void, thunkApi) => {
+//     try {
+//       const response = await api.post(
+//         `/auth/logout`,
+//         {},
+//         {
+//           headers: { Authorization: `Bearer ${token}` },
+//         }
+//       );
+//       removeUserFromLocalStorage();
+//       return response.data;
+//     } catch (err: any) {
+//       console.log(err.response.status)
+//       if (err.response.status === 403) {
+//           const { data } = await api.get(`/auth/refresh`);
+//           console.log("retry logout")
+//           logout(data.access_token);
+//           return;
+//       }
+//       const msg =
+//         typeof err?.response?.data?.message === "object"
+//           ? err?.response?.data?.message[0]
+//           : err?.response?.data?.message;
+//       return thunkApi.rejectWithValue(msg);
+//     }
+//   }
+// );
 
 const AuthSlice = createSlice({
   name: "auth",
@@ -175,6 +170,20 @@ const AuthSlice = createSlice({
         showAlert: true,
         alertText: alertText,
         alertType: alertType,
+      };
+    },
+    logout: (state) =>{
+      removeUserFromLocalStorage();
+      return {
+        ...state,
+        user: null,
+        token: "",
+      };
+    },
+    setCredential: (state, action) => {
+      return {
+        ...state,
+        token: action.payload,
       };
     },
   },
@@ -265,26 +274,27 @@ const AuthSlice = createSlice({
         state.alertText = action.payload as string;
         state.alertType = "error";
       });
-    builder.addCase(logout.pending, (state) => {
-      state.isLoading = true;
-    }),
-      builder.addCase(logout.fulfilled, (state) => {
-        state.isLoading = false;
-        state.showAlert = false;
-        state.alertText = "";
-        state.alertType = "";
-        state.token = "";
-        state.user = null;
-      }),
-      builder.addCase(logout.rejected, (state, action) => {
-        state.isLoading = false;
-        state.showAlert = true;
-        state.alertText = action.payload as string;
-        state.alertType = "error";
-      });
+    // builder.addCase(logout.pending, (state) => {
+    //   state.isLoading = true;
+    // }),
+    //   builder.addCase(logout.fulfilled, (state) => {
+    //     state.isLoading = false;
+    //     state.showAlert = false;
+    //     state.alertText = "";
+    //     state.alertType = "";
+    //     state.token = "";
+    //     state.user = null;
+    //   }),
+    //   builder.addCase(logout.rejected, (state, action) => {
+    //     state.isLoading = false;
+    //     state.showAlert = true;
+    //     state.alertText = action.payload as string;
+    //     state.alertType = "error";
+    //   });
   },
 });
 
-export const { clearAlert, displayAlert } = AuthSlice.actions;
+export const { logout, clearAlert, displayAlert, setCredential } =
+  AuthSlice.actions;
 
 export default AuthSlice.reducer;

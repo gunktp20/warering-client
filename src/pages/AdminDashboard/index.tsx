@@ -1,9 +1,23 @@
-import { useAppDispatch , useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { logout } from "../../features/auth/authSlice";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 function AdminDashboard() {
   const dispatch = useAppDispatch();
-  const { user , token} = useAppSelector((state) => state.auth)
+  const axiosPrivate = useAxiosPrivate();
+  const { user, token } = useAppSelector((state) => state.auth);
+
+  const signOut = async () => {
+    dispatch(logout());
+    await axiosPrivate.post(
+      `/auth/logout`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+  };
+
   return (
     <div className="flex flex-col">
       <div className="mb-5 mt-5">AdminDashboard</div>
@@ -15,9 +29,7 @@ function AdminDashboard() {
       </div>
       <button
         id="logout-btn"
-        onClick={async () => {
-          const responseLogout = await dispatch(logout(token));
-        }}
+        onClick={signOut}
         className="bg-red-500 text-white px-5 w-[200px] py-2 rounded-md"
       >
         Logout

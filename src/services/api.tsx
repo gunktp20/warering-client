@@ -8,18 +8,13 @@ const api = axios.create({
   },
 });
 
-// api.interceptors.response.use(
-//   (response) => {
-//     return response;
-//   },
-//   (err) => {
-//     if (err.response.status === 403) {
-//       dispatch(refreshToken())
-//       return
-//     }
-//     return Promise.reject(err);
-//   }
-// );
+export const axiosPrivate = axios.create({
+  baseURL: "http://localhost:3000/",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  withCredentials: true,
+});
 
 
 export default api;
