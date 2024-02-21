@@ -1,8 +1,7 @@
-import { Drawer, Box, Typography, Alert, Button } from "@mui/material";
+import { Drawer, Box, Typography, Alert, Button, makeStyles } from "@mui/material";
 import { FormRow } from "../../components";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   displayAlert,
@@ -10,9 +9,10 @@ import {
   register,
   login,
   forgetPassword,
-  refreshToken,
 } from "../../features/auth/authSlice";
 import { Link } from "react-router-dom";
+
+
 
 interface IDrawer {
   isDrawerOpen: boolean;
@@ -48,6 +48,17 @@ function SetupUserDrawer(props: IDrawer) {
   const { isLoading, showAlert, alertText, alertType } = useAppSelector(
     (state) => state.auth
   );
+
+  const styles = {
+    button: {
+      backgroundColor: '#3c52b2',
+      color: '#fff',
+      '&:hover': {
+        backgroundColor: '#fff',
+        color: '#3c52b2',
+      }
+    }
+  }
 
   const [values, setValues] = useState<IValue>(initialState);
   const [isForgetPassword, setIsForgetPassword] = useState<boolean>(false);
@@ -317,11 +328,19 @@ function SetupUserDrawer(props: IDrawer) {
                     onSubmit();
                   }}
                   style={{
-                    backgroundColor: "#1966fb",
                     textTransform: "none",
                     width: "100%",
                     height: "39px",
                     marginTop: "1.5rem",
+                  }}
+                  sx={{
+                    bgcolor: "#1966fb",
+                    ":hover": {
+                      bgcolor: "#10269C"
+                    },
+                    ":disabled":{
+                      color:"#fff",
+                    }
                   }}
                   variant="contained"
                   disabled={isLoading}

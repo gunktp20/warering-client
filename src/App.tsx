@@ -8,6 +8,8 @@ import Overview from "./pages/Overview";
 import AdminDashboard from "./pages/AdminDashboard";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
+import Dashboard from "./pages/Dashboard";
+import Device from "./pages/Device";
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
         <Route path="/term-condition" element={<TermAndCondition />} />
         <Route element={<RequireUser />}>
           <Route path="/" element={<Overview />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/device" element={<Device />} />
         </Route>
         <Route element={<RequireAdmin />}>
           <Route path="/admin" element={<AdminDashboard />} />
