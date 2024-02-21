@@ -57,7 +57,7 @@ export default function AlertDialogSlide(props: IDrawer) {
   const { isLoading, showAlert, alertText, alertType } = useAppSelector(
     (state) => state.auth
   );
-  
+
   const navigate = useNavigate();
 
   const [values, setValues] = useState<IValue>(initialState);
@@ -202,11 +202,19 @@ export default function AlertDialogSlide(props: IDrawer) {
                     onSubmit();
                   }}
                   style={{
-                    backgroundColor: "#1966fb",
                     textTransform: "none",
                     width: "100%",
                     height: "39px",
                     marginTop: "1rem",
+                  }}
+                  sx={{
+                    bgcolor: "#1966fb",
+                    ":hover": {
+                      bgcolor: "#10269C",
+                    },
+                    ":disabled": {
+                      color: "#fff",
+                    },
                   }}
                   variant="contained"
                   disabled={isLoading}
@@ -343,11 +351,19 @@ export default function AlertDialogSlide(props: IDrawer) {
                     onSubmit();
                   }}
                   style={{
-                    backgroundColor: "#1966fb",
                     textTransform: "none",
                     width: "100%",
                     height: "39px",
-                    marginTop: "1.5rem",
+                    marginTop: "1rem",
+                  }}
+                  sx={{
+                    bgcolor: "#1966fb",
+                    ":hover": {
+                      bgcolor: "#10269C",
+                    },
+                    ":disabled": {
+                      color: "#fff",
+                    },
                   }}
                   variant="contained"
                   disabled={isLoading}

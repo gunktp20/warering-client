@@ -39,7 +39,7 @@ function Landing() {
         />
       )}
       <Introduction />
-      <div className="w-[100%] justify-center mt-[4.5rem] mb-[4.5rem] flex">
+      <div className="w-[100%] justify-center pt-[4.5rem] pb-[4.5rem] flex bg-white">
         <div className="w-[75%] flex justify-between items-center gap-5 bg-white lg:flex-col md:flex-col sm:flex-col">
           {whatWeDo.length > 0 &&
             whatWeDo.map((item, index) => {

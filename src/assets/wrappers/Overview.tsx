@@ -1,7 +1,6 @@
 import styled from "styled-components";
 
 const Wrapper = styled.article`
-  background-color: #fafafa;
   display: flex;
   width: 100wh;
   height: 100%;

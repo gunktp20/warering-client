@@ -187,11 +187,19 @@ function SetupUserDrawer(props: IDrawer) {
                     onSubmit();
                   }}
                   style={{
-                    backgroundColor: "#1966fb",
                     textTransform: "none",
                     width: "100%",
                     height: "39px",
-                    marginTop: "1rem",
+                    marginTop: "1.5rem",
+                  }}
+                  sx={{
+                    bgcolor: "#1966fb",
+                    ":hover": {
+                      bgcolor: "#10269C"
+                    },
+                    ":disabled":{
+                      color:"#fff",
+                    }
                   }}
                   variant="contained"
                   disabled={isLoading}
