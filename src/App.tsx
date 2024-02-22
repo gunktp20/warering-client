@@ -18,6 +18,7 @@ function App() {
         <Route path="/home" element={<Landing />} />
         <Route path="/reset-password/:token" element={<ResetPass />} />
         <Route path="/term-condition" element={<TermAndCondition />} />
+        <Route path="/dashboard_list" element={<Dashboard />} />
         <Route element={<RequireUser />}>
           <Route path="/" element={<Overview />} />
           <Route path="/dashboard" element={<Dashboard />} />
