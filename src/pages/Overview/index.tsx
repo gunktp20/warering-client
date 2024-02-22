@@ -37,7 +37,7 @@ function Overview() {
           setIsDrawerOpen={setIsDrawerOpen}
           setIsMember={setIsMember}
           isMember={isMember} />
-        <div className="m-[3rem] relative top-[4rem] w-[100%] h-fit grid gap-[3rem] grid-cols-3 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 sm:top-[5rem]">
+        <div className="m-[3rem] relative top-[4rem] w-[100%] h-fit grid gap-[3rem] grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 sm:top-[5rem]">
           <button onClick={() => {
             setIsDrawerOpen(true)
           }}

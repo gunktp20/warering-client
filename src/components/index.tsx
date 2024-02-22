@@ -4,6 +4,7 @@ import RequireAdmin from "./RequireAdmin";
 import RequireUser from "./RequireUser";
 import SmallNavLink from "./SmallNavLink";
 import BigNavbar from "./BigNavbar";
+import FormControl from "./FormControl"
 
 
-export { FormRow, RequireAdmin, RequireUser, NavLinks, SmallNavLink, BigNavbar }
+export { FormRow, RequireAdmin, RequireUser, NavLinks, SmallNavLink, BigNavbar, FormControl }

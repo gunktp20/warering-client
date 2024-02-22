@@ -48,9 +48,9 @@ function SmallNavLinks(props: IDrawer) {
     const navigate = useNavigate();
 
     const { isDrawerOpen, setIsDrawerOpen, setIsMember, isMember } = props;
-    const { isLoading, showAlert, alertText, alertType } = useAppSelector(
-        (state) => state.auth
-    );
+    // const { isLoading, showAlert, alertText, alertType } = useAppSelector(
+    //     (state) => state.auth
+    // );
 
     const [values, setValues] = useState<IValue>(initialState);
     const [isForgetPassword, setIsForgetPassword] = useState<boolean>(false);
