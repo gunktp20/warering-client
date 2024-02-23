@@ -8,8 +8,9 @@ import Overview from "./pages/Overview";
 import AdminDashboard from "./pages/AdminDashboard";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
-import Dashboard from "./pages/Dashboard";
+import DashboardList from "./pages/DashboardList";
 import Device from "./pages/Device";
+import AddDashboard from "./pages/AddDashboard";
 
 function App() {
   return (
@@ -18,10 +19,10 @@ function App() {
         <Route path="/home" element={<Landing />} />
         <Route path="/reset-password/:token" element={<ResetPass />} />
         <Route path="/term-condition" element={<TermAndCondition />} />
-        <Route path="/dashboard_list" element={<Dashboard />} />
         <Route element={<RequireUser />}>
           <Route path="/" element={<Overview />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard-list" element={<DashboardList />} />
+          <Route path="/add-dashboard" element={<AddDashboard />} />
           <Route path="/device" element={<Device />} />
         </Route>
         <Route element={<RequireAdmin />}>

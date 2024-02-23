@@ -14,12 +14,14 @@ import { useState } from "react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import EditDashboardDialog from "./EditDashboardDialog";
 
-function Dashboard() {
+function DashboardList() {
     const dispatch = useAppDispatch();
     const navigate = useNavigate()
     const axiosPrivate = useAxiosPrivate();
     const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+    const [isEditDialogOpen, setEditDialogOpen] = useState<boolean>(false);
     const [isMember, setIsMember] = useState<boolean>(true);
     const { user, token } = useAppSelector((state) => state.auth);
 
@@ -47,6 +49,10 @@ function Dashboard() {
 
     return (
         <Wrapper>
+            <EditDashboardDialog
+                isEditDialogOpen={isEditDialogOpen}
+                setEditDialogOpen={setEditDialogOpen}
+            />
             <BigNavbar />
             <div className="flex">
                 <NavLinks />
@@ -71,7 +77,7 @@ function Dashboard() {
                     </div>
                     <div className="absolute top-[-4rem] text-[23px] text-[#1d4469] font-bold right-0">
                         <Button
-                            onClick={() => { 
+                            onClick={() => {
                                 navigate("/add-dashboard")
                             }}
                             style={{
@@ -146,7 +152,9 @@ function Dashboard() {
                                         <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
                                             <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">Action</div>
                                             <div className="flex justify-center sm:justify-start">
-                                                <button className="mr-6 text-[#2E7D32]">
+                                                <button onClick={() => {
+                                                    setEditDialogOpen(true)
+                                                }} className="mr-6 text-[#2E7D32]">
                                                     Edit
                                                 </button>
                                                 <button className="text-[#dc3546]">
@@ -165,4 +173,4 @@ function Dashboard() {
     );
 }
 
-export default Dashboard;
+export default DashboardList;

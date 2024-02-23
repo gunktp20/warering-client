@@ -163,7 +163,7 @@ function SmallNavLinks(props: IDrawer) {
                         </NavLink>
 
                         <NavLink
-                            to="/dashboard"
+                            to="/dashboard-list"
                             key={1}
                             onClick={() => {
 

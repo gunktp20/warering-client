@@ -1,11 +1,17 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 
 function BigNavbar() {
+
+    const navigate = useNavigate()
+
     return (
         <div className="bg-[#fff] w-[100%] p-3 flex justify-between shadow-sm">
-            <div className="text-[#1d4469] font-bold text-[25px] pl-[5.5rem] flex justify-center">
+            <button onClick={()=>{
+                navigate('/home')
+            }}className="text-[#1d4469] font-bold text-[25px] pl-[5.5rem] flex justify-center">
                 WR
-            </div>
+            </button>
             <div className=" flex items-center pr-[3rem]">
                 <div className="text-[14.5px]">Kuttapat Somwang</div>
                 <img
