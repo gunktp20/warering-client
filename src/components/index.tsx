@@ -1,10 +1,17 @@
 import FormRow from "./FormRow";
-import NavLinks from "./NavLinks";
+import NavLinkSidebar from "./NavLinkSidebar";
 import RequireAdmin from "./RequireAdmin";
 import RequireUser from "./RequireUser";
-import SmallNavLink from "./SmallNavLink";
 import BigNavbar from "./BigNavbar";
-import FormControl from "./FormControl"
+import FormControl from "./FormControl";
+import NavDialog from "./NavDialog";
 
-
-export { FormRow, RequireAdmin, RequireUser, NavLinks, SmallNavLink, BigNavbar, FormControl }
+export {
+  FormRow,
+  RequireAdmin,
+  RequireUser,
+  NavLinkSidebar,
+  NavDialog,
+  BigNavbar,
+  FormControl,
+};

@@ -9,8 +9,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
 import DashboardList from "./pages/DashboardList";
-import Device from "./pages/Device";
 import AddDashboard from "./pages/AddDashboard";
+import DeviceList from "./pages/DeviceList";
 
 function App() {
   return (
@@ -23,7 +23,7 @@ function App() {
           <Route path="/" element={<Overview />} />
           <Route path="/dashboard-list" element={<DashboardList />} />
           <Route path="/add-dashboard" element={<AddDashboard />} />
-          <Route path="/device" element={<Device />} />
+          <Route path="/device-list" element={<DeviceList />} />
         </Route>
         <Route element={<RequireAdmin />}>
           <Route path="/admin" element={<AdminDashboard />} />

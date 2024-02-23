@@ -96,7 +96,7 @@ export default function EditDashboardDialog(props: IDrawer) {
                             <div className="text-sm text-[#a4a4a4] mt-3">Fill in the information to add a Dashboard from your device.</div>
                         </div>
                         <div className="flex gap-10 mt-9 sm:flex-col sm:gap-0">
-                            <div className="w-[350px]">
+                            <div className="w-[350px] sm:w-[100%]">
                                 <FormRow
                                     type="text"
                                     name="dashboard_name"
@@ -106,7 +106,7 @@ export default function EditDashboardDialog(props: IDrawer) {
                                     marginTop="mt-[0.2rem]"
                                 />
                             </div>
-                            <div className="w-[350px]">
+                            <div className="w-[350px] sm:w-[100%]">
                                 <FormRow
                                     type="text"
                                     name="description"

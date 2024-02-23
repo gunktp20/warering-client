@@ -26,7 +26,7 @@ const NavLinks = () => {
 
                 <NavLink
                     to="/dashboard-list"
-                    key={1}
+                    key={2}
                     onClick={() => {
 
                     }}
@@ -39,8 +39,8 @@ const NavLinks = () => {
                 </NavLink>
 
                 <NavLink
-                    to="/device"
-                    key={1}
+                    to="/device-list"
+                    key={3}
                     onClick={() => {
 
                     }}

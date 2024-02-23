@@ -4,8 +4,8 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import {
     BigNavbar,
     FormRow,
-    NavLinks,
-    SmallNavLink,
+    NavLinkSidebar,
+    NavDialog,
     FormControl,
 } from "../../components";
 import Wrapper from "../../assets/wrappers/Dashboard";
@@ -51,12 +51,10 @@ function AddDashboard() {
         <Wrapper>
             <BigNavbar />
             <div className="flex">
-                <NavLinks />
-                <SmallNavLink
+                <NavLinkSidebar />
+                <NavDialog
                     isDrawerOpen={isDrawerOpen}
                     setIsDrawerOpen={setIsDrawerOpen}
-                    setIsMember={setIsMember}
-                    isMember={isMember}
                 />
                 <div className="m-[3rem] relative top-[5rem] w-[100%] h-fit flex flex-col sm:top-[5rem] bg-white shadow-md py-8 px-10 rounded-md sm:m-[3rem]">
                     <button

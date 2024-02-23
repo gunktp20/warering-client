@@ -1,43 +1,26 @@
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { logout } from "../../features/auth/authSlice";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { BigNavbar, NavLinks } from "../../components"
+import { BigNavbar, NavLinkSidebar } from "../../components"
 import Wrapper from "../../assets/wrappers/Overview";
 import { GoCpu } from "react-icons/go";
-import { SmallNavLink } from "../../components/";
+import { NavDialog } from "../../components/";
 import { RiMenu2Fill } from "react-icons/ri";
 import { useState } from "react";
 
 
 function Overview() {
-  const dispatch = useAppDispatch();
-  const axiosPrivate = useAxiosPrivate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
-  const [isMember, setIsMember] = useState<boolean>(true);
-  const { user, token } = useAppSelector((state) => state.auth);
-
-  const signOut = async () => {
-    dispatch(logout());
-    await axiosPrivate.post(
-      `/auth/logout`,
-      {},
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-  };
 
   return (
     <Wrapper>
 
       <BigNavbar />
       <div className="flex">
-        <NavLinks />
-        <SmallNavLink
+        <NavLinkSidebar />
+        <NavDialog
           isDrawerOpen={isDrawerOpen}
-          setIsDrawerOpen={setIsDrawerOpen}
-          setIsMember={setIsMember}
-          isMember={isMember} />
+          setIsDrawerOpen={setIsDrawerOpen}/>
         <div className="m-[3rem] relative top-[4rem] w-[100%] h-fit grid gap-[3rem] grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 sm:top-[5rem]">
           <button onClick={() => {
             setIsDrawerOpen(true)

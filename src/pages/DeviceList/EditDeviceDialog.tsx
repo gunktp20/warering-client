@@ -108,7 +108,7 @@ export default function EditDeviceDialog(props: IDrawer) {
               </div>
             </div>
             <div className="flex gap-10 mt-9 sm:flex-col sm:gap-0">
-              <div className="w-[350px]">
+              <div className="w-[350px] sm:w-[100%]">
                 <FormRow
                   type="text"
                   name="device_name"
@@ -118,7 +118,7 @@ export default function EditDeviceDialog(props: IDrawer) {
                   marginTop="mt-[0.2rem]"
                 />
               </div>
-              <div className="w-[350px]">
+              <div className="w-[350px] sm:w-[100%]">
                 <FormRow
                   type="text"
                   name="username_device"
@@ -130,7 +130,7 @@ export default function EditDeviceDialog(props: IDrawer) {
               </div>
             </div>
             <div className="flex gap-10 mt-3 sm:flex-col sm:gap-0">
-              <div className="w-[350px]">
+              <div className="w-[350px] sm:w-[100%]">
                 <FormRow
                   type="text"
                   name="password"
@@ -140,7 +140,7 @@ export default function EditDeviceDialog(props: IDrawer) {
                   marginTop="mt-[0.2rem]"
                 />
               </div>
-              <div className="w-[350px]">
+              <div className="w-[350px] sm:w-[100%]">
                 <FormRow
                   type="text"
                   name="description"
@@ -157,7 +157,7 @@ export default function EditDeviceDialog(props: IDrawer) {
               </div>
             </div>
             <div className="flex gap-10 mt-5 sm:flex-col sm:gap-0">
-              <div className="w-[350px]">
+              <div className="w-[350px] sm:w-[100%]">
                 <FormRow
                   type="text"
                   name="topic_device"
@@ -167,7 +167,7 @@ export default function EditDeviceDialog(props: IDrawer) {
                   marginTop="mt-[0.2rem]"
                 />
               </div>
-              <div className="w-[350px]">
+              <div className="w-[350px] sm:w-[100%]">
                 <FormRow
                   type="text"
                   name="Qos"

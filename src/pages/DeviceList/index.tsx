@@ -4,8 +4,8 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import {
   BigNavbar,
   FormRow,
-  NavLinks,
-  SmallNavLink,
+  NavLinkSidebar,
+  NavDialog,
   FormControl,
 } from "../../components";
 import Wrapper from "../../assets/wrappers/Dashboard";
@@ -98,14 +98,12 @@ function DeviceList() {
       />
       <BigNavbar />
       <div className="flex">
-        <NavLinks />
-        <SmallNavLink
+        <NavLinkSidebar />
+        <NavDialog
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
-          setIsMember={setIsMember}
-          isMember={isMember}
         />
-        <div className="m-[3rem] relative top-[4rem] w-[100%] h-fit flex flex-col sm:top-[5rem] bg-white shadow-md py-8 px-10 rounded-md sm:m-[3rem] sm:mx-[2rem]">
+        <div className="m-[3rem] relative top-[4rem] w-[100%] h-fit flex flex-col sm:top-[5rem] bg-white shadow-md py-8 px-10 rounded-md sm:m-[3rem] sm:mx-0">
           <button
             onClick={() => {
               setIsDrawerOpen(true);
@@ -146,7 +144,7 @@ function DeviceList() {
             </Button>
           </div>
           <div className=" w-[100%] justify-between flex items-center">
-            <div className="w-[330px] sm:w-[200px]">
+            <div className="w-[330px] sm:w-[150px]">
               <FormRow
                 type="text"
                 name="search_dashboard"
@@ -184,9 +182,9 @@ function DeviceList() {
               </thead>
               {/* <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600"> */}
               <tbody className="divide-y divide-gray-100">
-                {device_list.map((i) => {
+                {device_list.map((i,index) => {
                   return (
-                    <tr className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10">
+                    <tr key={index} className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10">
                       <td
                         className={`flex sm:hidden items-center justify-center capitalize p-3 text-[13px] ${
                           i.active ? "text-green-500" : "text-red-500"
