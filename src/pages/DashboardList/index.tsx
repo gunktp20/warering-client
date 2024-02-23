@@ -1,5 +1,4 @@
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { logout } from "../../features/auth/authSlice";
+import { useAppDispatch } from "../../app/hooks";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import {
   BigNavbar,
@@ -7,9 +6,9 @@ import {
   NavLinkSidebar,
   FormControl,
   NavDialog,
+  AccountUserDrawer,
 } from "../../components";
 import Wrapper from "../../assets/wrappers/Dashboard";
-import { GoCpu } from "react-icons/go";
 import { useState } from "react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { Button } from "@mui/material";
@@ -17,15 +16,12 @@ import { useNavigate } from "react-router-dom";
 import EditDashboardDialog from "./EditDashboardDialog";
 
 function DashboardList() {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const axiosPrivate = useAxiosPrivate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState<boolean>(false);
-  const [isMember, setIsMember] = useState<boolean>(true);
-  const { user, token } = useAppSelector((state) => state.auth);
+  const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
+    useState<boolean>(false);
 
-  // mock data
   const dashboard_list = [1, 2, 3, 4, 5];
 
   const [values, setValues] = useState({
@@ -36,24 +32,20 @@ function DashboardList() {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
-  const signOut = async () => {
-    dispatch(logout());
-    await axiosPrivate.post(
-      `/auth/logout`,
-      {},
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-  };
-
   return (
     <Wrapper>
+      <AccountUserDrawer
+        isAccountUserDrawerOpen={isAccountUserDrawerOpen}
+        setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
+      />
       <EditDashboardDialog
         isEditDialogOpen={isEditDialogOpen}
         setEditDialogOpen={setEditDialogOpen}
       />
-      <BigNavbar />
+      <BigNavbar
+        isAccountUserDrawerOpen={isAccountUserDrawerOpen}
+        setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
+      />
       <div className="flex">
         <NavLinkSidebar />
         <NavDialog
@@ -101,7 +93,7 @@ function DashboardList() {
             </Button>
           </div>
           <div className=" w-[100%] justify-between flex items-center">
-            <div className="w-[330px] sm:w-[150px]">
+            <div className="w-[330px] sm:w-[200px]">
               <FormRow
                 type="text"
                 name="search_dashboard"

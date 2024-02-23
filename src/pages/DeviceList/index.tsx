@@ -1,5 +1,4 @@
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { logout } from "../../features/auth/authSlice";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import {
   BigNavbar,
@@ -7,9 +6,9 @@ import {
   NavLinkSidebar,
   NavDialog,
   FormControl,
+  AccountUserDrawer,
 } from "../../components";
 import Wrapper from "../../assets/wrappers/Dashboard";
-import { GoCpu } from "react-icons/go";
 import { useState } from "react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { Button } from "@mui/material";
@@ -18,13 +17,9 @@ import EditDeviceDialog from "./EditDeviceDialog";
 import SwitchSave from "./SwitchSave";
 
 function DeviceList() {
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const axiosPrivate = useAxiosPrivate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState<boolean>(false);
-  const [isMember, setIsMember] = useState<boolean>(true);
-  const { user, token } = useAppSelector((state) => state.auth);
   interface IDevice {
     active: boolean;
     nameDevice: string;
@@ -32,7 +27,7 @@ function DeviceList() {
     lastLoggedIn: string;
     Registration: string;
   }
-  // mock data
+
   const device_list: IDevice[] = [
     {
       active: false,
@@ -75,28 +70,27 @@ function DeviceList() {
     search_dashboard: "",
   });
 
+  const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
+    useState<boolean>(false);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
-  const signOut = async () => {
-    dispatch(logout());
-    await axiosPrivate.post(
-      `/auth/logout`,
-      {},
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
-  };
-
   return (
     <Wrapper>
+      <AccountUserDrawer
+        isAccountUserDrawerOpen={isAccountUserDrawerOpen}
+        setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
+      />
       <EditDeviceDialog
         isEditDialogOpen={isEditDialogOpen}
         setEditDialogOpen={setEditDialogOpen}
       />
-      <BigNavbar />
+      <BigNavbar
+        isAccountUserDrawerOpen={isAccountUserDrawerOpen}
+        setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
+      />
       <div className="flex">
         <NavLinkSidebar />
         <NavDialog
@@ -119,7 +113,7 @@ function DeviceList() {
           <div className="absolute top-[-4rem] text-[23px] text-[#1d4469] font-bold right-0">
             <Button
               onClick={() => {
-                navigate("/add-dashboard");
+                navigate("/add-device");
               }}
               style={{
                 textTransform: "none",
@@ -144,11 +138,11 @@ function DeviceList() {
             </Button>
           </div>
           <div className=" w-[100%] justify-between flex items-center">
-            <div className="w-[330px] sm:w-[150px]">
+            <div className="w-[330px] sm:w-[190px]">
               <FormRow
                 type="text"
                 name="search_dashboard"
-                labelText="search dashboard"
+                labelText="search device"
                 value={values.search_dashboard}
                 handleChange={handleChange}
                 marginTop="mt-[0.2rem]"
@@ -182,9 +176,12 @@ function DeviceList() {
               </thead>
               {/* <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600"> */}
               <tbody className="divide-y divide-gray-100">
-                {device_list.map((i,index) => {
+                {device_list.map((i, index) => {
                   return (
-                    <tr key={index} className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10">
+                    <tr
+                      key={index}
+                      className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10"
+                    >
                       <td
                         className={`flex sm:hidden items-center justify-center capitalize p-3 text-[13px] ${
                           i.active ? "text-green-500" : "text-red-500"

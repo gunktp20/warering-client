@@ -9,15 +9,15 @@ function RequireUser() {
   useEffect(() => {
     if (!user) {
       navigate("/home");
-      return
+      return;
     }
-  
+
     const isAdmin = user?.roles.filter((role) => {
       return role === "admin";
     }).length;
     if (isAdmin) {
       navigate("/admin");
-      return
+      return;
     }
   }, [user]);
 

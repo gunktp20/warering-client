@@ -1,31 +1,39 @@
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { logout } from "../../features/auth/authSlice";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { BigNavbar, NavLinkSidebar } from "../../components"
+import { BigNavbar, NavLinkSidebar, AccountUserDrawer } from "../../components";
 import Wrapper from "../../assets/wrappers/Overview";
 import { GoCpu } from "react-icons/go";
 import { NavDialog } from "../../components/";
 import { RiMenu2Fill } from "react-icons/ri";
 import { useState } from "react";
 
-
 function Overview() {
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
+    useState<boolean>(false);
 
   return (
     <Wrapper>
-
-      <BigNavbar />
+      <AccountUserDrawer
+        isAccountUserDrawerOpen={isAccountUserDrawerOpen}
+        setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
+      />
+      <BigNavbar
+        isAccountUserDrawerOpen={isAccountUserDrawerOpen}
+        setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
+      />
       <div className="flex">
         <NavLinkSidebar />
         <NavDialog
           isDrawerOpen={isDrawerOpen}
-          setIsDrawerOpen={setIsDrawerOpen}/>
+          setIsDrawerOpen={setIsDrawerOpen}
+        />
         <div className="m-[3rem] relative top-[4rem] w-[100%] h-fit grid gap-[3rem] grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 sm:top-[5rem]">
-          <button onClick={() => {
-            setIsDrawerOpen(true)
-          }}
-            className="hidden p-1 w-fit h-fit left-[0rem] absolute sm:block top-[-7rem] text-[#8f8f8f]" id="small-open-sidebar-btn">
+          <button
+            onClick={() => {
+              setIsDrawerOpen(true);
+            }}
+            className="hidden p-1 w-fit h-fit left-[0rem] absolute sm:block top-[-7rem] text-[#8f8f8f]"
+            id="small-open-sidebar-btn"
+          >
             <RiMenu2Fill className="text-[23px]" />
           </button>
           <div className="absolute top-[-4rem] text-[23px] text-[#1d4469] font-bold">

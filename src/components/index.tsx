@@ -5,6 +5,7 @@ import RequireUser from "./RequireUser";
 import BigNavbar from "./BigNavbar";
 import FormControl from "./FormControl";
 import NavDialog from "./NavDialog";
+import AccountUserDrawer from "./AccountUserDrawer";
 
 export {
   FormRow,
@@ -14,4 +15,5 @@ export {
   NavDialog,
   BigNavbar,
   FormControl,
+  AccountUserDrawer
 };

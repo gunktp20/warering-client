@@ -1,13 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
-import { NavLink, useNavigate } from "react-router-dom";
-import { FormRow } from ".";
-import { Alert, Button } from "@mui/material";
-import { useAppDispatch } from "../app/hooks";
+import { NavLink } from "react-router-dom";
 import { PiNotebookBold } from "react-icons/pi";
 import { VscGraph } from "react-icons/vsc";
 import { FiCpu } from "react-icons/fi";
@@ -46,10 +43,16 @@ export default function SmallNavLinks(props: INavDialog) {
       >
         <DialogContent>
           <DialogContentText
-            className="p-3 "
+            className="p-3 relative "
             component={"div"}
             variant={"body2"}
           >
+            <div
+              onClick={handleClose}
+              className="cursor-pointer absolute top-2 right-3 text-[21px]"
+            >
+              X
+            </div>
             <NavLink
               to="/"
               key={1}

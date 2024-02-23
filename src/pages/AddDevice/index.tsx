@@ -12,15 +12,19 @@ import { Button } from "@mui/material";
 import { IoArrowBackSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 
-function AddDashboard() {
+function AddDevice() {
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
 
   const [values, setValues] = useState({
-    dashboard_name: "",
+    device_name: "",
+    username_device: "",
+    password: "",
     description: "",
+    topic_device: "",
+    Qos: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,11 +58,11 @@ function AddDashboard() {
             <RiMenu2Fill className="text-[23px]" />
           </button>
           <div className="absolute left-0 top-[-4rem] text-[23px] text-[#1d4469] font-bold">
-            Add Dashboard
+            Add Device
           </div>
           <button
             onClick={() => {
-              navigate("/dashboard-list");
+              navigate("/device-list");
             }}
             className="absolute top-[-6.5rem] flex cursor-pointer text-sm text-[#1D4469] font-bold items-center left-0 sm:left-[90%]"
           >
@@ -67,31 +71,98 @@ function AddDashboard() {
           </button>
           <div className=" w-[100%] flex flex-col">
             <div className="text-[18px] font-bold text-[#1D4469]">
-              Add Dashboard
+              Device Details
             </div>
             <div className="text-sm text-[#a4a4a4] mt-3">
               Fill in the information to add a Dashboard from your device.
             </div>
           </div>
           <div className="flex gap-10 mt-9 sm:flex-col sm:gap-0">
-            <FormRow
-              type="text"
-              name="dashboard_name"
-              labelText="Dashboard name"
-              value={values.dashboard_name}
-              handleChange={handleChange}
-              marginTop="mt-[0.2rem]"
-            />
-            <FormRow
-              type="text"
-              name="description"
-              labelText="description"
-              value={values.description}
-              handleChange={handleChange}
-              marginTop="mt-[0.2rem]"
+            <div className="w-[100%]">
+              <FormRow
+                type="text"
+                name="device_name"
+                labelText="Device name"
+                value={values.device_name}
+                handleChange={handleChange}
+                marginTop="mt-[0.2rem]"
+              />
+            </div>
+            <div className="w-[100%]">
+              <FormRow
+                type="text"
+                name="username_device"
+                labelText="username device"
+                value={values.username_device}
+                handleChange={handleChange}
+                marginTop="mt-[0.2rem]"
+              />
+            </div>
+          </div>
+          <div className="flex gap-10 mt-1 sm:flex-col sm:gap-0">
+            <div className="w-[100%]">
+              <FormRow
+                type="text"
+                name="password"
+                labelText="password"
+                value={values.password}
+                handleChange={handleChange}
+                marginTop="mt-[0.2rem]"
+              />
+            </div>
+            <div className="w-[100%]">
+              <FormRow
+                type="text"
+                name="description"
+                labelText="description"
+                value={values.description}
+                handleChange={handleChange}
+                marginTop="mt-[0.2rem]"
+              />
+            </div>
+          </div>
+          <div className=" w-[100%] flex flex-col">
+            <div className="text-[17px] font-bold text-[#1D4469]">
+              Publish Detail
+            </div>
+          </div>
+          <div className="flex gap-10 mt-2 sm:flex-col sm:gap-0">
+            <div className="w-[100%]">
+              <FormRow
+                type="text"
+                name="topic_device"
+                labelText="topic device"
+                value={values.topic_device}
+                handleChange={handleChange}
+                marginTop="mt-[0.2rem]"
+              />
+            </div>
+            <div className="w-[100%]">
+              <FormRow
+                type="text"
+                name="Qos"
+                labelText="Qos"
+                value={values.Qos}
+                handleChange={handleChange}
+                marginTop="mt-[0.2rem]"
+              />
+            </div>
+          </div>
+          <div className="flex items-center">
+            <label
+              htmlFor="link-checkbox"
+              className="ms-2 text-sm mr-2 font-medium text-[#1D4469] dark:text-gray-300"
+            >
+              Retain
+            </label>
+            <input
+              id="link-checkbox"
+              type="checkbox"
+              value=""
+              className=" w-[15px] h-[15px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#ffffff00] dark:focus:ring-[#2CB1BC] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
             />
           </div>
-          <div className="w-[250px] sm:w-[100%]">
+          <div className="w-[360px] sm:w-[100%]">
             <Button
               onClick={() => {}}
               style={{
@@ -112,7 +183,7 @@ function AddDashboard() {
               variant="contained"
               id="setup-user-submit"
             >
-              Add Dashboard
+              Add Device
             </Button>
           </div>
         </div>
@@ -121,4 +192,4 @@ function AddDashboard() {
   );
 }
 
-export default AddDashboard;
+export default AddDevice;

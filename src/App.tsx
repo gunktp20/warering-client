@@ -11,6 +11,9 @@ import NotFound from "./pages/NotFound";
 import DashboardList from "./pages/DashboardList";
 import AddDashboard from "./pages/AddDashboard";
 import DeviceList from "./pages/DeviceList";
+import AddDevice from "./pages/AddDevice";
+import Account from "./pages/Account";
+import EditProfile from "./pages/EditProfile";
 
 function App() {
   return (
@@ -24,6 +27,9 @@ function App() {
           <Route path="/dashboard-list" element={<DashboardList />} />
           <Route path="/add-dashboard" element={<AddDashboard />} />
           <Route path="/device-list" element={<DeviceList />} />
+          <Route path="/add-device" element={<AddDevice />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/edit-profile" element={<EditProfile />} />
         </Route>
         <Route element={<RequireAdmin />}>
           <Route path="/admin" element={<AdminDashboard />} />

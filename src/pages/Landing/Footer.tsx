@@ -5,9 +5,8 @@ function Footer() {
         <div className="flex flex-col w-[200px] sm:w-[300px] sm:mb-5">
           <div className=" text-[19px] text-white mb-5 font-bold">WR</div>
           <div className="text-[12.5px] text-[#fff]">
-            Nakhon Pathom Rajabhat University
-            85 Malaiman Road, Muang District, Nakhon Pathom 73000. 0 3426 1048
-            0 3410 9300. saraban@npru.ac.th
+            Nakhon Pathom Rajabhat University 85 Malaiman Road, Muang District,
+            Nakhon Pathom 73000. 0 3426 1048 0 3410 9300. saraban@npru.ac.th
           </div>
         </div>
         <div className="flex flex-col w-[200px] sm:w-[300px] sm:mb-5">
@@ -20,7 +19,9 @@ function Footer() {
           </div>
         </div>
         <div className="flex flex-col w-[200px] sm:w-[300px]">
-          <div className=" text-[19px] text-white mb-5 font-bold">Languages</div>
+          <div className=" text-[19px] text-white mb-5 font-bold">
+            Languages
+          </div>
           <div className="text-[12.5px] mb-3 text-[#fff] w-[200px]">
             English
           </div>

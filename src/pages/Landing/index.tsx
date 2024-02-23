@@ -9,14 +9,20 @@ import AlertDialogSlide from "./DialogMui";
 import Wrapper from "../../assets/wrappers/Landing/Landing";
 import whatWeDo from "../../utils/whatWeDo";
 import { useAppSelector } from "../../app/hooks";
+import { AccountUserDrawer } from "../../components";
 
 function Landing() {
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isMember, setIsMember] = useState<boolean>(true);
   const { user } = useAppSelector((state) => state.auth);
-
+  const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] = useState<boolean>(false);
+  
   return (
     <Wrapper>
+      <AccountUserDrawer
+        isAccountUserDrawerOpen={isAccountUserDrawerOpen}
+        setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
+      />
       <BigNavbar setIsMember={setIsMember} setIsDrawerOpen={setIsDrawerOpen} />
       <SmallNavbar
         setIsMember={setIsMember}
