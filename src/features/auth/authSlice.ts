@@ -172,7 +172,7 @@ const AuthSlice = createSlice({
         alertType: alertType,
       };
     },
-    logout: (state) =>{
+    logout: (state) => {
       removeUserFromLocalStorage();
       return {
         ...state,
@@ -184,6 +184,19 @@ const AuthSlice = createSlice({
       return {
         ...state,
         token: action.payload,
+      };
+    },
+    demoAuth: (state) => {
+      return {
+        ...state,
+        user: {
+          username: "demo",
+          firstname: "demo",
+          lastname: "demo",
+          email: "demo_email@gmail.com",
+          roles: ["user"],
+        },
+        token: "demo_app",
       };
     },
   },
@@ -294,7 +307,7 @@ const AuthSlice = createSlice({
   },
 });
 
-export const { logout, clearAlert, displayAlert, setCredential } =
+export const { logout, clearAlert, displayAlert, setCredential, demoAuth } =
   AuthSlice.actions;
 
 export default AuthSlice.reducer;

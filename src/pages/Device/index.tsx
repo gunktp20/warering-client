@@ -19,57 +19,57 @@ import SwitchSave from "./SwitchSave";
 
 function DeviceList() {
   const dispatch = useAppDispatch();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState<boolean>(false);
   const [isMember, setIsMember] = useState<boolean>(true);
   const { user, token } = useAppSelector((state) => state.auth);
   interface IDevice {
-    active: boolean,
-    nameDevice: string,
-    save: boolean,
-    lastLoggedIn: string
-    Registration: string
+    active: boolean;
+    nameDevice: string;
+    save: boolean;
+    lastLoggedIn: string;
+    Registration: string;
   }
-  // mock data 
+  // mock data
   const device_list: IDevice[] = [
     {
       active: false,
       nameDevice: "การเกษตรรวม",
       save: true,
       lastLoggedIn: "00/00/0000 00:00",
-      Registration: "00/00/0000 00:00"
+      Registration: "00/00/0000 00:00",
     },
     {
       active: false,
       nameDevice: "เเปลงผัก",
       save: true,
       lastLoggedIn: "00/00/0000 00:00",
-      Registration: "00/00/0000 00:00"
+      Registration: "00/00/0000 00:00",
     },
     {
       active: true,
       nameDevice: "ภายในบ้าน",
       save: false,
       lastLoggedIn: "00/00/0000 00:00",
-      Registration: "00/00/0000 00:00"
+      Registration: "00/00/0000 00:00",
     },
     {
       active: false,
       nameDevice: "อากาศ",
       save: false,
       lastLoggedIn: "00/00/0000 00:00",
-      Registration: "00/00/0000 00:00"
+      Registration: "00/00/0000 00:00",
     },
     {
       active: false,
       nameDevice: "ฝุ่น",
       save: true,
       lastLoggedIn: "00/00/0000 00:00",
-      Registration: "00/00/0000 00:00"
-    }
-  ]
+      Registration: "00/00/0000 00:00",
+    },
+  ];
 
   const [values, setValues] = useState({
     search_dashboard: "",
@@ -105,7 +105,7 @@ function DeviceList() {
           setIsMember={setIsMember}
           isMember={isMember}
         />
-        <div className="m-[3rem] relative top-[4rem] w-[100%] h-fit flex flex-col sm:top-[5rem] bg-white shadow-md py-8 px-10 rounded-md sm:m-[3rem]">
+        <div className="m-[3rem] relative top-[4rem] w-[100%] h-fit flex flex-col sm:top-[5rem] bg-white shadow-md py-8 px-10 rounded-md sm:m-[3rem] sm:mx-[2rem]">
           <button
             onClick={() => {
               setIsDrawerOpen(true);
@@ -121,7 +121,7 @@ function DeviceList() {
           <div className="absolute top-[-4rem] text-[23px] text-[#1d4469] font-bold right-0">
             <Button
               onClick={() => {
-                navigate("/add-dashboard")
+                navigate("/add-dashboard");
               }}
               style={{
                 textTransform: "none",
@@ -185,42 +185,77 @@ function DeviceList() {
               {/* <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600"> */}
               <tbody className="divide-y divide-gray-100">
                 {device_list.map((i) => {
-                  return <tr className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10">
-                    <td className={`flex sm:hidden items-center justify-center capitalize p-3 text-[13px] ${i.active ? "text-green-500" : "text-red-500"} whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}>
-                      <div className={`w-[8px] h-[8px] ${i.active ? "bg-green-500" : "bg-red-500"} rounded-full mr-2`}></div>
-                      {i.active ? "online" : "offline"}
-                    </td>
-                    <td className={`flex  items-center justify-center capitalize p-3 text-[14px] whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}>
+                  return (
+                    <tr className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10">
+                      <td
+                        className={`flex sm:hidden items-center justify-center capitalize p-3 text-[13px] ${
+                          i.active ? "text-green-500" : "text-red-500"
+                        } whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}
+                      >
+                        <div
+                          className={`w-[8px] h-[8px] ${
+                            i.active ? "bg-green-500" : "bg-red-500"
+                          } rounded-full mr-2`}
+                        ></div>
+                        {i.active ? "online" : "offline"}
+                      </td>
+                      {/* <td className={`flex  items-center justify-center capitalize p-3 text-[14px] whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}>
                       {i.nameDevice}
-                    </td>
-                    
-                    <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
-                      <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">Save</div>
-                      <SwitchSave checked={i.save} />
-                    </td>
-                    <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
-                      <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">Last Logged In</div>
-                      {i.lastLoggedIn}
+                    </td> */}
 
-                    </td>
-                    <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
-                      <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">Registration</div>
-                      {i.Registration}
-                    </td>
-                    <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
-                      <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">Action</div>
-                      <div className="flex justify-center sm:justify-start">
-                        <button onClick={() => {
-                          setEditDialogOpen(true)
-                        }} className="mr-6 text-[#2E7D32]">
-                          Edit
-                        </button>
-                        <button className="text-[#dc3546]">
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                      <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white">
+                        {i.nameDevice}
+                      </td>
+
+                      <td
+                        className={`hidden items-center sm:flex capitalize p-3 text-[13px] ${
+                          i.active ? "text-green-500" : "text-red-500"
+                        } whitespace-nowrap text-center sm:text-start`}
+                      >
+                        <div
+                          className={`w-[8px] h-[8px] ${
+                            i.active ? "bg-green-500" : "bg-red-500"
+                          } rounded-full mr-2`}
+                        ></div>
+                        {i.active ? "online" : "offline"}
+                      </td>
+
+                      <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
+                        <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
+                          Save
+                        </div>
+                        <SwitchSave checked={i.save} />
+                      </td>
+                      <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
+                        <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
+                          Last Logged In
+                        </div>
+                        {i.lastLoggedIn}
+                      </td>
+                      <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
+                        <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
+                          Registration
+                        </div>
+                        {i.Registration}
+                      </td>
+                      <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
+                        <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
+                          Action
+                        </div>
+                        <div className="flex justify-center sm:justify-start">
+                          <button
+                            onClick={() => {
+                              setEditDialogOpen(true);
+                            }}
+                            className="mr-6 text-[#2E7D32]"
+                          >
+                            Edit
+                          </button>
+                          <button className="text-[#dc3546]">Delete</button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
                 })}
               </tbody>
             </table>

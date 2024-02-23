@@ -62,7 +62,7 @@ function DashboardList() {
                     setIsMember={setIsMember}
                     isMember={isMember}
                 />
-                <div className="m-[3rem] relative top-[4rem] w-[100%] h-fit flex flex-col sm:top-[5rem] bg-white shadow-md py-8 px-10 rounded-md sm:m-[3rem]">
+                <div className="m-[3rem] relative top-[4rem] w-[100%] h-fit flex flex-col sm:top-[5rem] bg-white shadow-md py-8 px-10 rounded-md sm:m-[3rem] sm:mx-[2rem]">
                     <button
                         onClick={() => {
                             setIsDrawerOpen(true);

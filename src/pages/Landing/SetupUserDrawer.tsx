@@ -9,6 +9,7 @@ import {
   register,
   login,
   forgetPassword,
+  demoAuth
 } from "../../features/auth/authSlice";
 import { Link } from "react-router-dom";
 
@@ -48,17 +49,6 @@ function SetupUserDrawer(props: IDrawer) {
   const { isLoading, showAlert, alertText, alertType } = useAppSelector(
     (state) => state.auth
   );
-
-  const styles = {
-    button: {
-      backgroundColor: '#3c52b2',
-      color: '#fff',
-      '&:hover': {
-        backgroundColor: '#fff',
-        color: '#3c52b2',
-      }
-    }
-  }
 
   const [values, setValues] = useState<IValue>(initialState);
   const [isForgetPassword, setIsForgetPassword] = useState<boolean>(false);
@@ -340,6 +330,7 @@ function SetupUserDrawer(props: IDrawer) {
                     width: "100%",
                     height: "39px",
                     marginTop: "1.5rem",
+                    
                   }}
                   sx={{
                     bgcolor: "#1966fb",
@@ -373,6 +364,33 @@ function SetupUserDrawer(props: IDrawer) {
                     {isMember ? "SignUp" : "SignIn"}
                   </button>
                 </div>
+
+                <Button
+                  onClick={() => {
+                    dispatch(demoAuth())
+                  }}
+                  style={{
+                    textTransform: "none",
+                    width: "100%",
+                    height: "39px",
+                    marginTop: "1.5rem",
+                    fontSize:"13px"
+                  }}
+                  sx={{
+                    // bgcolor: "#1966fb",
+                    ":hover": {
+                    //   bgcolor: "#10269C",
+                    },
+                    ":disabled": {
+                      color: "#fff",
+                    },
+                  }}
+                  variant="outlined"
+                  id="demo-app"
+                >
+                  App Demo
+                </Button>
+
               </div>
             )}
           </Typography>
