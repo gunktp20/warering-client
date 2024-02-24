@@ -14,11 +14,13 @@ import { RiMenu2Fill } from "react-icons/ri";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import EditDashboardDialog from "./EditDashboardDialog";
+import ConfirmDelete from "./ConfirmDelete";
 
 function DashboardList() {
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState<boolean>(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState<boolean>(false);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
 
@@ -38,6 +40,7 @@ function DashboardList() {
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
       />
+      <ConfirmDelete isDeleteConfirmOpen={isDeleteConfirmOpen} setIsDeleteConfirmOpen={setIsDeleteConfirmOpen} />
       <EditDashboardDialog
         isEditDialogOpen={isEditDialogOpen}
         setEditDialogOpen={setEditDialogOpen}
@@ -159,7 +162,9 @@ function DashboardList() {
                           >
                             Edit
                           </button>
-                          <button className="text-[#dc3546]">Delete</button>
+                          <button className="text-[#dc3546]" onClick={()=>{
+                            setIsDeleteConfirmOpen(!isDeleteConfirmOpen)
+                          }}>Delete</button>
                         </div>
                       </td>
                     </tr>

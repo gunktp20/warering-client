@@ -34,7 +34,6 @@ const initialState: IValue = {
 export default function EditDashboardDialog(props: IDrawer) {
     const { setEditDialogOpen } = props;
     const [values, setValues] = useState<IValue>(initialState);
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setValues({ ...values, [e.target.name]: e.target.value });
     };

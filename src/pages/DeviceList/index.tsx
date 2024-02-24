@@ -15,11 +15,16 @@ import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import EditDeviceDialog from "./EditDeviceDialog";
 import SwitchSave from "./SwitchSave";
+import ConfirmDelete from "./ConfirmDeleteDevice";
 
 function DeviceList() {
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState<boolean>(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState<boolean>(false);
+  const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
+    useState<boolean>(false);
+    
   interface IDevice {
     active: boolean;
     nameDevice: string;
@@ -70,9 +75,6 @@ function DeviceList() {
     search_dashboard: "",
   });
 
-  const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
-    useState<boolean>(false);
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
@@ -83,6 +85,7 @@ function DeviceList() {
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
       />
+      <ConfirmDelete isDeleteConfirmOpen={isDeleteConfirmOpen} setIsDeleteConfirmOpen={setIsDeleteConfirmOpen} />
       <EditDeviceDialog
         isEditDialogOpen={isEditDialogOpen}
         setEditDialogOpen={setEditDialogOpen}
@@ -246,7 +249,9 @@ function DeviceList() {
                           >
                             Edit
                           </button>
-                          <button className="text-[#dc3546]">Delete</button>
+                          <button onClick={()=>{
+                            setIsDeleteConfirmOpen(!isDeleteConfirmOpen)
+                          }}className="text-[#dc3546]">Delete</button>
                         </div>
                       </td>
                     </tr>

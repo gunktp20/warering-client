@@ -49,7 +49,7 @@ function AccountUserDrawer(props: IDrawer) {
                 to="/account"
                 key={4}
                 onClick={() => {}}
-                className="flex pl-10 p-5 items-center text-[14.3px] text-[#1d4469]"
+                className="flex pl-10 p-5 items-center text-[13px] text-[#1d4469]"
               >
                 <FaRegUser className="mr-3 text-[16px]" />
                 Account
@@ -59,7 +59,7 @@ function AccountUserDrawer(props: IDrawer) {
                 to="/edit-profile"
                 key={5}
                 onClick={() => {}}
-                className="flex pl-10 p-5 items-center text-[14.3px] text-[#1d4469]"
+                className="flex pl-10 p-5 items-center text-[13px] text-[#1d4469]"
               >
                 <FiEdit3 className="mr-3 text-[16px]" />
                 Edit Profile
@@ -71,7 +71,7 @@ function AccountUserDrawer(props: IDrawer) {
               onClick={() => {
                 signOut();
               }}
-              className="flex pl-10 p-5 items-center text-[14.4px] text-[#962e39]"
+              className="flex pl-10 p-5 items-center text-[13px] text-[#962e39]"
             >
               <CiLogout className="mr-3 text-[16px]" />
               Logout
