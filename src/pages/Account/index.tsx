@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { IoArrowBackSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
+import ConfirmDeleteAccount from "./ConfirmDeleteAccount";
 
 const Account = () => {
   const navigate = useNavigate()
@@ -13,8 +15,11 @@ const Account = () => {
     password: "KruluzUtsman21wqq",
   };
 
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState<boolean>(false);
+
   return (
     <div className="flex items-center justify-center h-screen relative shadow-lg">
+      <ConfirmDeleteAccount isDeleteConfirmOpen={isDeleteConfirmOpen} setIsDeleteConfirmOpen={setIsDeleteConfirmOpen} />
       <div className="w-[705px] h-[566px] relative bg-white rounded-md shadow-md">
         <button
           onClick={() => {
@@ -71,12 +76,14 @@ const Account = () => {
         <div className="left-[381px] top-[391px] absolute text-neutral-500 prompt-regular">
           {accountData.password}
         </div>
-        <a
-          href=""
+        <button
+          onClick={()=>{
+            setIsDeleteConfirmOpen(true)
+          }}
           className="left-[83px] top-[457px] absolute text-red-500 prompt-regular"
         >
           Delete account
-        </a>
+        </button>
         <div className="left-[85px] top-[486px] absolute text-stone-300 text-xs prompt-regular">
           Permanently delete your account and all of your content.
         </div>
