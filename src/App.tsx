@@ -14,6 +14,7 @@ import DeviceList from "./pages/DeviceList";
 import AddDevice from "./pages/AddDevice";
 import Account from "./pages/Account";
 import EditProfile from "./pages/EditProfile";
+import Device from "./pages/Device/Device";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
           <Route path="/dashboard-list" element={<DashboardList />} />
           <Route path="/add-dashboard" element={<AddDashboard />} />
           <Route path="/device-list" element={<DeviceList />} />
+          <Route path="/device/:device_id" element={<Device />} />
           <Route path="/add-device" element={<AddDevice />} />
           <Route path="/account" element={<Account />} />
           <Route path="/edit-profile" element={<EditProfile />} />

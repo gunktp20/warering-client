@@ -162,7 +162,7 @@ function DashboardList() {
                           >
                             Edit
                           </button>
-                          <button className="text-[#dc3546]" onClick={()=>{
+                          <button className="text-[#dc3546]" onClick={() => {
                             setIsDeleteConfirmOpen(!isDeleteConfirmOpen)
                           }}>Delete</button>
                         </div>
@@ -172,6 +172,23 @@ function DashboardList() {
                 })}
               </tbody>
             </table>
+          </div>
+          <div className="flex justify-end items-center w-[100%] mt-4">
+            <div className="mr-3 text-[12.4px]">1-5 of items</div>
+            <div className="flex gap-2">
+              <div className="border-[1px] text-[#7a7a7a] border-[#cccccc] rounded-md w-[30px] h-[30px] flex items-center justify-center">
+                {"<"}
+              </div>
+              <div className="bg-[#1966fb] text-[13.5px]  text-white border-[1px] rounded-md w-[30px] h-[30px] flex items-center justify-center">
+                1
+              </div>
+              <div className="border-[1px] text-[13.5px] text-[#7a7a7a] border-[#cccccc] rounded-md w-[30px] h-[30px] flex items-center justify-center">
+                2
+              </div>
+              <div className="border-[1px] text-[13.5px] text-[#7a7a7a] border-[#cccccc] rounded-md w-[30px] h-[30px] flex items-center justify-center">
+                {">"}
+              </div>
+            </div>
           </div>
         </div>
       </div>

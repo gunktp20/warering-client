@@ -12,10 +12,12 @@ import Wrapper from "../../assets/wrappers/Dashboard";
 import { useState } from "react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import EditDeviceDialog from "./EditDeviceDialog";
 import SwitchSave from "./SwitchSave";
 import ConfirmDelete from "./ConfirmDeleteDevice";
+
+const pagination = [1, 2, 3, 4, 5]
 
 function DeviceList() {
   const navigate = useNavigate();
@@ -24,7 +26,7 @@ function DeviceList() {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState<boolean>(false);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
-    
+
   interface IDevice {
     active: boolean;
     nameDevice: string;
@@ -100,7 +102,7 @@ function DeviceList() {
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
         />
-        <div className="m-[3rem] relative top-[4rem] w-[100%] h-fit flex flex-col sm:top-[5rem] bg-white shadow-md py-8 px-10 rounded-md sm:m-[3rem] sm:mx-0">
+        <div className="m-[3rem] relative top-[4rem] w-[100%] h-fit flex flex-col sm:top-[5rem] shadow-md py-8 px-10 rounded-md sm:m-[3rem] sm:mx-0">
           <button
             onClick={() => {
               setIsDrawerOpen(true);
@@ -140,8 +142,8 @@ function DeviceList() {
               Add Device
             </Button>
           </div>
-          <div className=" w-[100%] justify-between flex items-center">
-            <div className="w-[330px] sm:w-[190px]">
+          <div className=" w-[100%] justify-between flex items-center sm:flex-col">
+            <div className="w-[330px] sm:w-[100%]">
               <FormRow
                 type="text"
                 name="search_dashboard"
@@ -151,7 +153,10 @@ function DeviceList() {
                 marginTop="mt-[0.2rem]"
               />
             </div>
-            <FormControl title="Sort by date" options={["Date"]} />
+            <div className="flex gap-3 sm:w-[100%]">
+              <FormControl title="Sort by date" options={["Date"]} />
+              <FormControl title="Filter" options={["filter"]} />
+            </div>
           </div>
           <div className="overflow-auto rounded-lg shadow block sm:shadow-none">
             <table className="w-full">
@@ -186,14 +191,12 @@ function DeviceList() {
                       className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10"
                     >
                       <td
-                        className={`flex sm:hidden items-center justify-center capitalize p-3 text-[13px] ${
-                          i.active ? "text-green-500" : "text-red-500"
-                        } whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}
+                        className={`flex sm:hidden items-center justify-center capitalize p-3 text-[13px] ${i.active ? "text-green-500" : "text-red-500"
+                          } whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}
                       >
                         <div
-                          className={`w-[8px] h-[8px] ${
-                            i.active ? "bg-green-500" : "bg-red-500"
-                          } rounded-full mr-2`}
+                          className={`w-[8px] h-[8px] ${i.active ? "bg-green-500" : "bg-red-500"
+                            } rounded-full mr-2`}
                         ></div>
                         {i.active ? "online" : "offline"}
                       </td>
@@ -201,19 +204,19 @@ function DeviceList() {
                       {i.nameDevice}
                     </td> */}
 
-                      <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white">
+                      <td onClick={()=>{
+                        navigate("/device/:device_id")
+                      }}className="p-3 cursor-pointer text-sm text-[#878787] whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white">
                         {i.nameDevice}
                       </td>
 
                       <td
-                        className={`hidden items-center sm:flex capitalize p-3 text-[13px] ${
-                          i.active ? "text-green-500" : "text-red-500"
-                        } whitespace-nowrap text-center sm:text-start`}
+                        className={`hidden items-center sm:flex capitalize p-3 text-[13px] ${i.active ? "text-green-500" : "text-red-500"
+                          } whitespace-nowrap text-center sm:text-start`}
                       >
                         <div
-                          className={`w-[8px] h-[8px] ${
-                            i.active ? "bg-green-500" : "bg-red-500"
-                          } rounded-full mr-2`}
+                          className={`w-[8px] h-[8px] ${i.active ? "bg-green-500" : "bg-red-500"
+                            } rounded-full mr-2`}
                         ></div>
                         {i.active ? "online" : "offline"}
                       </td>
@@ -249,9 +252,9 @@ function DeviceList() {
                           >
                             Edit
                           </button>
-                          <button onClick={()=>{
+                          <button onClick={() => {
                             setIsDeleteConfirmOpen(!isDeleteConfirmOpen)
-                          }}className="text-[#dc3546]">Delete</button>
+                          }} className="text-[#dc3546]">Delete</button>
                         </div>
                       </td>
                     </tr>
@@ -259,6 +262,23 @@ function DeviceList() {
                 })}
               </tbody>
             </table>
+          </div>
+          <div className="flex justify-end items-center w-[100%] mt-4">
+            <div className="mr-3 text-[12.4px]">1-5 of items</div>
+            <div className="flex gap-2">
+              <div className="border-[1px] text-[#7a7a7a] border-[#cccccc] rounded-md w-[30px] h-[30px] flex items-center justify-center">
+                {"<"}
+              </div>
+              <div className="bg-[#1966fb] text-[13.5px]  text-white border-[1px] rounded-md w-[30px] h-[30px] flex items-center justify-center">
+                1
+              </div>
+              <div className="border-[1px] text-[13.5px] text-[#7a7a7a] border-[#cccccc] rounded-md w-[30px] h-[30px] flex items-center justify-center">
+                2
+              </div>
+              <div className="border-[1px] text-[13.5px] text-[#7a7a7a] border-[#cccccc] rounded-md w-[30px] h-[30px] flex items-center justify-center">
+                {">"}
+              </div>
+            </div>
           </div>
         </div>
       </div>
