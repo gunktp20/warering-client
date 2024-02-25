@@ -106,7 +106,9 @@ function DashboardList() {
                 marginTop="mt-[0.2rem]"
               />
             </div>
+            <div>
             <FormControl title="Sort by date" options={["Date"]} />
+            </div>
           </div>
           <div className="overflow-auto rounded-lg shadow block sm:shadow-none">
             <table className="w-full">
