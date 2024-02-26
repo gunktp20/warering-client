@@ -49,7 +49,7 @@ function DashboardList() {
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
       />
-      <div className="flex">
+      <div className="flex h-[100vh]">
         <NavLinkSidebar />
         <NavDialog
           isDrawerOpen={isDrawerOpen}

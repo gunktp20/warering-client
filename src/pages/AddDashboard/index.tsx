@@ -37,13 +37,13 @@ function AddDashboard() {
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
       />
-      <div className="flex">
+      <div className="flex h-[100vh]">
         <NavLinkSidebar />
         <NavDialog
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
         />
-        <div className="m-[3rem] relative top-[5rem] w-[100%] h-fit flex flex-col sm:top-[5rem] bg-white shadow-md py-8 px-10 rounded-md sm:m-[3rem]">
+        <div className="m-[3rem] top-[5rem] w-[100%] h-fit flex flex-col sm:top-[5rem] bg-white shadow-md py-8 px-10 rounded-md sm:m-[3rem]">
           <button
             onClick={() => {
               setIsDrawerOpen(true);

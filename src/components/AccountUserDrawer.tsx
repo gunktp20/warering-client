@@ -22,6 +22,7 @@ function AccountUserDrawer(props: IDrawer) {
     await axiosPrivate.post(
       `/auth/logout`,
       {},
+      
       {
         headers: { Authorization: `Bearer ${token}` },
       }

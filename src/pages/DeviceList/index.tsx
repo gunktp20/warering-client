@@ -96,13 +96,13 @@ function DeviceList() {
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
       />
-      <div className="flex">
+      <div className="flex h-[100vh]">
         <NavLinkSidebar />
         <NavDialog
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
         />
-        <div className="m-[3rem] bg-white relative top-[4rem] w-[100%] h-fit flex flex-col sm:top-[5rem] shadow-md py-8 px-10 rounded-md sm:m-[3rem] sm:mx-0">
+        <div className="m-[3rem] bg-white top-[4rem] w-[100%] h-fit flex flex-col sm:top-[5rem] shadow-md py-8 px-10 rounded-md sm:m-[3rem] sm:mx-0">
           <button
             onClick={() => {
               setIsDrawerOpen(true);
