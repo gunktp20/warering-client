@@ -109,7 +109,7 @@ export default function EditDashboardDialog(props: IDrawer) {
                                 variant="contained"
                                 id="setup-user-submit"
                             >
-                                Add Dashboard
+                                Edit Dashboard
                             </Button>
                         </div>
                     </DialogContentText>

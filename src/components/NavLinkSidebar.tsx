@@ -5,7 +5,7 @@ import { NavLink } from "react-router-dom";
 
 const NavLinks = () => {
   return (
-    <div className="bg-[#fff] w-[300px] shadow-md pt-5 h-[100%] w-sm flex flex-col sm:hidden">
+    <div className="bg-[#fff] h-[100v%] w-[300px] shadow-md pt-5 w-sm flex flex-col sm:hidden">
       <div className="flex flex-col">
         <NavLink
           to="/"
