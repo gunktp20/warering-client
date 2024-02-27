@@ -37,7 +37,7 @@ function AccountUserDrawer(props: IDrawer) {
         onClose={() => {
           setIsAccountUserDrawerOpen(false);
         }}
-        className="sm:hidden"
+        className=""
         PaperProps={{ id: "setup-user-drawer" }}
       >
         <Box p={2} width="250px" textAlign="left" role="presentation">

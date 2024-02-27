@@ -9,13 +9,13 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
 import DashboardList from "./pages/DashboardList";
+import Dashboard from "./pages/Dashboard";
 import AddDashboard from "./pages/AddDashboard";
 import DeviceList from "./pages/DeviceList";
+import Device from "./pages/Device/Device";
 import AddDevice from "./pages/AddDevice";
 import Account from "./pages/Account";
 import EditProfile from "./pages/EditProfile";
-import Device from "./pages/Device/Device";
-
 function App() {
   return (
     <BrowserRouter>
@@ -26,6 +26,7 @@ function App() {
         <Route element={<RequireUser />}>
           <Route path="/" element={<Overview />} />
           <Route path="/dashboard-list" element={<DashboardList />} />
+          <Route path="/dashboard/:dashboard_id" element={<Dashboard />} />
           <Route path="/add-dashboard" element={<AddDashboard />} />
           <Route path="/device-list" element={<DeviceList />} />
           <Route path="/device/:device_id" element={<Device />} />

@@ -150,7 +150,9 @@ function DashboardList() {
                         key={index}
                         className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10"
                       >
-                        <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white">
+                        <td onClick={()=>{
+                          navigate("/dashboard/:dashboard_id")
+                        }} className="cursor-pointer p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white">
                           Dashboard Name
                         </td>
                         <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
