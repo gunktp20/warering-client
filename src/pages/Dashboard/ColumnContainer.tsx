@@ -12,17 +12,14 @@ interface Props {
   deleteTask: (id: Id) => void;
   tasks: Task[];
 }
-import TaskCard from "./TaskCard";
-import { ButtonControl, Gauge } from "../../components/widgets";
+import { ButtonControl, Gauge, MessageBox, ToggleSwitch } from "../../components/widgets";
+import RangeSlider from "../../components/widgets/RangeSlider";
 
 function ColumnContainer({
   column,
-  deleteColumn,
   updateColumn,
   createTask,
   tasks,
-  deleteTask,
-  updateTask,
 }: Props) {
   const [editMode, setEditMode] = useState(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
@@ -92,6 +89,7 @@ function ColumnContainer({
         onClick={() => {
           setEditMode(true);
         }}
+        // border-2
         className="
       text-md
       h-[60px]
@@ -100,7 +98,7 @@ function ColumnContainer({
       rounded-b-none
       p-3
       font-bold
-      border-2
+      
       flex
       items-center
       justify-between
@@ -122,7 +120,7 @@ function ColumnContainer({
           >
             0
           </div>
-          {!editMode && column.id}
+          {/* {!editMode && column.id} */}
           {editMode && (
             <input
               className=" focus:border-[#1966fb] border rounded outline-none px-2"
@@ -139,7 +137,7 @@ function ColumnContainer({
             />
           )}
         </div>
-        <button
+        {/* <button
           onClick={() => {
             deleteColumn(column.id);
           }}
@@ -153,7 +151,7 @@ function ColumnContainer({
         "
         >
           TrashIcon
-        </button>
+        </button> */}
       </div>
 
       {/* Column task container */}
@@ -171,17 +169,45 @@ function ColumnContainer({
               );
             }
             if (task?.category === "ButtonControl") {
-            return (
-              <ButtonControl
-                key={task.id}
-                task={task}
-                isDeleteConfirmOpen={isDeleteConfirmOpen}
-                setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-              />
-            );
+              return (
+                <ButtonControl
+                  key={task.id}
+                  task={task}
+                  isDeleteConfirmOpen={isDeleteConfirmOpen}
+                  setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
+                />
+              );
             }
-
-         
+            if (task?.category === "MessageBox") {
+              return (
+                <MessageBox
+                  key={task.id}
+                  task={task}
+                  isDeleteConfirmOpen={isDeleteConfirmOpen}
+                  setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
+                />
+              );
+            }
+            if (task?.category === "RangeSlider") {
+              return (
+                <RangeSlider
+                  key={task.id}
+                  task={task}
+                  isDeleteConfirmOpen={isDeleteConfirmOpen}
+                  setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
+                />
+              );
+            }
+            if (task?.category === "ToggleSwitch") {
+              return (
+                <ToggleSwitch
+                  key={task.id}
+                  task={task}
+                  isDeleteConfirmOpen={isDeleteConfirmOpen}
+                  setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
+                />
+              );
+            }
           })}
         </SortableContext>
       </div>
@@ -192,7 +218,7 @@ function ColumnContainer({
           createTask(column.id);
         }}
       >
-        + Add task
+        {/* + Add task */}
       </button>
     </div>
   );

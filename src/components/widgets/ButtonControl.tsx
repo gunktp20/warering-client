@@ -3,7 +3,6 @@ import { Id, Task } from "./types";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { Doughnut } from "react-chartjs-2";
 import { RxDotsHorizontal } from "react-icons/rx";
 import { Button } from "@mui/material"
 

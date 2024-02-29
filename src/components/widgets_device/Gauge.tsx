@@ -35,7 +35,6 @@ const data = {
 const options = {};
 
 interface IProp {
-  task: Task;
   isDeleteConfirmOpen: boolean;
   setIsDeleteConfirmOpen: (active: boolean) => void;
 }
@@ -44,56 +43,13 @@ function Gauge(props: IProp) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [mouseIsOver, setMouseIsOver] = useState(false);
   const [editMode, setEditMode] = useState(true);
-  const {
-    setNodeRef,
-    attributes,
-    listeners,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: props.task.id,
-    data: {
-      type: "Task",
-      task: props.task,
-    },
-    disabled: editMode,
-  });
-
-  const style = {
-    transition,
-    transform: CSS.Transform.toString(transform),
-  };
-
-  if (isDragging) {
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        className="
-        opacity-30
-      bg-mainBackgroundColor p-2.5 h-[100px] min-h-[100px] items-center flex text-left rounded-xl border-2 border-rose-500  cursor-grab relative
-      "
-      />
-    );
-  }
 
   return (
     <div
-      onMouseEnter={() => {
-        setMouseIsOver(true);
-      }}
-      onMouseLeave={() => {
-        setMouseIsOver(false);
-      }}
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
       className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 hover:ring-inset hover:ring-rose-500 cursor-grab"
     >
       <div className="absolute left-2 top-2 text-[#1d4469] text-sm">
-        Temperature ID : <b className="text-xl">{props.task.id}</b>
+        Temperature
       </div>
       <div
         onClick={() => {

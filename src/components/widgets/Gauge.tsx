@@ -16,7 +16,7 @@ interface Props {
   updateTask?: (id: Id, content: string) => void;
 }
 
-function TaskCard({ task, deleteTask, updateTask , setIsDeleteConfirmOpen,isDeleteConfirmOpen }: Props) {
+function Gauge({ task, deleteTask, updateTask , setIsDeleteConfirmOpen,isDeleteConfirmOpen }: Props) {
   const [mouseIsOver, setMouseIsOver] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
@@ -160,4 +160,4 @@ function TaskCard({ task, deleteTask, updateTask , setIsDeleteConfirmOpen,isDele
   );
 }
 
-export default TaskCard;
+export default Gauge;

@@ -12,14 +12,13 @@ import { SiMicrosoftexcel } from "react-icons/si";
 import { BsFiletypeJson } from "react-icons/bs";
 import { FaClipboardList } from "react-icons/fa";
 import Wrapper from "../../assets/wrappers/Device";
-// widget component
 import {
   ButtonControl,
   Gauge,
   MessageBox,
   ToggleSwitch,
   RangeSlider,
-} from "../../components/widgets";
+} from "../../components/widgets_device";
 import { Button } from "@mui/material";
 import AddDisplayDialog from "./AddDisplayDialog";
 import ConfirmDelete from "./ConfirmDelete";
@@ -255,16 +254,26 @@ function Device() {
 
           {/* start widget container */}
           <div className="grid grid-cols-3 gap-10 mt-8 md:grid-cols-2 sm:grid-cols-1">
-            <Gauge isDeleteConfirmOpen={isDeleteConfirmOpen}
-        setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}/>
-            <MessageBox isDeleteConfirmOpen={isDeleteConfirmOpen}
-        setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}/>
-            <RangeSlider isDeleteConfirmOpen={isDeleteConfirmOpen}
-        setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}/>
-            <ToggleSwitch isDeleteConfirmOpen={isDeleteConfirmOpen}
-        setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}/>
-            <ButtonControl isDeleteConfirmOpen={isDeleteConfirmOpen}
-        setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}/>
+            <Gauge
+              isDeleteConfirmOpen={isDeleteConfirmOpen}
+              setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
+            />
+            <MessageBox
+              isDeleteConfirmOpen={isDeleteConfirmOpen}
+              setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
+            />
+            <RangeSlider
+              isDeleteConfirmOpen={isDeleteConfirmOpen}
+              setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
+            />
+            <ToggleSwitch
+              isDeleteConfirmOpen={isDeleteConfirmOpen}
+              setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
+            />
+            <ButtonControl
+              isDeleteConfirmOpen={isDeleteConfirmOpen}
+              setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
+            />
           </div>
           {/* end widget container */}
         </div>

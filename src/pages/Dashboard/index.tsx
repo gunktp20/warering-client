@@ -15,7 +15,6 @@ import {
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
 import TaskCard from "./TaskCard";
-import { Gauge } from "../../components/widgets";
 
 const defaultCols: Column[] = [
   {
@@ -48,58 +47,24 @@ const defaultTasks: Task[] = [
   {
     id: "3",
     columnId: "col2",
-    content: "Conduct security testing",
+    category: "MessageBox",
   },
   {
     id: "4",
     columnId: "col2",
-    content: "Analyze competitors",
+    category: "RangeSlider",
   },
   {
     id: "5",
     columnId: "col3",
-    content: "Create UI kit documentation",
+    category: "ToggleSwitch",
   },
   {
     id: "6",
     columnId: "col3",
     content: "Dev meeting",
   },
-  // {
-  //   id: "7",
-  //   columnId: "col3",
-  //   content: "Deliver dashboard prototype",
-  // },
-  // {
-  //   id: "8",
-  //   columnId: "col1",
-  //   content: "Optimize application performance",
-  // },
-  // {
-  //   id: "9",
-  //   columnId: "col1",
-  //   content: "Implement data validation",
-  // },
-  // {
-  //   id: "10",
-  //   columnId: "col1",
-  //   content: "Design database schema",
-  // },
-  // {
-  //   id: "11",
-  //   columnId: "col1",
-  //   content: "Integrate SSL web certificates into workflow",
-  // },
-  // {
-  //   id: "12",
-  //   columnId: "col2",
-  //   content: "Implement error logging and monitoring",
-  // },
-  // {
-  //   id: "13",
-  //   columnId: "col2",
-  //   content: "Design and implement responsive UI",
-  // },
+
 ];
 
 function KanbanBoard() {
@@ -123,7 +88,6 @@ function KanbanBoard() {
 
   useEffect(() => {
     console.log("useEffect tasks : ", tasks)
-    
   }, [tasks])
 
   return (
