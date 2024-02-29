@@ -1,18 +1,9 @@
-import { useSortable } from "@dnd-kit/sortable";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { RxDotsHorizontal } from "react-icons/rx";
-import { CSS } from "@dnd-kit/utilities";
 
 export type Id = string | number;
-
-type Task = {
-  id: Id;
-  columnId: Id;
-  content?: string;
-  category?: string;
-};
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -41,8 +32,6 @@ interface IProp {
 
 function Gauge(props: IProp) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
-  const [mouseIsOver, setMouseIsOver] = useState(false);
-  const [editMode, setEditMode] = useState(true);
 
   return (
     <div

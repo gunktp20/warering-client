@@ -4,17 +4,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
-import {
-  login,
-  register,
-  forgetPassword,
-  clearAlert,
-  displayAlert,
-} from "../../features/auth/authSlice";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { Link, useNavigate } from "react-router-dom";
 import { FormRow } from "../../components";
-import { Alert, Button } from "@mui/material";
+import { Button } from "@mui/material";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -50,30 +41,22 @@ const initialState: IValue = {
 
 export default function EditDeviceDialog(props: IDrawer) {
   const { setEditDialogOpen } = props;
-
-  const navigate = useNavigate();
-
   const [values, setValues] = useState<IValue>(initialState);
-  const [isAcceptTerm, setIsAcceptTerm] = useState<boolean>(false);
-  
-  
 
-  const dispatch = useAppDispatch();
-
-  const showDisplayAlert = (
-    alertType: "warning" | "error" | "info" | "success",
-    alertText: string
-  ) => {
-    dispatch(
-      displayAlert({
-        alertType,
-        alertText,
-      })
-    );
-    setTimeout(() => {
-      dispatch(clearAlert());
-    }, 4000);
-  };
+  // const showDisplayAlert = (
+  //   alertType: "warning" | "error" | "info" | "success",
+  //   alertText: string
+  // ) => {
+  //   dispatch(
+  //     displayAlert({
+  //       alertType,
+  //       alertText,
+  //     })
+  //   );
+  //   setTimeout(() => {
+  //     dispatch(clearAlert());
+  //   }, 4000);
+  // };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
@@ -182,7 +165,7 @@ export default function EditDeviceDialog(props: IDrawer) {
               <div className="w-[250px] sm:w-[100%] mr-5">
                 <Button
                   onClick={() => {
-                    handleClose()
+                    handleClose();
                   }}
                   style={{
                     textTransform: "none",
@@ -193,7 +176,7 @@ export default function EditDeviceDialog(props: IDrawer) {
                   sx={{
                     // bgcolor: "#1966fb",
                     ":hover": {
-                    //   bgcolor: "#10269C",
+                      //   bgcolor: "#10269C",
                     },
                     ":disabled": {
                       color: "#fff",

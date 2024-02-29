@@ -1,5 +1,3 @@
-import { useAppDispatch } from "../../app/hooks";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import {
   BigNavbar,
   FormRow,
@@ -144,10 +142,10 @@ function DashboardList() {
                 </thead>
                 {/* <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600"> */}
                 <tbody className="divide-y divide-gray-100">
-                  {dashboard_list.map((i, index) => {
+                  {dashboard_list.map((i) => {
                     return (
                       <tr
-                        key={index}
+                        key={i}
                         className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10"
                       >
                         <td onClick={()=>{

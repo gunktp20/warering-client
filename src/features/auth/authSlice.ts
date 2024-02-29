@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import api from "../../services/api";
 import { jwtDecode } from "jwt-decode";
 import {
@@ -119,36 +119,6 @@ export const refreshToken = createAsyncThunk(
     }
   }
 );
-
-// export const logout = createAsyncThunk(
-//   "auth/logout",
-//   async (token: string | null | void, thunkApi) => {
-//     try {
-//       const response = await api.post(
-//         `/auth/logout`,
-//         {},
-//         {
-//           headers: { Authorization: `Bearer ${token}` },
-//         }
-//       );
-//       removeUserFromLocalStorage();
-//       return response.data;
-//     } catch (err: any) {
-//       console.log(err.response.status)
-//       if (err.response.status === 403) {
-//           const { data } = await api.get(`/auth/refresh`);
-//           console.log("retry logout")
-//           logout(data.access_token);
-//           return;
-//       }
-//       const msg =
-//         typeof err?.response?.data?.message === "object"
-//           ? err?.response?.data?.message[0]
-//           : err?.response?.data?.message;
-//       return thunkApi.rejectWithValue(msg);
-//     }
-//   }
-// );
 
 const AuthSlice = createSlice({
   name: "auth",

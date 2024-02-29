@@ -16,9 +16,7 @@ interface Props {
   updateTask?: (id: Id, content: string) => void;
 }
 
-function Gauge({ task, deleteTask, updateTask , setIsDeleteConfirmOpen,isDeleteConfirmOpen }: Props) {
-  const [mouseIsOver, setMouseIsOver] = useState(false);
-  const [editMode, setEditMode] = useState(false);
+function Gauge({ task, setIsDeleteConfirmOpen,isDeleteConfirmOpen }: Props) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
 
   const data = {
@@ -60,12 +58,6 @@ function Gauge({ task, deleteTask, updateTask , setIsDeleteConfirmOpen,isDeleteC
     transform: CSS.Transform.toString(transform),
   };
 
-  const toggleEditMode = () => {
-    console.log("toggleEditMode");
-    // setEditMode((prev) => !prev);
-    setMouseIsOver(false);
-  };
-
   if (isDragging) {
     return (
       <div
@@ -79,50 +71,13 @@ function Gauge({ task, deleteTask, updateTask , setIsDeleteConfirmOpen,isDeleteC
     );
   }
 
-  if (editMode) {
-    console.log("editMode", editMode, task.id);
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        {...attributes}
-        {...listeners}
-        className="bg-[#000] p-2.5 h-[100px] min-h-[100px] items-center flex text-left rounded-xl hover:ring-2 hover:ring-inset hover:ring-[#1966fb] cursor-grab relative"
-      >
-        <textarea
-          className="
-        h-[90%]
-        w-full resize-none border-none rounded bg-transparent text-white focus:outline-none
-        "
-          value={task.content}
-          autoFocus
-          placeholder="Task content here"
-          onBlur={toggleEditMode}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && e.shiftKey) {
-              // toggleEditMode();
-            }
-          }}
-          // onChange={(e) => updateTask(task.id, e.target.value)}
-        />
-      </div>
-    );
-  }
-
   return (
     <div
       ref={setNodeRef}
       style={style}
       {...attributes}
       {...listeners}
-      // onClick={toggleEditMode}
       className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 hover:ring-inset hover:ring-[#1966fb] cursor-grab"
-      onMouseEnter={() => {
-        setMouseIsOver(true);
-      }}
-      onMouseLeave={() => {
-        setMouseIsOver(false);
-      }}
     >
       <div className="absolute left-2 top-2 text-[#1d4469] text-sm">
         Temperature

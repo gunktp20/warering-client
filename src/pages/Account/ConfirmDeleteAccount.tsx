@@ -19,9 +19,6 @@ interface IProps {
 }
 
 export default function ConfirmDeleteAccount(props: IProps) {
-  const handleClickOpen = () => {
-    props.setIsDeleteConfirmOpen(true);
-  };
 
   const handleClose = () => {
     props.setIsDeleteConfirmOpen(false);

@@ -1,7 +1,6 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
-import Typography from "@mui/material/Typography";
 import { RxDotsHorizontal } from "react-icons/rx";
 
 const MAX = 10;

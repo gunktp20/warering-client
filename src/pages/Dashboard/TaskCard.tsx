@@ -110,17 +110,11 @@ function TaskCard({ task, deleteTask, updateTask }: Props) {
       {...listeners}
       onClick={toggleEditMode}
       className="bg-white relative border-[1px] border-[#afafaf] p-2.5 h-[100px] min-h-[100px] flex rounded-xl hover:ring-2 hover:ring-inset hover:ring-[#1966fb] cursor-grab task justify-center items-center"
-      onMouseEnter={() => {
-        setMouseIsOver(true);
-      }}
-      onMouseLeave={() => {
-        setMouseIsOver(false);
-      }}
     > 
-    <div className="absolute text-[black] top-[0%] right-1 text-[30px] pt-[0%] flex border-[#000] w-fit h-[30px] w-[30px] rounded-[100%]">
+    <div className="absolute text-[black] top-[0%] right-1 text-[30px] pt-[0%] flex border-[#000] h-[30px] w-[30px] rounded-[100%]">
       <div className="relative top-[-1.1rem] left-0">...</div>
     </div>
-    <div className="absolute text-[black] top-[1.3rem] left-2 text-[30px] pt-[0%] flex border-[#000] w-fit h-[30px] w-[30px] rounded-[100%]">
+    <div className="absolute text-[black] top-[1.3rem] left-2 text-[30px] pt-[0%] flex border-[#000] h-[30px] w-[30px] rounded-[100%]">
       <div className="relative top-[-1.1rem] left-0 text-[25px]">{task.id}</div>
     </div>
       <div className='w-[100px]'>

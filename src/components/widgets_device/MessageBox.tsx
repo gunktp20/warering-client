@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { RxDotsHorizontal } from "react-icons/rx";
 
-const options = {};
-
 interface IProp {
     isDeleteConfirmOpen:boolean;
     setIsDeleteConfirmOpen:(active:boolean)=>void

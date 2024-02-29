@@ -32,15 +32,6 @@ function Device() {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
 
-  const [values, setValues] = useState({
-    device_name: "",
-    username_device: "",
-    password: "",
-    description: "",
-    topic_device: "",
-    Qos: "",
-  });
-
   const jsonData = {
     data: "HelloWorld",
     username: "gunktp14",
@@ -48,9 +39,6 @@ function Device() {
     description: "สวัดดีครับท่านผู้ชม",
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValues({ ...values, [e.target.name]: e.target.value });
-  };
 
   return (
     <Wrapper>

@@ -15,28 +15,8 @@ interface Props {
   updateTask?: (id: Id, content: string) => void;
 }
 
-function TaskCard({ task, deleteTask, updateTask , isDeleteConfirmOpen , setIsDeleteConfirmOpen }: Props) {
-  const [mouseIsOver, setMouseIsOver] = useState(false);
-  const [editMode, setEditMode] = useState(false);
+function TaskCard({ task, isDeleteConfirmOpen , setIsDeleteConfirmOpen }: Props) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
-
-  const data = {
-    labels: [],
-    datasets: [
-      {
-        label: "Poll",
-        data: [3, 24],
-        backgroundColor: ["#a0727245", "#1966fb"],
-        borderColor: ["#fff", "#fff"],
-        circumference: 180,
-        rotation: 270,
-        borderWidth: 0,
-        cutout: "84%",
-      },
-    ],
-  };
-
-  const options = {};
 
   const {
     setNodeRef,
@@ -59,12 +39,6 @@ function TaskCard({ task, deleteTask, updateTask , isDeleteConfirmOpen , setIsDe
     transform: CSS.Transform.toString(transform),
   };
 
-  const toggleEditMode = () => {
-    console.log("toggleEditMode");
-    // setEditMode((prev) => !prev);
-    setMouseIsOver(false);
-  };
-
   if (isDragging) {
     return (
       <div
@@ -78,50 +52,13 @@ function TaskCard({ task, deleteTask, updateTask , isDeleteConfirmOpen , setIsDe
     );
   }
 
-  if (editMode) {
-    console.log("editMode",editMode,task.id)
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        {...attributes}
-        {...listeners}
-        className="bg-[#000] p-2.5 h-[100px] min-h-[100px] items-center flex text-left rounded-xl hover:ring-2 hover:ring-inset hover:ring-[#1966fb] cursor-grab relative"
-      >
-        <textarea
-          className="
-        h-[90%]
-        w-full resize-none border-none rounded bg-transparent text-white focus:outline-none
-        "
-          value={task.content}
-          autoFocus
-          placeholder="Task content here"
-          onBlur={toggleEditMode}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && e.shiftKey) {
-              // toggleEditMode();
-            }
-          }}
-          // onChange={(e) => updateTask(task.id, e.target.value)}
-        />
-      </div>
-    );
-  }
-
   return (
     <div
       ref={setNodeRef}
       style={style}
       {...attributes}
       {...listeners}
-      // onClick={toggleEditMode}
       className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 hover:ring-inset hover:ring-[#1966fb] cursor-grab"
-      onMouseEnter={() => {
-        setMouseIsOver(true);
-      }}
-      onMouseLeave={() => {
-        setMouseIsOver(false);
-      }}
     >
       <div className="absolute left-2 top-2 text-[#1d4469] text-sm">
         Message Box

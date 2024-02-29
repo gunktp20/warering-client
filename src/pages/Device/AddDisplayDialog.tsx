@@ -8,8 +8,6 @@ import {
   InputLabel,
   Select,
   OutlinedInput,
-  MenuItem,
-  Button,
 } from "@mui/material";
 
 const Transition = React.forwardRef(function Transition(
@@ -31,9 +29,6 @@ interface IProps {
 //   };
 
 export default function AddDisplayDialog(props: IProps) {
-  const handleClickOpen = () => {
-    props.setIsAddDisplayShow(true);
-  };
 
   const handleClose = () => {
     props.setIsAddDisplayShow(false);
