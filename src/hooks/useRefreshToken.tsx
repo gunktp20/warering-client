@@ -13,9 +13,11 @@ const useRefreshToken = () => {
                 },
                 withCredentials: true,
             })
+            console.log('Refresh token is valid')
             dispatch(setCredential(response.data?.access_token));
             return response.data.access_token;
         } catch (err: any) {
+            console.log('! Refresh token is not valid')
             dispatch(logout())
             Cookies.remove("refresh_token")
         }

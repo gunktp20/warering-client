@@ -1,10 +1,16 @@
 import { useEffect } from "react";
 import { useAppSelector } from "../app/hooks";
 import { useNavigate, Outlet } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
+import { AccessTokenPayload } from "../features/auth/types"
 
 function RequireAdmin() {
   const navigate = useNavigate();
-  const { user } = useAppSelector((state) => state.auth);
+  const { user , token} = useAppSelector((state) => state.auth);
+
+  const decoded: AccessTokenPayload | undefined = token
+  ? jwtDecode(token)
+  : undefined;
 
   useEffect(() => {
     if (!user) {
@@ -12,7 +18,7 @@ function RequireAdmin() {
       navigate("/home");
       return;
     }
-    const isAdmin = user?.roles.filter((role) => {
+    const isAdmin = decoded?.roles.filter((role) => {
       return role === "admin";
     }).length;
     if (!isAdmin) {

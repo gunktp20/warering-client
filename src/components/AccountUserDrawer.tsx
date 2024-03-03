@@ -14,19 +14,11 @@ interface IDrawer {
 
 function AccountUserDrawer(props: IDrawer) {
   const dispatch = useAppDispatch();
-  const { token } = useAppSelector((state) => state.auth);
   const { isAccountUserDrawerOpen, setIsAccountUserDrawerOpen } = props;
 
   const signOut = async () => {
     dispatch(logout());
-    await axiosPrivate.post(
-      `/auth/logout`,
-      {},
-      
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    );
+    await axiosPrivate.get("/auth/logout");
   };
 
   return (

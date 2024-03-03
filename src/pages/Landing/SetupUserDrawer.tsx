@@ -365,7 +365,7 @@ function SetupUserDrawer(props: IDrawer) {
                   </button>
                 </div>
 
-                <Button
+                {/* <Button
                   onClick={() => {
                     dispatch(demoAuth())
                   }}
@@ -389,7 +389,7 @@ function SetupUserDrawer(props: IDrawer) {
                   id="demo-app"
                 >
                   App Demo
-                </Button>
+                </Button> */}
 
               </div>
             )}

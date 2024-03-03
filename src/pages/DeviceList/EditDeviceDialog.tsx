@@ -1,11 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
-import { FormRow } from "../../components";
+import { FormRow, FormSelect, SnackBar } from "../../components";
 import { Button } from "@mui/material";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { Alert } from "@mui/material"
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -19,52 +21,174 @@ const Transition = React.forwardRef(function Transition(
 interface IDrawer {
   isEditDialogOpen: boolean;
   setEditDialogOpen: (active: boolean) => void;
+  selectedDevice: string;
 }
 
 interface IValue {
-  device_name: string;
-  username_device: string;
-  password: string;
+  nameDevice: string;
+  usernameDevice: string;
+  password?: string;
   description: string;
-  topic_device: string;
-  Qos: string;
+  topics: string;
+  qos?: number;
+  retain: boolean;
+  isSaveData: boolean;
 }
 
 const initialState: IValue = {
-  device_name: "device name",
-  username_device: "username device",
-  password: "password",
-  description: "description",
-  topic_device: "topic device",
-  Qos: "Qos",
+  nameDevice: "",
+  usernameDevice: "",
+  password: "",
+  description: "",
+  topics: "",
+  retain: true,
+  isSaveData: true,
 };
 
 export default function EditDeviceDialog(props: IDrawer) {
   const { setEditDialogOpen } = props;
+  const axiosPrivate = useAxiosPrivate();
   const [values, setValues] = useState<IValue>(initialState);
-
-  // const showDisplayAlert = (
-  //   alertType: "warning" | "error" | "info" | "success",
-  //   alertText: string
-  // ) => {
-  //   dispatch(
-  //     displayAlert({
-  //       alertType,
-  //       alertText,
-  //     })
-  //   );
-  //   setTimeout(() => {
-  //     dispatch(clearAlert());
-  //   }, 4000);
-  // };
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const options = [0, 1, 2];
+  const [qos, setQos] = useState<number>(options[0]);
+  const [timeoutIds, setTimeoutIds] = useState<any>([]);
+  const [showSnackBar, setShowSnackBar] = useState<boolean>(false);
+  const [snackBarText, setSnackBarText] = useState<string>("");
+  const [snackBarType, setSnackBarType] = useState<
+    "error" | "success" | "info" | "warning"
+  >("error");
+  const [currentDeviceInfo,setCurrentDeviceInfo] = useState<any>()
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
   const handleClose = () => {
+    if(isLoading){
+      return;
+    }
     setEditDialogOpen(false);
   };
+
+  const fetchDeviceInfo = async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await axiosPrivate.get(
+        `/devices/${props.selectedDevice}`
+      );
+      const {
+        nameDevice,
+        usernameDevice,
+        description,
+        topics,
+        qos,
+        retain,
+        isSaveData,
+      } = data;
+
+      setValues({
+        nameDevice,
+        usernameDevice,
+        description,
+        password: "",
+        topics:topics[0].split('/')[1],
+        retain,
+        isSaveData,
+      });
+      setCurrentDeviceInfo({
+        nameDevice,
+        usernameDevice,
+        description,
+        password: "",
+        topics:topics[0].split('/')[1],
+        qos,
+        retain,
+        isSaveData,
+      })
+      setQos(qos);
+      setIsLoading(false);
+    } catch (err: any) {
+      setIsLoading(false);
+    }
+  };
+
+  const onSubmit = async() =>{
+    const {
+      nameDevice,
+      usernameDevice,
+      password,
+      description,
+      topics,
+    } = values;
+    if (
+      !nameDevice ||
+      !usernameDevice ||
+      !description ||
+      !topics 
+    ) {
+      setShowSnackBar(true);
+      setSnackBarType("error");
+      setSnackBarText("Please provide all value!");
+      clearAlert();
+      return;
+    }
+
+    const deviceInfo = {
+      ...values,
+      nameDevice:nameDevice === currentDeviceInfo.nameDevice ? undefined : nameDevice ,
+      usernameDevice:usernameDevice === currentDeviceInfo.usernameDevice ? undefined : usernameDevice ,
+      password:password === "" ? undefined : password ,
+      description:description === currentDeviceInfo.description ? undefined : description ,
+      topics:topics === currentDeviceInfo.topics ? undefined : topics ,
+      qos:Number(qos)
+    }
+    await editDevice(deviceInfo)
+  }
+
+  const editDevice = async (deviceInfo: any) => {
+    setIsLoading(true);
+    try {
+      await axiosPrivate.put(`/devices/${props.selectedDevice}`, deviceInfo);
+      setIsLoading(false);
+      setShowSnackBar(true);
+      setSnackBarType("success");
+      setSnackBarText("Your device information has been edited successfully");
+      clearAlert();
+      setIsLoading(false);
+    } catch (err: any) {
+      setValues(currentDeviceInfo)
+      const msg =
+        typeof err?.response?.data?.message === "object"
+          ? err?.response?.data?.message[0]
+          : err?.response?.data?.message;
+      setShowSnackBar(true);
+      setSnackBarType("error");
+      setSnackBarText(msg);
+      clearAlert();
+      setIsLoading(false);
+    }
+  };
+
+  // Function to clear all running timeouts
+  const clearAllTimeouts = () => {
+    timeoutIds.forEach((timeoutId: any) => clearTimeout(timeoutId));
+    setTimeoutIds([]); // Clear the timeout IDs from state
+  };
+  // Function to set a new timeout
+  const clearAlert = () => {
+    clearAllTimeouts(); // Clear existing timeouts before setting a new one
+    const newTimeoutId = setTimeout(() => {
+      // Your timeout function logic here
+      setShowSnackBar(false);
+    }, 3000);
+    setTimeoutIds([newTimeoutId]); // Store the new timeout ID in state
+  };
+
+  useEffect(() => {
+    if (props.selectedDevice) {
+      fetchDeviceInfo();
+    }
+  }, [props.selectedDevice]);
 
   return (
     <div>
@@ -90,13 +214,28 @@ export default function EditDeviceDialog(props: IDrawer) {
                 Fill in the information to add a Dashboard from your device.
               </div>
             </div>
+            {showSnackBar && snackBarType && (
+              <div className="hidden sm:block">
+                <Alert
+                  severity={snackBarType}
+                  sx={{
+                    fontSize: "11.8px",
+                    alignItems: "center",
+                    marginTop: "2rem",
+                  }}
+                >
+                  {snackBarText}
+                </Alert>
+              </div>
+            )}
+
             <div className="flex gap-10 mt-9 sm:flex-col sm:gap-0">
               <div className="w-[350px] sm:w-[100%]">
                 <FormRow
                   type="text"
-                  name="device_name"
+                  name="nameDevice"
                   labelText="Device name"
-                  value={values.device_name}
+                  value={values.nameDevice}
                   handleChange={handleChange}
                   marginTop="mt-[0.2rem]"
                 />
@@ -104,9 +243,9 @@ export default function EditDeviceDialog(props: IDrawer) {
               <div className="w-[350px] sm:w-[100%]">
                 <FormRow
                   type="text"
-                  name="username_device"
+                  name="usernameDevice"
                   labelText="username device"
-                  value={values.username_device}
+                  value={values.usernameDevice}
                   handleChange={handleChange}
                   marginTop="mt-[0.2rem]"
                 />
@@ -115,7 +254,7 @@ export default function EditDeviceDialog(props: IDrawer) {
             <div className="flex gap-10 mt-3 sm:flex-col sm:gap-0">
               <div className="w-[350px] sm:w-[100%]">
                 <FormRow
-                  type="text"
+                  type="password"
                   name="password"
                   labelText="password"
                   value={values.password}
@@ -143,20 +282,20 @@ export default function EditDeviceDialog(props: IDrawer) {
               <div className="w-[350px] sm:w-[100%]">
                 <FormRow
                   type="text"
-                  name="topic_device"
-                  labelText="topic device"
-                  value={values.topic_device}
+                  name="topics"
+                  labelText="topics"
+                  value={values.topics}
                   handleChange={handleChange}
                   marginTop="mt-[0.2rem]"
                 />
               </div>
               <div className="w-[350px] sm:w-[100%]">
-                <FormRow
-                  type="text"
-                  name="Qos"
+                <FormSelect
                   labelText="Qos"
-                  value={values.Qos}
-                  handleChange={handleChange}
+                  name="Qos"
+                  options={options}
+                  setValue={setQos}
+                  value={qos}
                   marginTop="mt-[0.2rem]"
                 />
               </div>
@@ -190,7 +329,9 @@ export default function EditDeviceDialog(props: IDrawer) {
               </div>
               <div className="w-[250px] sm:w-[100%]">
                 <Button
-                  onClick={() => {}}
+                  onClick={() => {
+                    onSubmit();
+                  }}
                   style={{
                     textTransform: "none",
                     width: "100%",
@@ -208,10 +349,21 @@ export default function EditDeviceDialog(props: IDrawer) {
                   }}
                   variant="contained"
                   id="setup-user-submit"
+                  disabled={isLoading}
                 >
                   Save
                 </Button>
               </div>
+              {showSnackBar && (
+              <div className="block sm:hidden">
+                <SnackBar
+                  severity={snackBarType}
+                  showSnackBar={showSnackBar}
+                  snackBarText={snackBarText}
+                  setShowSnackBar={setShowSnackBar}
+                />
+              </div>
+            )}
             </div>
           </DialogContentText>
         </DialogContent>

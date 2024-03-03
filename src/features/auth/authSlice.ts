@@ -27,7 +27,7 @@ const addUserToLocalStorage: AddUserFunc = (user, token) => {
   localStorage.setItem("user", JSON.stringify(user));
   localStorage.setItem("token", token);
 };
-const removeUserFromLocalStorage = () => {
+export const removeUserFromLocalStorage = () => {
   localStorage.removeItem("user");
   localStorage.removeItem("token");
 };
@@ -257,23 +257,6 @@ const AuthSlice = createSlice({
         state.alertText = action.payload as string;
         state.alertType = "error";
       });
-    // builder.addCase(logout.pending, (state) => {
-    //   state.isLoading = true;
-    // }),
-    //   builder.addCase(logout.fulfilled, (state) => {
-    //     state.isLoading = false;
-    //     state.showAlert = false;
-    //     state.alertText = "";
-    //     state.alertType = "";
-    //     state.token = "";
-    //     state.user = null;
-    //   }),
-    //   builder.addCase(logout.rejected, (state, action) => {
-    //     state.isLoading = false;
-    //     state.showAlert = true;
-    //     state.alertText = action.payload as string;
-    //     state.alertType = "error";
-    //   });
   },
 });
 

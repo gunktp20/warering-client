@@ -22,6 +22,7 @@ const useAxiosPrivate = () => {
     const responseIntercept = axiosPrivate.interceptors.response.use(
       (response) => response,
       async (error) => {
+        console.log("Error axios in AxiosPrivate",error)
         const pervRequest = error?.config;
 
         if (error?.response?.status === 403 && !pervRequest?.sent) {
