@@ -1,10 +1,11 @@
+import { useEffect, useState } from "react";
+import mqtt, { MqttClient } from "mqtt";
 import {
   BigNavbar,
   NavLinkSidebar,
   NavDialog,
   AccountUserDrawer,
 } from "../../components";
-import { useState } from "react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { IoArrowBackSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
@@ -22,11 +23,16 @@ import {
 import { Button } from "@mui/material";
 import AddDisplayDialog from "./AddDisplayDialog";
 import ConfirmDelete from "./ConfirmDelete";
+import { JsonView, allExpanded, darkStyles, defaultStyles } from 'react-json-view-lite';
+import 'react-json-view-lite/dist/index.css';
 
 function Device() {
   const navigate = useNavigate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isAddDisplayShow, setIsAddDisplayShow] = useState<boolean>(false);
+  const [client, setClient] = useState<MqttClient | null>(null);
+  const [connectStatus, setConnectStatus] = useState("Connect");
+  const [payload, setPayload] = useState({});
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
@@ -38,7 +44,74 @@ function Device() {
     password: "71567****",
     description: "สวัดดีครับท่านผู้ชม",
   };
+  const mqttDisconnect = () => {
+    if (client) {
+      try {
+        client.end(false, () => {
+          setConnectStatus("Connect");
+          console.log("disconnected successfully");
+        });
+      } catch (error) {
+        console.log("disconnect error:", error);
+      }
+    }
+  };
 
+  useEffect(() => {
+    (() => {
+      const _mqtt = mqtt.connect("ws://localhost:8083/mqtt", {
+        protocol: "ws",
+        host: "localhost",
+        clientId: "emqx_react_" + Math.random().toString(16).substring(2, 8),
+        port: 8083,
+        username: "home_ken",
+        password: "home_ken",
+      });
+      setClient(_mqtt);
+      // console.log(_mqtt);
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (client) {
+      // https://github.com/mqttjs/MQTT.js#event-connect
+      client.on("connect", () => {
+        setConnectStatus("Connected");
+        console.log("connection successful");
+        if (client) {
+          client.subscribe(
+            "65d498e4cd3c338a793184f7/home_ken/publish",
+            {
+              qos: 0,
+            },
+            (err) => {
+              console.log("not sub", err);
+            }
+          );
+        }
+      });
+
+      // https://github.com/mqttjs/MQTT.js#event-error
+      client.on("error", (err) => {
+        console.error("Connection error: ", err);
+
+        client.end();
+      });
+
+      // https://github.com/mqttjs/MQTT.js#event-reconnect
+      client.on("reconnect", () => {
+        setConnectStatus("Reconnecting");
+      });
+
+      // https://github.com/mqttjs/MQTT.js#event-message
+      client.on("message", (topic, message) => {
+        const payload = { topic, message: message.toString() };
+     
+        const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'))
+        setPayload(payloadObject)
+      });
+    }
+  }, [client]);
 
   return (
     <Wrapper>
@@ -185,7 +258,9 @@ function Device() {
             View JSON data
           </div>
           <div className="w-[100%] text-sm p-5 bg-[#f2f2f2] text-[#7a7a7a] shadow-sm mt-7">
-            <pre>{JSON.stringify(jsonData, null, 2)}</pre>
+            <JsonView data={payload} shouldExpandNode={allExpanded} style={defaultStyles} />
+            {/* <pre>{JSON.stringify(jsonData, null, 2)}</pre> */}
+            {/* <JsonView data={payload} shouldExpandNode={allExpanded} style={darkStyles} /> */}
           </div>
 
           <div className="text-[#1d4469] text-[20px] mt-8 font-bold">
