@@ -23,8 +23,12 @@ import {
 import { Button } from "@mui/material";
 import AddDisplayDialog from "./AddDisplayDialog";
 import ConfirmDelete from "./ConfirmDelete";
-import { JsonView, allExpanded, darkStyles, defaultStyles } from 'react-json-view-lite';
-import 'react-json-view-lite/dist/index.css';
+import {
+  JsonView,
+  allExpanded,
+  defaultStyles,
+} from "react-json-view-lite";
+import "react-json-view-lite/dist/index.css";
 
 function Device() {
   const navigate = useNavigate();
@@ -106,9 +110,17 @@ function Device() {
       // https://github.com/mqttjs/MQTT.js#event-message
       client.on("message", (topic, message) => {
         const payload = { topic, message: message.toString() };
-     
-        const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'))
-        setPayload(payloadObject)
+        console.log(payload.message);
+        try {
+          
+          const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
+          console.log(payloadObject);
+          
+          setPayload(payloadObject);
+        } catch (error) {
+          console.log(error);
+          
+        }
       });
     }
   }, [client]);
@@ -258,7 +270,11 @@ function Device() {
             View JSON data
           </div>
           <div className="w-[100%] text-sm p-5 bg-[#f2f2f2] text-[#7a7a7a] shadow-sm mt-7">
-            <JsonView data={payload} shouldExpandNode={allExpanded} style={defaultStyles} />
+            <JsonView
+              data={payload}
+              shouldExpandNode={allExpanded}
+              style={defaultStyles}
+            />
             {/* <pre>{JSON.stringify(jsonData, null, 2)}</pre> */}
             {/* <JsonView data={payload} shouldExpandNode={allExpanded} style={darkStyles} /> */}
           </div>
