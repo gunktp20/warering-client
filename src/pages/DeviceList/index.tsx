@@ -30,6 +30,7 @@ function DeviceList() {
 
   const axiosPrivate = useAxiosPrivate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
@@ -64,6 +65,13 @@ function DeviceList() {
     const newTimeoutId = setTimeout(() => {
       setisSaveDevice(id, save);
     }, 300);
+    setTimeoutIds([newTimeoutId]);
+  };
+  const onTogglePermission = (id: string, permission: string) => {
+    clearAllTimeouts();
+    const newTimeoutId = setTimeout(() => {
+      setDevicePermission(id, permission);
+    }, 1000);
     setTimeoutIds([newTimeoutId]);
   };
 
@@ -107,6 +115,26 @@ function DeviceList() {
       dispatch(setDevices(data.data));
       setIsLoading(false);
       setPageCount(data.metadata.pageCount);
+    } catch (err: any) {
+      setIsLoading(false);
+    }
+  };
+
+  const setDevicePermission = async (deviceId: string, permission: string) => {
+    setIsLoading(true);
+    try {
+      const { data } = await axiosPrivate.put(
+        `/devices/permission/${deviceId}`,
+        {
+          permission: permission,
+        }
+      );
+      if (values.search_device) {
+        fetchAllByQueryString();
+      } else {
+        fetchAllDevice();
+      }
+      setIsLoading(false);
     } catch (err: any) {
       setIsLoading(false);
     }
@@ -174,9 +202,11 @@ function DeviceList() {
       <BigNavbar
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
+        setIsSidebarShow={setIsSidebarShow}
+        isSidebarShow={isSidebarShow}
       />
       <div className="flex h-[100vh]">
-        <NavLinkSidebar />
+        <NavLinkSidebar isSidebarShow={isSidebarShow} />
         <NavDialog
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
@@ -269,8 +299,18 @@ function DeviceList() {
               </div>
             </div>
 
-            {devices.length === 0 && <div className="text-[80px] flex justify-center w-[100%] my-5 text-[#c0c0c0]"> <MdSearchOff/></div>}
-            {devices.length === 0 && <div className="text-md text-center w-[100%] my-5 text-[#c0c0c0]"> Not found any device</div>}
+            {devices.length === 0 && (
+              <div className="text-[80px] flex justify-center w-[100%] my-5 text-[#c0c0c0]">
+                {" "}
+                <MdSearchOff />
+              </div>
+            )}
+            {devices.length === 0 && (
+              <div className="text-md text-center w-[100%] my-5 text-[#c0c0c0]">
+                {" "}
+                Not found any device
+              </div>
+            )}
 
             <div
               className={`overflow-auto rounded-lg shadow block sm:shadow-none ${
@@ -298,112 +338,122 @@ function DeviceList() {
                     </th>
                   </tr>
                 </thead>
-
-                <tbody className={`divide-y divide-gray-100 `}>
-                  {devices.length === 0 && (
-                    <div className="w-[100%]">Not Found</div>
-                  )}
-                  {devices.length > 0 &&
-                    devices.map((i, index) => {
-                      return (
-                        <tr
-                          key={index}
-                          className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10"
-                        >
-                          <td
-                            className={`flex sm:hidden items-center justify-center capitalize p-3 text-[13px] ${
-                              i.permission === "allow"
-                                ? "text-green-500"
-                                : "text-red-500"
-                            } whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}
+                  <tbody className={`divide-y divide-gray-100 `}>
+                    {devices.length > 0 &&
+                      devices.map((i, index) => {
+                        return (
+                          <tr
+                            key={index}
+                            className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10"
                           >
-                            <div
-                              className={`w-[8px] h-[8px] ${
+                            <td
+                              className={`cursor-pointer flex sm:hidden items-center justify-center capitalize p-3 text-[13px] select-none ${
                                 i.permission === "allow"
-                                  ? "bg-green-500"
-                                  : "bg-red-500"
-                              } rounded-full mr-2`}
-                            ></div>
-                            {i.permission}
-                          </td>
+                                  ? "text-green-500"
+                                  : "text-red-500"
+                              } whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}
+                              onClick={() => {
+                                onTogglePermission(
+                                  i.id,
+                                  i.permission === "allow" ? "deny" : "allow"
+                                );
+                              }}
+                            >
+                              <button
+                                className={`w-[8px] h-[8px] ${
+                                  i.permission === "allow"
+                                    ? "bg-green-500"
+                                    : "bg-red-500"
+                                } rounded-full mr-2`}
+                              ></button>
+                              {i.permission}
+                            </td>
+                                
+                            <td
+                              onClick={() => {
+                                navigate(`/device/${i.id}`);
+                              }}
+                              className="p-3 cursor-pointer text-sm text-[#878787] whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white"
+                            >
+                              {i.nameDevice}
+                            </td>
 
-                          <td
-                            onClick={() => {
-                              navigate("/device/:device_id");
-                            }}
-                            className="p-3 cursor-pointer text-sm text-[#878787] whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white"
-                          >
-                            {i.nameDevice}
-                          </td>
-
-                          <td
-                            className={`hidden items-center sm:flex capitalize p-3 text-[13px] ${
-                              i.permission === "allow"
-                                ? "text-green-500"
-                                : "text-red-500"
-                            } whitespace-nowrap text-center sm:text-start`}
-                          >
-                            <div
-                              className={`w-[8px] h-[8px] ${
+                            <td
+                              className={`hidden items-center sm:flex capitalize p-3 text-[13px] ${
                                 i.permission === "allow"
-                                  ? "bg-green-500"
-                                  : "bg-red-500"
-                              } rounded-full mr-2`}
-                            ></div>
-                            {i.permission}
-                          </td>
+                                  ? "text-green-500"
+                                  : "text-red-500"
+                              } whitespace-nowrap text-center sm:text-start`}
+                              onClick={() => {
+                                onTogglePermission(
+                                  i.id,
+                                  i.permission === "allow" ? "deny" : "allow"
+                                );
+                              }}
+                            >
+                              <div
+                                className={`w-[8px] h-[8px] ${
+                                  i.permission === "allow"
+                                    ? "bg-green-500"
+                                    : "bg-red-500"
+                                } rounded-full mr-2`}
+                              ></div>
+                              {i.permission}
+                            </td>
 
-                          <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
-                            <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
-                              Save
-                            </div>
-                            <SwitchSave
-                              checked={i.isSaveData}
-                              onClick={() =>
-                                onToggleSwitchSave({
-                                  id: i.id,
-                                  save: !i.isSaveData,
-                                })
-                              }
-                            />
-                          </td>
-                          <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
-                            <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
-                              Registration
-                            </div>
-                            {moment(i.createdAt)
-                              .add(543, "year")
-                              .format("DD/MM/YYYY h:mm")}
-                          </td>
-                          <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
-                            <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
-                              Action
-                            </div>
-                            <div className="flex justify-center sm:justify-start">
-                              <button
-                                onClick={() => {
-                                  setSelectedDevice(i.id);
-                                  setEditDialogOpen(true);
-                                }}
-                                className="mr-6 text-[#2E7D32]"
-                              >
-                                Edit
-                              </button>
-                              <button
-                                onClick={() => {
-                                  setSelectedDevice(i.id);
-                                  setIsDeleteConfirmOpen(!isDeleteConfirmOpen);
-                                }}
-                                className="text-[#dc3546]"
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
+                            <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
+                              <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
+                                Save
+                              </div>
+                              <SwitchSave
+                                checked={i.isSaveData}
+                                onClick={() =>
+                                  onToggleSwitchSave({
+                                    id: i.id,
+                                    save: !i.isSaveData,
+                                  })
+                                }
+                              />
+                            </td>
+                            <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
+                              <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
+                                Registration
+                              </div>
+                              {moment(i.createdAt)
+                                .add(543, "year")
+                                .format("DD/MM/YYYY h:mm")}
+                            </td>
+                            <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
+                              <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
+                                Action
+                              </div>
+                              <div className="flex justify-center sm:justify-start">
+                                <button
+                                  onClick={() => {
+                                    setSelectedDevice(i.id);
+                                    setEditDialogOpen(true);
+                                  }}
+                                  className="mr-6 text-[#2E7D32]"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setSelectedDevice(i.id);
+                                    setIsDeleteConfirmOpen(
+                                      !isDeleteConfirmOpen
+                                    );
+                                  }}
+                                  className="text-[#dc3546]"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
               </table>
             </div>
             {pageCount > 1 && (

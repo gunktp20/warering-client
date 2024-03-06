@@ -12,7 +12,7 @@ import DashboardList from "./pages/DashboardList";
 import Dashboard from "./pages/Dashboard";
 import AddDashboard from "./pages/AddDashboard";
 import DeviceList from "./pages/DeviceList";
-import Device from "./pages/Device/Device";
+import Device from "./pages/Device";
 import AddDevice from "./pages/AddDevice";
 import Account from "./pages/Account";
 import EditProfile from "./pages/EditProfile";

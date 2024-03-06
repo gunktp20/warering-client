@@ -29,7 +29,7 @@ function DashboardList() {
   const [values, setValues] = useState({
     search_dashboard: "",
   });
-
+  const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
@@ -51,9 +51,11 @@ function DashboardList() {
       <BigNavbar
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
+        isSidebarShow={isSidebarShow}
+        setIsSidebarShow={setIsSidebarShow}
       />
       <div className="flex h-[100vh]">
-        <NavLinkSidebar />
+        <NavLinkSidebar isSidebarShow={isSidebarShow}/>
         <NavDialog
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}

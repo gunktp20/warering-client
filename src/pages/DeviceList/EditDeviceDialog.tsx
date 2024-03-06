@@ -31,7 +31,7 @@ interface IValue {
   description: string;
   topics: string;
   qos?: number;
-  retain: boolean;
+  retain?: boolean;
   isSaveData: boolean;
 }
 
@@ -41,7 +41,6 @@ const initialState: IValue = {
   password: "",
   description: "",
   topics: "",
-  retain: true,
   isSaveData: true,
 };
 
@@ -52,6 +51,7 @@ export default function EditDeviceDialog(props: IDrawer) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const options = [0, 1, 2];
   const [qos, setQos] = useState<number>(options[0]);
+  const [retain,setRetain] = useState<boolean>(true)
   const [timeoutIds, setTimeoutIds] = useState<any>([]);
   const [showSnackBar, setShowSnackBar] = useState<boolean>(false);
   const [snackBarText, setSnackBarText] = useState<string>("");
@@ -92,7 +92,6 @@ export default function EditDeviceDialog(props: IDrawer) {
         description,
         password: "",
         topics:topics[0].split('/')[1],
-        retain,
         isSaveData,
       });
       setCurrentDeviceInfo({
@@ -106,6 +105,7 @@ export default function EditDeviceDialog(props: IDrawer) {
         isSaveData,
       })
       setQos(qos);
+      setRetain(retain)
       setIsLoading(false);
     } catch (err: any) {
       setIsLoading(false);
@@ -140,6 +140,7 @@ export default function EditDeviceDialog(props: IDrawer) {
       password:password === "" ? undefined : password ,
       description:description === currentDeviceInfo.description ? undefined : description ,
       topics:topics === currentDeviceInfo.topics ? undefined : topics ,
+      retain:retain === currentDeviceInfo.retain ? undefined:retain,
       qos:Number(qos)
     }
     await editDevice(deviceInfo)
@@ -299,6 +300,24 @@ export default function EditDeviceDialog(props: IDrawer) {
                   marginTop="mt-[0.2rem]"
                 />
               </div>
+            </div>
+            <div className="flex items-center">
+              <label
+                htmlFor="link-checkbox"
+                className="ms-2 text-sm mr-2 font-medium text-[#1D4469] dark:text-gray-300"
+              >
+                Retain
+              </label>
+              <input
+                id="link-checkbox"
+                type="checkbox"
+                name="retain"
+                onChange={() => {
+                  setRetain(!retain)
+                }}
+                checked={retain}
+                className=" w-[15px] h-[15px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#ffffff00] dark:focus:ring-[#2CB1BC] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />
             </div>
             <div className="flex sm:flex-col">
               <div className="w-[250px] sm:w-[100%] mr-5">

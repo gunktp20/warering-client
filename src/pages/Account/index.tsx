@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { IoArrowBackSharp } from "react-icons/io5";
+import Wrapper from "../../assets/wrappers/Account";
 import { useNavigate } from "react-router-dom";
 import ConfirmDeleteAccount from "./ConfirmDeleteAccount";
+import { IoArrowBackSharp } from "react-icons/io5";
 
 const Account = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const accountData = {
     img: "https://img.freepik.com/free-psd/3d-illustration-person-with-long-hair_23-2149436197.jpg?w=740&t=st=1708260597~exp=1708261197~hmac=6e04022c7ee16156ca21397efa80e383f0a513a6abc241afc626e3c6774b120d",
     email: "Kruluz_Utsman@gmail.com",
@@ -15,13 +16,17 @@ const Account = () => {
     password: "KruluzUtsman21wqq",
   };
 
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState<boolean>(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
+    useState<boolean>(false);
 
   return (
-    <div className="flex items-center justify-center h-screen relative shadow-lg">
-      <ConfirmDeleteAccount isDeleteConfirmOpen={isDeleteConfirmOpen} setIsDeleteConfirmOpen={setIsDeleteConfirmOpen} />
-      <div className="w-[705px] h-[566px] relative bg-white rounded-md shadow-md">
-        <button
+    <Wrapper>
+      <ConfirmDeleteAccount
+        isDeleteConfirmOpen={isDeleteConfirmOpen}
+        setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
+      />
+      <div className="bg-white relative py-[2rem] px-[3.1rem] h-fit w-[610px] top-[7rem] border-[#f3f3f3] rounded-lg border-[1px] shadow-sm sm:w-[100%] sm:px-[1.6rem] sm:mx-[0.5rem]">
+      <button
           onClick={() => {
             navigate("/");
           }}
@@ -30,68 +35,50 @@ const Account = () => {
           <IoArrowBackSharp className="text-sm" />
           Back
         </button>
-        <div className="left-[82px] top-[27px] absolute text-black text-[28px] prompt-medium">
+        <div className="text-[2rem] flex justify-start w-[100%] border-b-[1px] border-[#dfdfdf] pb-5">
           Account
         </div>
-        <div className="left-[85px] top-[115px] absolute text-black prompt-regular">
-          Email address
+        <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
+          <div className="text-[14.5px]">Email address</div>
+          <div className="text-[#8b8b8b] text-[14px] mr-10">644259003@webmail.npru.ac.th</div>
         </div>
-        <div className="left-[381px] top-[113px] absolute text-neutral-500 prompt-regular">
-          {accountData.email}
-        </div>
-        <div className="left-[83px] top-[166px] absolute text-black prompt-regular">
-          Profile information
-        </div>
-        <div className="left-[83px] top-[194px] absolute text-stone-300 text-xs prompt-regular">
-          Edit your photo, name, bio, etc.
-        </div>
-        <div className="left-[380px] top-[165px] absolute text-neutral-500 prompt-regular">
-          KruluzUtsman
-        </div>
-        <img
-          className="w-9 h-[33px] left-[502px] top-[161px] absolute rounded-md"
-          src={accountData.img}
-        />
-        <div className="left-[82px] top-[240px] absolute text-black prompt-regular">
-          Firstname
-        </div>
-        <div className="left-[379px] top-[240px] absolute text-neutral-500 prompt-regular">
-          {accountData.firstname}
-        </div>
-        <div className="left-[83px] top-[288px] absolute text-black prompt-regular">
-          Username
-        </div>
-        <div className="left-[381px] top-[288px] absolute text-neutral-500 prompt-regular">
-          {accountData.username}
-        </div>
-        <div className="left-[82px] top-[339px] absolute text-black prompt-regular">
-          Lastname
-        </div>
-        <div className="left-[381px] top-[339px] absolute text-neutral-500 prompt-regular">
-          {accountData.lastname}
-        </div>
-        <div className="left-[83px] top-[391px] absolute text-black prompt-regular">
-          Password
-        </div>
-        <div className="left-[381px] top-[391px] absolute text-neutral-500 prompt-regular">
-          {accountData.password}
-        </div>
-        <button
-          onClick={()=>{
-            setIsDeleteConfirmOpen(true)
-          }}
-          className="left-[83px] top-[457px] absolute text-red-500 prompt-regular"
-        >
-          Delete account
-        </button>
-        <div className="left-[85px] top-[486px] absolute text-stone-300 text-xs prompt-regular">
-          Permanently delete your account and all of your content.
-        </div>
-        <div className="w-[538.06px] h-[0px] left-[82px] top-[437px] absolute border border-stone-300"></div>
-        <div className="w-[538.06px] h-[0px] left-[85px] top-[91px] absolute border border-stone-300"></div>
-      </div>
-    </div>
-  )
-}
+        <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
+          <div className="text-[14.5px]">
+            Profile Information
+            <div className="text-[11px] text-[#cccccc] mt-1">Edit your photo, name , bio, etc</div>
+          </div>
+          <div className="text-[#8b8b8b] text-[14px] mr-10 flex items-center">Kuttapat Somwang  <img
+          src={
+            "https://www.wilsoncenter.org/sites/default/files/media/images/person/james-person-1.jpg"
+          }
+          className="ml-5 w-[38px] h-[38px] object-cover rounded-lg"
+          onClick={() => {
 
-export default Account
+          }}
+        ></img></div>
+        </div>
+        <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
+          <div className="text-[14.5px]">Username</div>
+          <div className="text-[#8b8b8b] text-[14px] mr-10">gunktp14</div>
+        </div>
+        <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
+          <div className="text-[14.5px]">Firstname</div>
+          <div className="text-[#8b8b8b] text-[14px] mr-10">Kuttpat</div>
+        </div>
+        <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
+          <div className="text-[14.5px]">Lastname</div>
+          <div className="text-[#8b8b8b] text-[14px] mr-10">Somwang</div>
+        </div>
+        <div className="border-b-[1px] border-[#dfdfdf] pb-5 mt-5"></div>
+        <div className="mt-3">
+          <div className="text-[#dc3546] text-[16.3px] cursor-pointer" onClick={()=>{
+            setIsDeleteConfirmOpen(!isDeleteConfirmOpen)
+          }}>Delete account</div>
+          <div className="text-[#cccccc] text-[12.3px] mt-1">Permanently delete your account and all of your content.</div>
+        </div>
+      </div>
+    </Wrapper>
+  );
+};
+
+export default Account;

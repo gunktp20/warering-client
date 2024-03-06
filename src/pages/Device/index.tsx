@@ -4,7 +4,7 @@ import {
   NavDialog,
   AccountUserDrawer,
 } from "../../components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { IoArrowBackSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +12,7 @@ import { SiMicrosoftexcel } from "react-icons/si";
 import { BsFiletypeJson } from "react-icons/bs";
 import { FaClipboardList } from "react-icons/fa";
 import Wrapper from "../../assets/wrappers/Device";
+import mqtt, { MqttClient } from "mqtt";
 import {
   ButtonControl,
   Gauge,
@@ -22,15 +23,32 @@ import {
 import { Button } from "@mui/material";
 import AddDisplayDialog from "./AddDisplayDialog";
 import ConfirmDelete from "./ConfirmDelete";
+import { useParams } from "react-router-dom";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import {
+  JsonView,
+  allExpanded,
+  defaultStyles,
+} from "react-json-view-lite";
+import "react-json-view-lite/dist/index.css";
+import moment from "moment";
 
 function Device() {
   const navigate = useNavigate();
+  const axiosPrivate = useAxiosPrivate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isAddDisplayShow, setIsAddDisplayShow] = useState<boolean>(false);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  let { device_id } = useParams();
+  const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
+  const [deviceInfo, setDeviceInfo] = useState<any>(null);
+  const [client, setClient] = useState<MqttClient | null>(null);
+  const [connectStatus, setConnectStatus] = useState("Connect");
+  const [payload, setPayload] = useState({});
 
   const jsonData = {
     data: "HelloWorld",
@@ -39,6 +57,93 @@ function Device() {
     description: "สวัดดีครับท่านผู้ชม",
   };
 
+  const fetchDeviceById = async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await axiosPrivate.get(`/devices/${device_id}`);
+      setDeviceInfo(data);
+      setIsLoading(false);
+    } catch (err: any) {
+      setIsLoading(false);
+    }
+  };
+
+  const mqttDisconnect = () => {
+    if (client) {
+      try {
+        client.end(false, () => {
+          setConnectStatus("Connect");
+          console.log("disconnected successfully");
+        });
+      } catch (error) {
+        console.log("disconnect error:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchDeviceById();
+  }, []);
+
+  useEffect(() => {
+    (() => {
+      const _mqtt = mqtt.connect("ws://localhost:8083/mqtt", {
+        protocol: "ws",
+        host: "localhost",
+        clientId: "emqx_react_" + Math.random().toString(16).substring(2, 8),
+        port: 8083,
+        username: "TestMQTT",
+        password: "TestMQTT",
+      });
+      setClient(_mqtt);
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (client) {
+      client.on("connect", () => {
+        setConnectStatus("Connected");
+        console.log("connection successful");
+        if (client) {
+          client.subscribe(
+            "65e2e2e1946718f317756f47/TestMQTT/publish",
+            {
+              qos: deviceInfo.qos,
+            },
+            (err) => {
+              console.log("not sub", err);
+            }
+          );
+        }
+      });
+
+      // https://github.com/mqttjs/MQTT.js#event-error
+      client.on("error", (err) => {
+        console.error("Connection error: ", err);
+
+        client.end();
+      });
+
+      // https://github.com/mqttjs/MQTT.js#event-reconnect
+      client.on("reconnect", () => {
+        setConnectStatus("Reconnecting");
+      });
+
+      // https://github.com/mqttjs/MQTT.js#event-message
+      client.on("message", (topic, message) => {
+        const payload = { topic, message: message.toString() };
+        console.log(payload.message);
+        try {
+          const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
+          console.log(payloadObject);
+
+          setPayload(payloadObject);
+        } catch (error) {
+          console.log(error);
+        }
+      });
+    }
+  }, [client]);
 
   return (
     <Wrapper>
@@ -58,10 +163,12 @@ function Device() {
       <BigNavbar
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
+        setIsSidebarShow={setIsSidebarShow}
+        isSidebarShow={isSidebarShow}
       />
 
       <div className="flex h-[100%]">
-        <NavLinkSidebar />
+        <NavLinkSidebar isSidebarShow={isSidebarShow} />
         <NavDialog
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
@@ -124,41 +231,43 @@ function Device() {
 
           {/* Start Device info container */}
           <div className="p-5 w-[100%] border-[1px] grid grid-cols-3 border-[#f1f1f1] rounded-md shadow-sm bg-white sm:grid-cols-2">
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-4">
-              Dashboard Name
-              <div className="dd font-medium mt-2 text-[#7a7a7a] text-sm ">
-                การเกษตรรวม
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
+              Device Name
+              <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px] ">
+                {deviceInfo?.nameDevice}
               </div>
             </div>
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-4">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
               Description
-              <div className="dd font-medium mt-2 text-[#7a7a7a] text-sm">
-                การเกษตรรวมภายใน
+              <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
+                {deviceInfo?.description}
               </div>
             </div>
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-4">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
               CreatedAt
-              <div className="dd font-medium mt-2 text-[#7a7a7a] text-sm">
-                00/00/0000 00:00
+              <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
+                {moment(deviceInfo?.createdAt)
+                  .add(543, "year")
+                  .format("DD/MM/YYYY h:mm")}
               </div>
             </div>
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-4">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
               Username Device
-              <div className="dd font-medium mt-2 text-[#7a7a7a] text-sm">
-                การเกษตรรวม
+              <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
+                {deviceInfo?.usernameDevice}
               </div>
             </div>
 
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-4">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
               Password Device
-              <div className="dd font-medium mt-2 text-[#7a7a7a] text-sm">
-                การเกษตรรวม
+              <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
+                *********516
               </div>
             </div>
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-4">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
               Qos
-              <div className="dd font-medium mt-2 text-[#7a7a7a] text-sm">
-                0 : ony way
+              <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
+                {deviceInfo?.qos}
               </div>
             </div>
             <div className="flex items-center">
@@ -169,6 +278,7 @@ function Device() {
                 Retain
               </label>
               <input
+                checked={deviceInfo?.retain}
                 id="link-checkbox"
                 type="checkbox"
                 value=""
@@ -181,11 +291,16 @@ function Device() {
           <div className="text-[#1d4469] text-[20px] mt-8 font-bold">
             JSON view
           </div>
-          <div className="text-[text-[#7a7a7a] text-sm] text-[13.2px]">
+          <div className="text-[#7a7a7a text-sm text-[13.2px]" >
             View JSON data
           </div>
           <div className="w-[100%] text-sm p-5 bg-[#f2f2f2] text-[#7a7a7a] shadow-sm mt-7">
-            <pre>{JSON.stringify(jsonData, null, 2)}</pre>
+            <JsonView
+              data={payload}
+              shouldExpandNode={allExpanded}
+              style={defaultStyles}
+
+            />
           </div>
 
           <div className="text-[#1d4469] text-[20px] mt-8 font-bold">

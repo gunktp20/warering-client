@@ -1,11 +1,17 @@
 import { FiCpu } from "react-icons/fi";
 import { PiNotebookBold } from "react-icons/pi";
+import { RiMenu2Fill } from "react-icons/ri";
 import { VscGraph } from "react-icons/vsc";
 import { NavLink } from "react-router-dom";
 
-const NavLinks = () => {
+interface IProp {
+  isSidebarShow:boolean,
+}
+
+const NavLinks = (props:IProp) => {
+  
   return (
-    <div className="bg-[#fff] h-[100v%] w-[300px] shadow-md pt-5 w-sm flex flex-col sm:hidden">
+    <div className={`bg-[#fff] h-[100v%] w-[300px] shadow-md pt-5 w-sm flex flex-col sm:hidden transition-all ${!props.isSidebarShow && "ml-[-17.8rem]"}`}>
       <div className="flex flex-col">
         <NavLink
           to="/"
@@ -20,7 +26,6 @@ const NavLinks = () => {
           <PiNotebookBold className="mr-3 text-[16px]" />
           Overview
         </NavLink>
-
         <NavLink
           to="/dashboard-list"
           key={2}

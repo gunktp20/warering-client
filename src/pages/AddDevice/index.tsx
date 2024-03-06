@@ -34,6 +34,7 @@ function AddDevice() {
   const dispatch = useAppDispatch();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
   const [showSnackBar, setShowSnackBar] = useState<boolean>(false);
   const [snackBarText, setSnackBarText] = useState<string>("");
   const [snackBarType, setSnackBarType] = useState<
@@ -135,9 +136,11 @@ function AddDevice() {
       <BigNavbar
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
+        setIsSidebarShow={setIsSidebarShow}
+        isSidebarShow={isSidebarShow}
       />
       <div className="flex h-[100vh]">
-        <NavLinkSidebar />
+        <NavLinkSidebar isSidebarShow={isSidebarShow}/>
         <NavDialog
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
