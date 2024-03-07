@@ -17,7 +17,7 @@ function AdminDashboard() {
       }
     );
   };
-
+  
   return (
     <div className="flex flex-col">
       <div className="mb-5 mt-5">AdminDashboard</div>

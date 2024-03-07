@@ -54,13 +54,14 @@ function DeviceList() {
     timeoutIds.forEach((timeoutId: any) => clearTimeout(timeoutId));
     setTimeoutIds([]);
   };
-  const onSearch = () => {
-    clearAllTimeouts();
-    const newTimeoutId = setTimeout(() => {
-      fetchAllDevice()
-    }, 150);
-    setTimeoutIds([newTimeoutId]);
-  };
+  // const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   clearAllTimeouts();
+  //   const newTimeoutId = setTimeout(() => {
+  //     fetchAllDevice()
+  //   }, 150);
+  //   setTimeoutIds([newTimeoutId]);
+  // };
+  
   const onToggleSwitchSave = ({ id, save }: { id: string; save: boolean }) => {
     clearAllTimeouts();
     const newTimeoutId = setTimeout(() => {
@@ -146,7 +147,7 @@ function DeviceList() {
 
   useEffect(() => {
       fetchAllDevice();
-  }, [numOfPage, values.search_device,sortCreatedAt]);
+  }, [numOfPage,sortCreatedAt,values.search_device]);
 
   const hookDeleteSuccess = () => {
       fetchAllDevice();
@@ -246,11 +247,14 @@ function DeviceList() {
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-5 py-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     defaultValue={sortCreatedAt}  
                     onChange={(e)=>{
+                      if(!e.target.value){
+                        return;
+                      }
                       console.log(e.target.value)
                       setSortCreatedAt(e.target.value)
                     }}
                   >
-                    <option>Sort by Date</option>
+                    <option value="-createdAt">Sort by Date</option>
                     <option value="%2BcreatedAt">Oldest</option>
                     <option value="-createdAt">Latest</option>
                   </select>

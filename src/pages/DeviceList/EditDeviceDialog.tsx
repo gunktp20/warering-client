@@ -48,16 +48,17 @@ export default function EditDeviceDialog(props: IDrawer) {
   const { setEditDialogOpen } = props;
   const axiosPrivate = useAxiosPrivate();
   const [values, setValues] = useState<IValue>(initialState);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const options = [0, 1, 2];
-  const [qos, setQos] = useState<number>(options[0]);
-  const [retain,setRetain] = useState<boolean>(true)
   const [timeoutIds, setTimeoutIds] = useState<any>([]);
   const [showSnackBar, setShowSnackBar] = useState<boolean>(false);
   const [snackBarText, setSnackBarText] = useState<string>("");
   const [snackBarType, setSnackBarType] = useState<
     "error" | "success" | "info" | "warning"
   >("error");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const options = [0, 1, 2];
+  const [qos, setQos] = useState<number>(options[0]);
+  const [retain,setRetain] = useState<boolean>(true)
+  
   const [currentDeviceInfo,setCurrentDeviceInfo] = useState<any>()
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });

@@ -27,15 +27,12 @@ import AddDisplayDialog from "./AddDisplayDialog";
 import ConfirmDelete from "./ConfirmDelete";
 import { useParams } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import {
-  JsonView,
-  allExpanded,
-  defaultStyles,
-} from "react-json-view-lite";
+import { JsonView, allExpanded, defaultStyles } from "react-json-view-lite";
 import "react-json-view-lite/dist/index.css";
 import moment from "moment";
 import TopicsDialog from "./TopicsDialog";
 import AddWidgetDialog from "./AddWidgetDialog";
+import { GaugePreview } from "../../components/widgets_preview";
 
 function Device() {
   const navigate = useNavigate();
@@ -53,22 +50,36 @@ function Device() {
   const [client, setClient] = useState<MqttClient | null>(null);
   const [connectStatus, setConnectStatus] = useState("Connect");
   const [payload, setPayload] = useState({});
-  const [passwordVisible,setPasswordVisible] = useState<boolean>(false)
-  const [isTopicsShow,setIsTopicsShow] = useState<boolean>(false)
-  const [isAddWidgetShow,setIsAddWidgetShow] = useState<boolean>(false)
-  
+  const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
+  const [isTopicsShow, setIsTopicsShow] = useState<boolean>(false);
+  const [isAddWidgetShow, setIsAddWidgetShow] = useState<boolean>(false);
+  const [widgets, setWidgets] = useState<any>(null);
+
   const fetchDeviceById = async () => {
     setIsLoading(true);
+    console.log("fetchDevice");
     try {
       const { data } = await axiosPrivate.get(`/devices/${device_id}`);
       setDeviceInfo(data);
-      connectEMQX(data)
+      connectEMQX(data);
       setIsLoading(false);
     } catch (err: any) {
       setIsLoading(false);
     }
   };
-  
+
+  const fetchAllWidgets = async () => {
+    console.log("fetchAllWidgets");
+    setIsLoading(true);
+    try {
+      const { data } = await axiosPrivate.get(`/widgets/`);
+      setWidgets(data);
+      setIsLoading(false);
+    } catch (err: any) {
+      setIsLoading(false);
+    }
+  };
+
   const mqttDisconnect = () => {
     if (client) {
       try {
@@ -82,7 +93,7 @@ function Device() {
     }
   };
 
-  const connectEMQX = async (data:any) =>{
+  const connectEMQX = async (data: any) => {
     const _mqtt = await mqtt.connect(import.meta.env.VITE_EMQX_DOMAIN, {
       protocol: "ws",
       host: "localhost",
@@ -92,14 +103,11 @@ function Device() {
       password: data?.password,
     });
     setClient(_mqtt);
-  }
+  };
 
   useEffect(() => {
     fetchDeviceById();
-  }, []);
-
-  useEffect(() => {
-    
+    fetchAllWidgets();
   }, []);
 
   useEffect(() => {
@@ -119,7 +127,7 @@ function Device() {
           );
         }
       });
-      
+
       // client.end(() => {
       //   setConnectStatus('Disconnected');
       // });
@@ -135,7 +143,7 @@ function Device() {
       });
       // https://github.com/mqttjs/MQTT.js#event-message
       client.on("message", (topic, message) => {
-        console.log("message")
+        console.log("message");
         const payload = { topic, message: message.toString() };
         console.log(payload.message);
         try {
@@ -152,8 +160,21 @@ function Device() {
 
   return (
     <Wrapper>
-      <AddWidgetDialog isAddWidgetShow={isAddWidgetShow} setIsAddWidgetShow={setIsAddWidgetShow}/>
-      {deviceInfo?.topics && <TopicsDialog isTopicsDialogShow={isTopicsShow} setTopicsDialogShow={setIsTopicsShow} topics={deviceInfo?.topics}/>}
+      {deviceInfo?.nameDevice && (
+        <AddWidgetDialog
+          isAddWidgetShow={isAddWidgetShow}
+          setIsAddWidgetShow={setIsAddWidgetShow}
+          nameDevice={deviceInfo?.nameDevice}
+        />
+      )}
+
+      {deviceInfo?.topics && (
+        <TopicsDialog
+          isTopicsDialogShow={isTopicsShow}
+          setTopicsDialogShow={setIsTopicsShow}
+          topics={deviceInfo?.topics}
+        />
+      )}
       <ConfirmDelete
         isDeleteConfirmOpen={isDeleteConfirmOpen}
         setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
@@ -267,10 +288,20 @@ function Device() {
             <div className=" w-[100%] text-[#1D4469] font-bold mb-8 ">
               Password Device
               <div className="font-medium mt-2 text-[#7a7a7a] text-[13.3px] flex">
-              <button className="" onClick={()=>{
-                  setPasswordVisible(!passwordVisible)
-                }}>{passwordVisible ? <LuEye/>:<LuEyeOff/>}</button>
-                <input className={`ml-2 relative focus:outline-none outline-none focus:border-none w-[100%]`} type={passwordVisible ? "text" : "password"} readOnly={true} value={deviceInfo?.password}></input>
+                <button
+                  className=""
+                  onClick={() => {
+                    setPasswordVisible(!passwordVisible);
+                  }}
+                >
+                  {passwordVisible ? <LuEye /> : <LuEyeOff />}
+                </button>
+                <input
+                  className={`ml-2 relative focus:outline-none outline-none focus:border-none w-[100%]`}
+                  type={passwordVisible ? "text" : "password"}
+                  readOnly={true}
+                  value={deviceInfo?.password}
+                ></input>
               </div>
             </div>
             <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
@@ -279,7 +310,7 @@ function Device() {
                 {deviceInfo?.qos}
               </div>
             </div>
-            
+
             <div className="flex flex-col">
               <label
                 htmlFor="link-checkbox"
@@ -293,15 +324,25 @@ function Device() {
                   id="link-checkbox"
                   type="checkbox"
                   value=""
-                  className=" w-[15px] h-[15px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#ffffff00] dark:focus:ring-[#2CB1BC] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
-                <div className={`ml-2 bottom-[0px] relative ${deviceInfo?.retain ? "text-[#0075ff]":"text-[#7a7a7a]"} text-[13.4px]`}>{deviceInfo?.retain.toString()}</div>
+                  className=" w-[15px] h-[15px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#ffffff00] dark:focus:ring-[#2CB1BC] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                />
+                <div
+                  className={`ml-2 bottom-[0px] relative ${
+                    deviceInfo?.retain ? "text-[#0075ff]" : "text-[#7a7a7a]"
+                  } text-[13.4px]`}
+                >
+                  {deviceInfo?.retain.toString()}
+                </div>
               </div>
             </div>
             <div className=" w-[100%] text-[#1D4469] font-bold">
-              <button onClick={()=>{
-                setIsTopicsShow(!isTopicsShow)
-              }} className="text-[#0075ff] px-3 py-1 border-[1px] text-[12.4px] rounded-md border-[#0075ff] flex font-medium mt-2 ">
-                 View Topics
+              <button
+                onClick={() => {
+                  setIsTopicsShow(!isTopicsShow);
+                }}
+                className="text-[#0075ff] px-3 py-1 border-[1px] text-[12.4px] rounded-md border-[#0075ff] flex font-medium mt-2 "
+              >
+                View Topics
               </button>
             </div>
           </div>
@@ -310,7 +351,7 @@ function Device() {
           <div className="text-[#1d4469] text-[20px] mt-8 font-bold">
             JSON view
           </div>
-          <div className="text-[#7a7a7a text-sm text-[13.2px]" >
+          <div className="text-[#7a7a7a text-sm text-[13.2px]">
             View JSON data
           </div>
           <div className="w-[100%] text-sm p-5 bg-[#eeeeee] text-[#7a7a7a] shadow-sm mt-7">
@@ -320,7 +361,7 @@ function Device() {
               style={defaultStyles}
             />
           </div>
-              
+
           <div className="text-[#1d4469] text-[20px] mt-8 font-bold">
             Export
           </div>
@@ -374,9 +415,20 @@ function Device() {
           </div>
 
           {/* start widget container */}
-          
+
           <div className="grid grid-cols-3 gap-10 mt-8 md:grid-cols-2 sm:grid-cols-1">
-           
+            {widgets &&
+              widgets.map((widget :any, index : number) => {
+                console.log(widget)
+                if (widget.type === "Gauge") {
+                  return <GaugePreview
+                    label={widget.nameDevice}
+                    value={widget?.configWidget?.value}
+                    min={widget?.configWidget?.min}
+                    max={widget?.configWidget?.max}
+                  />;
+                }
+              })}
             {/* <Gauge
               isDeleteConfirmOpen={isDeleteConfirmOpen}
               setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
@@ -397,7 +449,6 @@ function Device() {
               isDeleteConfirmOpen={isDeleteConfirmOpen}
               setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
             /> */}
-            
           </div>
           {/* end widget container */}
         </div>
