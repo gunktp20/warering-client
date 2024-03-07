@@ -103,7 +103,7 @@ export default function AddWidgetDialog(props: IProps) {
                             </div>
                             <div className="w-[350px] sm:w-[100%]">
                                 <FormRow
-                                    type="text"
+                                    type="number"
                                     name="value"
                                     labelText="value"
                                     value={values.value}
@@ -115,7 +115,7 @@ export default function AddWidgetDialog(props: IProps) {
                         <div className="flex gap-10 mt-3 sm:flex-col sm:gap-0">
                             <div className="w-[350px] sm:w-[100%]">
                                 <FormRow
-                                    type="text"
+                                    type="number"
                                     name="min"
                                     labelText="min"
                                     value={values.min}
@@ -125,7 +125,7 @@ export default function AddWidgetDialog(props: IProps) {
                             </div>
                             <div className="w-[350px] sm:w-[100%]">
                                 <FormRow
-                                    type="text"
+                                    type="number"
                                     name="max"
                                     labelText="max"
                                     value={values.max}

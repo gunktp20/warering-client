@@ -20,14 +20,24 @@ interface IProp {
 
 function GaugePreview({ label, value, min, max }: IProp) {
     const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
-
+    // 100 x value / max + min   35
+    
+    const sum = Number(max) + Number(min);
+    console.log("sum",sum)
+    const newValue = Number(value) + Number(min)
+    const result = Math.round(100 * newValue / sum) 
+    console.log("result = " + Math.round(result))
+    const firstNum = result 
+    const secondNum = 100 - result
+    console.log("firstNum",firstNum)
+    console.log("secondNum",secondNum)
     const data = {
         labels: [],
         datasets: [
             {
                 label: "doughnut", 
-                data:[100,100],
-                backgroundColor: ["#00000045", "#1966fb"],
+                data:[firstNum,secondNum],
+                backgroundColor: ["#1966fb", "#00000045"],
                 borderColor: ["#fff", "#fff"],
                 circumference: 180,
                 rotation: 270,
@@ -37,6 +47,14 @@ function GaugePreview({ label, value, min, max }: IProp) {
         ],
     };
 
+    // min = 20
+    // 100 x value / max + min   35
+    //
+    // max = 70
+    // 1% = 20 
+    // 100% = 70
+
+    // value = 10
     return (
         <div
             className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 hover:ring-inset hover:ring-rose-500 cursor-grab"
