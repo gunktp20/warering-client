@@ -39,6 +39,7 @@ function DeviceList() {
   const [numOfPage, setNumOfPage] = useState<number>(1);
   const [pageCount, setPageCount] = useState<number>(0);
   const [selectedDevice, setSelectedDevice] = useState<any>();
+  const [sortCreatedAt,setSortCreatedAt] = useState<string>("-createdAt")
   const elements = [];
 
   interface IDevice {
@@ -56,14 +57,14 @@ function DeviceList() {
   const onSearch = () => {
     clearAllTimeouts();
     const newTimeoutId = setTimeout(() => {
-      fetchAllByQueryString();
+      fetchAllDevice()
     }, 150);
     setTimeoutIds([newTimeoutId]);
   };
   const onToggleSwitchSave = ({ id, save }: { id: string; save: boolean }) => {
     clearAllTimeouts();
     const newTimeoutId = setTimeout(() => {
-      setisSaveDevice(id, save);
+      setIsSaveDevice(id, save);
     }, 300);
     setTimeoutIds([newTimeoutId]);
   };
@@ -75,17 +76,13 @@ function DeviceList() {
     setTimeoutIds([newTimeoutId]);
   };
 
-  const setisSaveDevice = async (deviceId: string, save: boolean) => {
+  const setIsSaveDevice = async (deviceId: string, save: boolean) => {
     try {
       const { data } = await axiosPrivate.put(`/devices/store/${deviceId}`, {
         storeData: save,
       });
       setIsLoading(false);
-      if (values.search_device) {
-        fetchAllByQueryString();
-      } else {
-        fetchAllDevice();
-      }
+      fetchAllDevice();
       setPageCount(data.metadata.pageCount);
     } catch (err: any) {
       setIsLoading(false);
@@ -96,21 +93,7 @@ function DeviceList() {
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(
-        `/devices?limit=${limitQuery}&page=${numOfPage}`
-      );
-      dispatch(setDevices(data.data));
-      setIsLoading(false);
-      setPageCount(data.metadata.pageCount);
-    } catch (err: any) {
-      setIsLoading(false);
-    }
-  };
-
-  const fetchAllByQueryString = async () => {
-    setIsLoading(true);
-    try {
-      const { data } = await axiosPrivate.get(
-        `/devices/search?query=${values.search_device}&limit=${limitQuery}&page=${numOfPage}`
+        `/devices?limit=${limitQuery}&page=${numOfPage}&query=${values.search_device}&createdAt=${sortCreatedAt}`
       );
       dispatch(setDevices(data.data));
       setIsLoading(false);
@@ -129,11 +112,7 @@ function DeviceList() {
           permission: permission,
         }
       );
-      if (values.search_device) {
-        fetchAllByQueryString();
-      } else {
         fetchAllDevice();
-      }
       setIsLoading(false);
     } catch (err: any) {
       setIsLoading(false);
@@ -155,11 +134,10 @@ function DeviceList() {
           setNumOfPage(i);
         }}
         key={i}
-        className={`${
-          numOfPage === i
+        className={`${numOfPage === i
             ? "bg-[#1966fb] text-white"
             : "bg-white text-[#7a7a7a]"
-        } cursor-pointer  border-[#cccccc] border-[1px] text-[13.5px] rounded-md w-[30px] h-[30px] flex items-center justify-center`}
+          } cursor-pointer  border-[#cccccc] border-[1px] text-[13.5px] rounded-md w-[30px] h-[30px] flex items-center justify-center`}
       >
         {i}
       </button>
@@ -167,19 +145,11 @@ function DeviceList() {
   }
 
   useEffect(() => {
-    if (values.search_device) {
-      onSearch();
-    } else {
       fetchAllDevice();
-    }
-  }, [numOfPage, values.search_device]);
+  }, [numOfPage, values.search_device,sortCreatedAt]);
 
   const hookDeleteSuccess = () => {
-    if (values.search_device) {
-      fetchAllByQueryString();
-    } else {
       fetchAllDevice();
-    }
   };
 
   return (
@@ -274,13 +244,15 @@ function DeviceList() {
                   <select
                     id="countries"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-5 py-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    defaultValue="US"
+                    defaultValue={sortCreatedAt}  
+                    onChange={(e)=>{
+                      console.log(e.target.value)
+                      setSortCreatedAt(e.target.value)
+                    }}
                   >
                     <option>Sort by Date</option>
-                    <option value="US">Date</option>
-                    <option value="CA">Date</option>
-                    <option value="FR">Date</option>
-                    <option value="DE">Date</option>
+                    <option value="%2BcreatedAt">Oldest</option>
+                    <option value="-createdAt">Latest</option>
                   </select>
                 </div>
                 <div className="pb-2 sm:w-[100%]">
@@ -313,9 +285,8 @@ function DeviceList() {
             )}
 
             <div
-              className={`overflow-auto rounded-lg shadow block sm:shadow-none ${
-                devices.length === 0 && "hidden"
-              }`}
+              className={`overflow-auto rounded-lg shadow block sm:shadow-none ${devices.length === 0 && "hidden"
+                }`}
             >
               <table className="w-full">
                 <thead className="border-b-2 border-gray-200 sm:hidden">
@@ -338,122 +309,118 @@ function DeviceList() {
                     </th>
                   </tr>
                 </thead>
-                  <tbody className={`divide-y divide-gray-100 `}>
-                    {devices.length > 0 &&
-                      devices.map((i, index) => {
-                        return (
-                          <tr
-                            key={index}
-                            className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10"
-                          >
-                            <td
-                              className={`cursor-pointer flex sm:hidden items-center justify-center capitalize p-3 text-[13px] select-none ${
-                                i.permission === "allow"
-                                  ? "text-green-500"
-                                  : "text-red-500"
+                <tbody className={`divide-y divide-gray-100 `}>
+                  {devices.length > 0 &&
+                    devices.map((i, index) => {
+                      return (
+                        <tr
+                          key={index}
+                          className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10"
+                        >
+                          <td
+                            className={`cursor-pointer flex sm:hidden items-center justify-center capitalize p-3 text-[13px] select-none ${i.permission === "allow"
+                                ? "text-green-500"
+                                : "text-red-500"
                               } whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}
-                              onClick={() => {
-                                onTogglePermission(
-                                  i.id,
-                                  i.permission === "allow" ? "deny" : "allow"
-                                );
-                              }}
-                            >
-                              <button
-                                className={`w-[8px] h-[8px] ${
-                                  i.permission === "allow"
-                                    ? "bg-green-500"
-                                    : "bg-red-500"
+                            onClick={() => {
+                              onTogglePermission(
+                                i.id,
+                                i.permission === "allow" ? "deny" : "allow"
+                              );
+                            }}
+                          >
+                            <button
+                              className={`w-[8px] h-[8px] ${i.permission === "allow"
+                                  ? "bg-green-500"
+                                  : "bg-red-500"
                                 } rounded-full mr-2`}
-                              ></button>
-                              {i.permission}
-                            </td>
-                                
-                            <td
-                              onClick={() => {
-                                navigate(`/device/${i.id}`);
-                              }}
-                              className="p-3 cursor-pointer text-sm text-[#878787] whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white"
-                            >
-                              {i.nameDevice}
-                            </td>
+                            ></button>
+                            {i.permission}
+                          </td>
 
-                            <td
-                              className={`hidden items-center sm:flex capitalize p-3 text-[13px] ${
-                                i.permission === "allow"
-                                  ? "text-green-500"
-                                  : "text-red-500"
+                          <td
+                            onClick={() => {
+                              navigate(`/device/${i.id}`);
+                            }}
+                            className="p-3 cursor-pointer text-sm text-[#878787] whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white"
+                          >
+                            {i.nameDevice}
+                          </td>
+
+                          <td
+                            className={`hidden items-center sm:flex capitalize p-3 text-[13px] ${i.permission === "allow"
+                                ? "text-green-500"
+                                : "text-red-500"
                               } whitespace-nowrap text-center sm:text-start`}
-                              onClick={() => {
-                                onTogglePermission(
-                                  i.id,
-                                  i.permission === "allow" ? "deny" : "allow"
-                                );
-                              }}
-                            >
-                              <div
-                                className={`w-[8px] h-[8px] ${
-                                  i.permission === "allow"
-                                    ? "bg-green-500"
-                                    : "bg-red-500"
+                            onClick={() => {
+                              onTogglePermission(
+                                i.id,
+                                i.permission === "allow" ? "deny" : "allow"
+                              );
+                            }}
+                          >
+                            <div
+                              className={`w-[8px] h-[8px] ${i.permission === "allow"
+                                  ? "bg-green-500"
+                                  : "bg-red-500"
                                 } rounded-full mr-2`}
-                              ></div>
-                              {i.permission}
-                            </td>
+                            ></div>
+                            {i.permission}
+                          </td>
 
-                            <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
-                              <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
-                                Save
-                              </div>
-                              <SwitchSave
-                                checked={i.isSaveData}
-                                onClick={() =>
-                                  onToggleSwitchSave({
-                                    id: i.id,
-                                    save: !i.isSaveData,
-                                  })
-                                }
-                              />
-                            </td>
-                            <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
-                              <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
-                                Registration
-                              </div>
-                              {moment(i.createdAt)
-                                .add(543, "year")
-                                .format("DD/MM/YYYY h:mm")}
-                            </td>
-                            <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
-                              <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
-                                Action
-                              </div>
-                              <div className="flex justify-center sm:justify-start">
-                                <button
-                                  onClick={() => {
-                                    setSelectedDevice(i.id);
-                                    setEditDialogOpen(true);
-                                  }}
-                                  className="mr-6 text-[#2E7D32]"
-                                >
-                                  Edit
-                                </button>
-                                <button
-                                  onClick={() => {
-                                    setSelectedDevice(i.id);
-                                    setIsDeleteConfirmOpen(
-                                      !isDeleteConfirmOpen
-                                    );
-                                  }}
-                                  className="text-[#dc3546]"
-                                >
-                                  Delete
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
+                          <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
+                            <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
+                              Save
+                            </div>
+                            <SwitchSave
+                              checked={i.isSaveData}
+                              onClick={() =>
+                                onToggleSwitchSave({
+                                  id: i.id,
+                                  save: !i.isSaveData,
+                                })
+                              }
+                            />
+                          </td>
+                          <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
+                            <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
+                              Registration
+                            </div>
+                            {moment(i.createdAt)
+                              .add(543, "year")
+                              .format("DD/MM/YYYY h:mm")}
+                          </td>
+                          <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
+                            <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
+                              Action
+                            </div>
+                            <div className="flex justify-center sm:justify-start">
+                              <button
+                                onClick={() => {
+                                  setSelectedDevice(i.id);
+                                  setEditDialogOpen(true);
+                                }}
+                                className="mr-6 text-[#2E7D32]"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => {
+                                  setSelectedDevice(i.id);
+                                  setIsDeleteConfirmOpen(
+                                    !isDeleteConfirmOpen
+                                  );
+                                }}
+                                className="text-[#dc3546]"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
               </table>
             </div>
             {pageCount > 1 && (

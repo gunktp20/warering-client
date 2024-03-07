@@ -13,6 +13,8 @@ import { BsFiletypeJson } from "react-icons/bs";
 import { FaClipboardList } from "react-icons/fa";
 import Wrapper from "../../assets/wrappers/Device";
 import mqtt, { MqttClient } from "mqtt";
+import { LuEye } from "react-icons/lu";
+import { LuEyeOff } from "react-icons/lu";
 import {
   ButtonControl,
   Gauge,
@@ -32,6 +34,8 @@ import {
 } from "react-json-view-lite";
 import "react-json-view-lite/dist/index.css";
 import moment from "moment";
+import TopicsDialog from "./TopicsDialog";
+import AddWidgetDialog from "./AddWidgetDialog";
 
 function Device() {
   const navigate = useNavigate();
@@ -49,25 +53,22 @@ function Device() {
   const [client, setClient] = useState<MqttClient | null>(null);
   const [connectStatus, setConnectStatus] = useState("Connect");
   const [payload, setPayload] = useState({});
-
-  const jsonData = {
-    data: "HelloWorld",
-    username: "gunktp14",
-    password: "71567****",
-    description: "สวัดดีครับท่านผู้ชม",
-  };
-
+  const [passwordVisible,setPasswordVisible] = useState<boolean>(false)
+  const [isTopicsShow,setIsTopicsShow] = useState<boolean>(false)
+  const [isAddWidgetShow,setIsAddWidgetShow] = useState<boolean>(false)
+  
   const fetchDeviceById = async () => {
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(`/devices/${device_id}`);
       setDeviceInfo(data);
+      connectEMQX(data)
       setIsLoading(false);
     } catch (err: any) {
       setIsLoading(false);
     }
   };
-
+  
   const mqttDisconnect = () => {
     if (client) {
       try {
@@ -81,22 +82,24 @@ function Device() {
     }
   };
 
+  const connectEMQX = async (data:any) =>{
+    const _mqtt = await mqtt.connect(import.meta.env.VITE_EMQX_DOMAIN, {
+      protocol: "ws",
+      host: "localhost",
+      clientId: "emqx_react_" + Math.random().toString(16).substring(2, 8),
+      port: 8083,
+      username: data?.usernameDevice,
+      password: data?.password,
+    });
+    setClient(_mqtt);
+  }
+
   useEffect(() => {
     fetchDeviceById();
   }, []);
 
   useEffect(() => {
-    (() => {
-      const _mqtt = mqtt.connect("ws://localhost:8083/mqtt", {
-        protocol: "ws",
-        host: "localhost",
-        clientId: "emqx_react_" + Math.random().toString(16).substring(2, 8),
-        port: 8083,
-        username: "TestMQTT",
-        password: "TestMQTT",
-      });
-      setClient(_mqtt);
-    })();
+    
   }, []);
 
   useEffect(() => {
@@ -106,9 +109,9 @@ function Device() {
         console.log("connection successful");
         if (client) {
           client.subscribe(
-            "65e2e2e1946718f317756f47/TestMQTT/publish",
+            deviceInfo?.topics[0],
             {
-              qos: deviceInfo.qos,
+              qos: deviceInfo?.qos,
             },
             (err) => {
               console.log("not sub", err);
@@ -116,21 +119,23 @@ function Device() {
           );
         }
       });
-
+      
+      // client.end(() => {
+      //   setConnectStatus('Disconnected');
+      // });
       // https://github.com/mqttjs/MQTT.js#event-error
       client.on("error", (err) => {
         console.error("Connection error: ", err);
 
         client.end();
       });
-
       // https://github.com/mqttjs/MQTT.js#event-reconnect
       client.on("reconnect", () => {
         setConnectStatus("Reconnecting");
       });
-
       // https://github.com/mqttjs/MQTT.js#event-message
       client.on("message", (topic, message) => {
+        console.log("message")
         const payload = { topic, message: message.toString() };
         console.log(payload.message);
         try {
@@ -147,6 +152,8 @@ function Device() {
 
   return (
     <Wrapper>
+      <AddWidgetDialog isAddWidgetShow={isAddWidgetShow} setIsAddWidgetShow={setIsAddWidgetShow}/>
+      {deviceInfo?.topics && <TopicsDialog isTopicsDialogShow={isTopicsShow} setTopicsDialogShow={setIsTopicsShow} topics={deviceInfo?.topics}/>}
       <ConfirmDelete
         isDeleteConfirmOpen={isDeleteConfirmOpen}
         setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
@@ -174,7 +181,7 @@ function Device() {
           setIsDrawerOpen={setIsDrawerOpen}
         />
         {/* content container */}
-        <div className="m-[3rem] top-[5rem] min-h-vh w-[100%] flex flex-col rounded-md sm:m-[3rem]">
+        <div className="m-[3rem] top-[5rem] min-h-vh w-[100%] flex flex-col rounded-md sm:m-[1rem] sm:mt-[2.5rem]">
           <div className="flex justify-between">
             <button
               onClick={() => {
@@ -196,7 +203,6 @@ function Device() {
               Back
             </button>
           </div>
-
           <div className="flex w-[100%] justify-between sm:hidden">
             <div className="text-[23px] text-[#1d4469] font-bold mb-10">
               การเกษตรรวม
@@ -228,7 +234,7 @@ function Device() {
           </button> */}
 
           {/* Back button
-
+            
           {/* Start Device info container */}
           <div className="p-5 w-[100%] border-[1px] grid grid-cols-3 border-[#f1f1f1] rounded-md shadow-sm bg-white sm:grid-cols-2">
             <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
@@ -258,10 +264,13 @@ function Device() {
               </div>
             </div>
 
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8 ">
               Password Device
-              <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
-                *********516
+              <div className="font-medium mt-2 text-[#7a7a7a] text-[13.3px] flex">
+              <button className="" onClick={()=>{
+                  setPasswordVisible(!passwordVisible)
+                }}>{passwordVisible ? <LuEye/>:<LuEyeOff/>}</button>
+                <input className={`ml-2 relative focus:outline-none outline-none focus:border-none w-[100%]`} type={passwordVisible ? "text" : "password"} readOnly={true} value={deviceInfo?.password}></input>
               </div>
             </div>
             <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
@@ -270,20 +279,30 @@ function Device() {
                 {deviceInfo?.qos}
               </div>
             </div>
-            <div className="flex items-center">
+            
+            <div className="flex flex-col">
               <label
                 htmlFor="link-checkbox"
                 className="ms-2 text-sm mr-2 font-medium text-[#1D4469] dark:text-gray-300"
               >
                 Retain
               </label>
-              <input
-                checked={deviceInfo?.retain}
-                id="link-checkbox"
-                type="checkbox"
-                value=""
-                className=" w-[15px] h-[15px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#ffffff00] dark:focus:ring-[#2CB1BC] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-              />
+              <div className="flex items-center ml-2 mt-2">
+                <input
+                  checked={deviceInfo?.retain}
+                  id="link-checkbox"
+                  type="checkbox"
+                  value=""
+                  className=" w-[15px] h-[15px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#ffffff00] dark:focus:ring-[#2CB1BC] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" />
+                <div className={`ml-2 bottom-[0px] relative ${deviceInfo?.retain ? "text-[#0075ff]":"text-[#7a7a7a]"} text-[13.4px]`}>{deviceInfo?.retain.toString()}</div>
+              </div>
+            </div>
+            <div className=" w-[100%] text-[#1D4469] font-bold">
+              <button onClick={()=>{
+                setIsTopicsShow(!isTopicsShow)
+              }} className="text-[#0075ff] px-3 py-1 border-[1px] text-[12.4px] rounded-md border-[#0075ff] flex font-medium mt-2 ">
+                 View Topics
+              </button>
             </div>
           </div>
           {/* End Device info container */}
@@ -294,15 +313,14 @@ function Device() {
           <div className="text-[#7a7a7a text-sm text-[13.2px]" >
             View JSON data
           </div>
-          <div className="w-[100%] text-sm p-5 bg-[#f2f2f2] text-[#7a7a7a] shadow-sm mt-7">
+          <div className="w-[100%] text-sm p-5 bg-[#eeeeee] text-[#7a7a7a] shadow-sm mt-7">
             <JsonView
               data={payload}
               shouldExpandNode={allExpanded}
               style={defaultStyles}
-
             />
           </div>
-
+              
           <div className="text-[#1d4469] text-[20px] mt-8 font-bold">
             Export
           </div>
@@ -330,7 +348,7 @@ function Device() {
           <div className="w-[300px] mt-8 sm:w-[100%]">
             <Button
               onClick={() => {
-                setIsAddDisplayShow(true);
+                setIsAddWidgetShow(true);
               }}
               style={{
                 textTransform: "none",
@@ -356,8 +374,10 @@ function Device() {
           </div>
 
           {/* start widget container */}
+          
           <div className="grid grid-cols-3 gap-10 mt-8 md:grid-cols-2 sm:grid-cols-1">
-            <Gauge
+           
+            {/* <Gauge
               isDeleteConfirmOpen={isDeleteConfirmOpen}
               setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
             />
@@ -376,7 +396,8 @@ function Device() {
             <ButtonControl
               isDeleteConfirmOpen={isDeleteConfirmOpen}
               setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-            />
+            /> */}
+            
           </div>
           {/* end widget container */}
         </div>

@@ -40,7 +40,7 @@ function Overview() {
   useEffect(() => {
     const timeoutID = setInterval(() => {
       fetchDeviceOverview();
-    }, 1000);
+    }, 20000);
 
     return () => {
       clearInterval(timeoutID);

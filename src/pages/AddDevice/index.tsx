@@ -90,7 +90,7 @@ function AddDevice() {
     description: "",
     topics: "",
   });
-  const [retain, setRetain] = useState<boolean>(true);
+  const [retain, setRetain] = useState<boolean>(false);
   const options = [0, 1, 2];
   const [qos, setQos] = useState<number>(options[0]);
 
