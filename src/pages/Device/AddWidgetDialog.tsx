@@ -48,6 +48,7 @@ export default function AddWidgetDialog(props: IProps) {
         value: "",
         min: 0,
         max: 100,
+        unit:"",
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,9 +70,9 @@ export default function AddWidgetDialog(props: IProps) {
     };
 
     const onSubmit = () => {
-        const { label, value, min, max } = values;
+        const { label, value, min, max , unit } = values;
         console.log("value", value)
-        if (occupation === "Gauge" && (!label || !value || !min || !max)) {
+        if (occupation === "Gauge" && (!label || !value || !min || !max || !unit)) {
             setShowSnackBar(true);
             setSnackBarType("error");
             setSnackBarText("Please provide all value!");
@@ -85,12 +86,13 @@ export default function AddWidgetDialog(props: IProps) {
         setIsLoading(true);
         try {
             const { data } = await axiosPrivate.post(`/widgets`, {
-                nameDevice: props?.nameDevice,
+                nameDevice: values?.label,
                 type: occupation,
                 configWidget: {
                     value: values.value,
                     min: Number(values.min),
-                    max: Number(values.max)
+                    max: Number(values.max),
+                    unit: values.unit
                 },
             });
             console.log(data)
@@ -221,6 +223,19 @@ export default function AddWidgetDialog(props: IProps) {
                                         />
                                     </div>
                                 </div>
+                                <div className="flex gap-10 mt-3 sm:flex-col sm:gap-0">
+                                    <div className="w-[240px] sm:w-[100%]">
+                                        <FormRow
+                                            type="text"
+                                            name="unit"
+                                            labelText="unit"
+                                            value={values.unit}
+                                            handleChange={handleChange}
+                                            marginTop="mt-[0.2rem]"
+                                        />
+                                    </div>
+                                </div>
+                             
                                 <div className=" w-[100%] flex flex-col">
                                     <div className="font-bold text-[#767676] text-[12px]">
                                         Preview

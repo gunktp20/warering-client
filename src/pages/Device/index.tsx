@@ -53,8 +53,10 @@ function Device() {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
   const [isTopicsShow, setIsTopicsShow] = useState<boolean>(false);
   const [isAddWidgetShow, setIsAddWidgetShow] = useState<boolean>(false);
+
   const [widgets, setWidgets] = useState<any>(null);
   const [gaugeValue, setGaugeValue] = useState<number>(0);
+  const [configWidgetsDevice,setConfigWidgetsDevice] = useState<any>(null);
 
   const fetchDeviceById = async () => {
     setIsLoading(true);
@@ -149,8 +151,11 @@ function Device() {
         console.log(payload.message);
         try {
           const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
+          console.log(payloadObject)
           console.log(payloadObject?.Gauge_value);
           setGaugeValue(payloadObject?.Gauge_value)
+          setConfigWidgetsDevice(payloadObject)
+          console.log("configWidgetsDevice",configWidgetsDevice)
           setPayload(payloadObject);
         } catch (error) {
           console.log(error);
@@ -420,14 +425,16 @@ function Device() {
           <div className="grid grid-cols-3 gap-10 mt-8 md:grid-cols-2 sm:grid-cols-1">
             {widgets &&
               widgets.map((widget: any, index: number) => {
-                console.log(widget)
+                console.log(`${[widget.nameDevice]}`, widget)
+                console.log(`unit`, widget?.configWidget?.unit)
                 if (widget.type === "Gauge") {
                   return <Gauge
                     key={index}
-                    label={widget.nameDevice}
-                    value={gaugeValue}
+                    label={widget?.nameDevice}
+                    value={configWidgetsDevice?.[widget?.configWidget?.value]}
                     min={widget?.configWidget?.min}
                     max={widget?.configWidget?.max}
+                    unit={widget?.configWidget?.unit}
                   />;
                 }
               })}

@@ -14,9 +14,10 @@ interface IProp {
   value: number;
   min: number;
   max: number;
+  unit:string
 }
 
-function Gauge({ label, value, min, max }: IProp) {
+function Gauge({ label, value, min, max , unit }: IProp) {
   // 100 x value / max + min   35
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const sum = Number(max) + Number(min);
@@ -84,7 +85,7 @@ function Gauge({ label, value, min, max }: IProp) {
         <Doughnut data={data} options={options}></Doughnut>
       </div>
       <div className="w-[100px] text-[#1966fb] absolute text-center bottom-7 text-[12.8px]">
-        {value}
+        {value} {unit}
       </div>
     </div>
   );
