@@ -7,38 +7,55 @@ export type Id = string | number;
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const data = {
-  labels: [],
-  datasets: [
-    {
-      label: "Poll",
-      data: [3, 24],
-      backgroundColor: ["#00000045", "#1966fb"],
-      borderColor: ["#fff", "#fff"],
-      circumference: 180,
-      rotation: 270,
-      borderWidth: 0,
-      cutout: "84%",
-    },
-  ],
-};
-
 const options = {};
 
 interface IProp {
-  isDeleteConfirmOpen: boolean;
-  setIsDeleteConfirmOpen: (active: boolean) => void;
+  label: string;
+  value: number;
+  min: number;
+  max: number;
 }
 
-function Gauge(props: IProp) {
+function Gauge({ label, value, min, max }: IProp) {
+  // 100 x value / max + min   35
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
+  const sum = Number(max) + Number(min);
+  console.log("sum", sum);
+  const newValue = Number(value) + Number(min);
+  const result = Math.round((100 * newValue) / sum);
+  console.log("result = " + Math.round(result));
+  const firstNum = result;
+  const secondNum = 100 - result;
+  console.log("firstNum", firstNum);
+  console.log("secondNum", secondNum);
+  const data = {
+    labels: [],
+    datasets: [
+      {
+        label: "doughnut",
+        data: [firstNum, secondNum],
+        backgroundColor: ["#1966fb", "#00000045"],
+        borderColor: ["#fff", "#fff"],
+        circumference: 180,
+        rotation: 270,
+        borderWidth: 0,
+        cutout: "84%",
+      },
+    ],
+  };
 
+  // min = 20
+  // 100 x value / max + min   35
+  //
+  // max = 70
+  // 1% = 20
+  // 100% = 70
+
+  // value = 10
   return (
-    <div
-      className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 hover:ring-inset hover:ring-rose-500 cursor-grab"
-    >
+    <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2  cursor-grab">
       <div className="absolute left-2 top-2 text-[#1d4469] text-sm">
-        Temperature
+        {label}
       </div>
       <div
         onClick={() => {
@@ -55,7 +72,7 @@ function Gauge(props: IProp) {
           </button>
           <button
             onClick={() => {
-              props.setIsDeleteConfirmOpen(!props.isDeleteConfirmOpen);
+            //   props.setIsDeleteConfirmOpen(!props.isDeleteConfirmOpen);
             }}
             className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]"
           >
@@ -67,7 +84,7 @@ function Gauge(props: IProp) {
         <Doughnut data={data} options={options}></Doughnut>
       </div>
       <div className="w-[100px] text-[#1966fb] absolute text-center bottom-7 text-[12.8px]">
-        7.25
+        {value}
       </div>
     </div>
   );

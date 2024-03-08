@@ -54,6 +54,7 @@ function Device() {
   const [isTopicsShow, setIsTopicsShow] = useState<boolean>(false);
   const [isAddWidgetShow, setIsAddWidgetShow] = useState<boolean>(false);
   const [widgets, setWidgets] = useState<any>(null);
+  const [gaugeValue, setGaugeValue] = useState<number>(0);
 
   const fetchDeviceById = async () => {
     setIsLoading(true);
@@ -148,8 +149,8 @@ function Device() {
         console.log(payload.message);
         try {
           const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
-          console.log(payloadObject);
-
+          console.log(payloadObject?.Gauge_value);
+          setGaugeValue(payloadObject?.Gauge_value)
           setPayload(payloadObject);
         } catch (error) {
           console.log(error);
@@ -165,6 +166,7 @@ function Device() {
           isAddWidgetShow={isAddWidgetShow}
           setIsAddWidgetShow={setIsAddWidgetShow}
           nameDevice={deviceInfo?.nameDevice}
+          fetchAllWidgets={fetchAllWidgets}
         />
       )}
 
@@ -327,9 +329,8 @@ function Device() {
                   className=" w-[15px] h-[15px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#ffffff00] dark:focus:ring-[#2CB1BC] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                 />
                 <div
-                  className={`ml-2 bottom-[0px] relative ${
-                    deviceInfo?.retain ? "text-[#0075ff]" : "text-[#7a7a7a]"
-                  } text-[13.4px]`}
+                  className={`ml-2 bottom-[0px] relative ${deviceInfo?.retain ? "text-[#0075ff]" : "text-[#7a7a7a]"
+                    } text-[13.4px]`}
                 >
                   {deviceInfo?.retain.toString()}
                 </div>
@@ -418,12 +419,13 @@ function Device() {
 
           <div className="grid grid-cols-3 gap-10 mt-8 md:grid-cols-2 sm:grid-cols-1">
             {widgets &&
-              widgets.map((widget :any, index : number) => {
+              widgets.map((widget: any, index: number) => {
                 console.log(widget)
                 if (widget.type === "Gauge") {
-                  return <GaugePreview
+                  return <Gauge
+                    key={index}
                     label={widget.nameDevice}
-                    value={widget?.configWidget?.value}
+                    value={gaugeValue}
                     min={widget?.configWidget?.min}
                     max={widget?.configWidget?.max}
                   />;
