@@ -39,7 +39,9 @@ function DeviceList() {
   const [numOfPage, setNumOfPage] = useState<number>(1);
   const [pageCount, setPageCount] = useState<number>(0);
   const [selectedDevice, setSelectedDevice] = useState<any>();
-  const [sortCreatedAt,setSortCreatedAt] = useState<string>("-createdAt")
+  const [sortCreatedAt, setSortCreatedAt] = useState<string>("-createdAt");
+  const [filterByPermission, setFilterByPermission] = useState<string>("");
+  const [filterByisSaveData, setFilterByIsSaveData] = useState<string>("");
   const elements = [];
 
   interface IDevice {
@@ -54,14 +56,6 @@ function DeviceList() {
     timeoutIds.forEach((timeoutId: any) => clearTimeout(timeoutId));
     setTimeoutIds([]);
   };
-  // const onSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   clearAllTimeouts();
-  //   const newTimeoutId = setTimeout(() => {
-  //     fetchAllDevice()
-  //   }, 150);
-  //   setTimeoutIds([newTimeoutId]);
-  // };
-  
   const onToggleSwitchSave = ({ id, save }: { id: string; save: boolean }) => {
     clearAllTimeouts();
     const newTimeoutId = setTimeout(() => {
@@ -94,7 +88,7 @@ function DeviceList() {
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(
-        `/devices?limit=${limitQuery}&page=${numOfPage}&query=${values.search_device}&createdAt=${sortCreatedAt}`
+        `/devices?limit=${limitQuery}&page=${numOfPage}&query=${values.search_device}&createdAt=${sortCreatedAt}${filterByPermission && "&permission=" + filterByPermission}${filterByisSaveData && "&isSaveData=" + filterByisSaveData}`
       );
       dispatch(setDevices(data.data));
       setIsLoading(false);
@@ -113,7 +107,7 @@ function DeviceList() {
           permission: permission,
         }
       );
-        fetchAllDevice();
+      fetchAllDevice();
       setIsLoading(false);
     } catch (err: any) {
       setIsLoading(false);
@@ -135,10 +129,11 @@ function DeviceList() {
           setNumOfPage(i);
         }}
         key={i}
-        className={`${numOfPage === i
+        className={`${
+          numOfPage === i
             ? "bg-[#1966fb] text-white"
             : "bg-white text-[#7a7a7a]"
-          } cursor-pointer  border-[#cccccc] border-[1px] text-[13.5px] rounded-md w-[30px] h-[30px] flex items-center justify-center`}
+        } cursor-pointer  border-[#cccccc] border-[1px] text-[13.5px] rounded-md w-[30px] h-[30px] flex items-center justify-center`}
       >
         {i}
       </button>
@@ -146,11 +141,17 @@ function DeviceList() {
   }
 
   useEffect(() => {
-      fetchAllDevice();
-  }, [numOfPage,sortCreatedAt,values.search_device]);
+    fetchAllDevice();
+  }, [
+    numOfPage,
+    sortCreatedAt,
+    values.search_device,
+    filterByPermission,
+    filterByisSaveData,
+  ]);
 
   const hookDeleteSuccess = () => {
-      fetchAllDevice();
+    fetchAllDevice();
   };
 
   return (
@@ -245,13 +246,9 @@ function DeviceList() {
                   <select
                     id="countries"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-5 py-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    defaultValue={sortCreatedAt}  
-                    onChange={(e)=>{
-                      if(!e.target.value){
-                        return;
-                      }
-                      console.log(e.target.value)
-                      setSortCreatedAt(e.target.value)
+                    defaultValue={sortCreatedAt}
+                    onChange={(e) => {
+                      setSortCreatedAt(e.target.value);
                     }}
                   >
                     <option value="-createdAt">Sort by Date</option>
@@ -263,13 +260,32 @@ function DeviceList() {
                   <select
                     id="countries"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-5 py-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                    defaultValue="US"
+                    defaultValue={filterByPermission}
+                    onChange={(e) => {
+                      setFilterByPermission(e.target.value);
+                    }}
                   >
-                    <option>Filter by</option>
-                    <option value="US">Filter</option>
-                    <option value="CA">Filter</option>
-                    <option value="FR">Filter</option>
-                    <option value="DE">Filter</option>
+                    <option value="">Permission</option>
+                    <option value="allow">Permission Allow</option>
+                    <option value="deny">Permission Deny</option>
+                  </select>
+                </div>
+                <div className="pb-2 sm:w-[100%]">
+                  <select
+                    id="countries"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-5 py-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    defaultValue={filterByisSaveData}
+                    onChange={(e) => {
+                      if (!e.target.value) {
+                        return;
+                      }
+                      console.log(e.target.value);
+                      setFilterByIsSaveData(e.target.value);
+                    }}
+                  >
+                    <option value="">isSaveData</option>
+                    <option value="true">isSave ON</option>
+                    <option value="false">isSave OFF</option>
                   </select>
                 </div>
               </div>
@@ -289,8 +305,9 @@ function DeviceList() {
             )}
 
             <div
-              className={`overflow-auto rounded-lg shadow block sm:shadow-none ${devices.length === 0 && "hidden"
-                }`}
+              className={`overflow-auto rounded-lg shadow block sm:shadow-none ${
+                devices.length === 0 && "hidden"
+              }`}
             >
               <table className="w-full">
                 <thead className="border-b-2 border-gray-200 sm:hidden">
@@ -322,10 +339,11 @@ function DeviceList() {
                           className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10"
                         >
                           <td
-                            className={`cursor-pointer flex sm:hidden items-center justify-center capitalize p-3 text-[13px] select-none ${i.permission === "allow"
+                            className={`cursor-pointer flex sm:hidden items-center justify-center capitalize p-3 text-[13px] select-none ${
+                              i.permission === "allow"
                                 ? "text-green-500"
                                 : "text-red-500"
-                              } whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}
+                            } whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}
                             onClick={() => {
                               onTogglePermission(
                                 i.id,
@@ -334,10 +352,11 @@ function DeviceList() {
                             }}
                           >
                             <button
-                              className={`w-[8px] h-[8px] ${i.permission === "allow"
+                              className={`w-[8px] h-[8px] ${
+                                i.permission === "allow"
                                   ? "bg-green-500"
                                   : "bg-red-500"
-                                } rounded-full mr-2`}
+                              } rounded-full mr-2`}
                             ></button>
                             {i.permission}
                           </td>
@@ -352,10 +371,11 @@ function DeviceList() {
                           </td>
 
                           <td
-                            className={`hidden items-center sm:flex capitalize p-3 text-[13px] ${i.permission === "allow"
+                            className={`hidden items-center sm:flex capitalize p-3 text-[13px] ${
+                              i.permission === "allow"
                                 ? "text-green-500"
                                 : "text-red-500"
-                              } whitespace-nowrap text-center sm:text-start`}
+                            } whitespace-nowrap text-center sm:text-start`}
                             onClick={() => {
                               onTogglePermission(
                                 i.id,
@@ -364,10 +384,11 @@ function DeviceList() {
                             }}
                           >
                             <div
-                              className={`w-[8px] h-[8px] ${i.permission === "allow"
+                              className={`w-[8px] h-[8px] ${
+                                i.permission === "allow"
                                   ? "bg-green-500"
                                   : "bg-red-500"
-                                } rounded-full mr-2`}
+                              } rounded-full mr-2`}
                             ></div>
                             {i.permission}
                           </td>
@@ -411,9 +432,7 @@ function DeviceList() {
                               <button
                                 onClick={() => {
                                   setSelectedDevice(i.id);
-                                  setIsDeleteConfirmOpen(
-                                    !isDeleteConfirmOpen
-                                  );
+                                  setIsDeleteConfirmOpen(!isDeleteConfirmOpen);
                                 }}
                                 className="text-[#dc3546]"
                               >

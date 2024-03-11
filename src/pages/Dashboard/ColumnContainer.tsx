@@ -42,7 +42,7 @@ function ColumnContainer({
       type: "Column",
       column,
     },
-    disabled: editMode,
+    disabled: true,
   });
 
   const style = {
@@ -76,11 +76,14 @@ function ColumnContainer({
       style={style}
       className="
   w-[100%]
-  h-[100%]
+  h-fit
   rounded-md
   flex
   flex-col
+  
   "
+  // border column medieum
+  // bg-blue-500
     >
       {/* Column title */}
       <div
@@ -90,20 +93,19 @@ function ColumnContainer({
           setEditMode(true);
         }}
         // border-2
+        // bg-red-500
         className="
-      text-md
-      h-[60px]
-      cursor-grab
-      rounded-md
-      rounded-b-none
-      p-3
-      font-bold
+        text-md
+        cursor-grab
+        rounded-md
+        rounded-b-none
+        font-bold
       
-      flex
-      items-center
-      justify-between
-      text-black
-      "
+        flex
+        items-center
+        justify-between
+        text-black
+        "
       >
         <div className="flex gap-2">
           <div
@@ -118,7 +120,7 @@ function ColumnContainer({
         text-white
         "
           >
-            0
+            {/* 0 */}
           </div>
           {/* {!editMode && column.id} */}
           {editMode && (
@@ -212,14 +214,14 @@ function ColumnContainer({
         </SortableContext>
       </div>
       {/* Column footer */}
-      <button
+      {/* <button
         className="hidden gap-2 items-center border-columnBackgroundColor border-2 rounded-md p-4 border-x-columnBackgroundColor hover:bg-mainBackgroundColor hover:text-[#1966fb] active:bg-black"
         onClick={() => {
           createTask(column.id);
         }}
-      >
+      > */}
         {/* + Add task */}
-      </button>
+      {/* </button> */}
     </div>
   );
 }

@@ -1,4 +1,3 @@
-
 import { useEffect, useMemo, useState } from "react";
 import { Column, Id, Task } from "./types";
 import ColumnContainer from "./ColumnContainer";
@@ -15,6 +14,8 @@ import {
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
 import TaskCard from "./TaskCard";
+import { BigNavbar, NavDialog, NavLinkSidebar } from "../../components";
+import Wrapper from "../../assets/wrappers/Dashboard";
 
 const defaultCols: Column[] = [
   {
@@ -64,7 +65,6 @@ const defaultTasks: Task[] = [
     columnId: "col3",
     content: "Dev meeting",
   },
-
 ];
 
 function KanbanBoard() {
@@ -72,11 +72,15 @@ function KanbanBoard() {
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
   // tasksStorage ? JSON.parse(tasksStorage) : vvv
-  const [tasks, setTasks] = useState<Task[]>( defaultTasks);
+  const [tasks, setTasks] = useState<Task[]>(defaultTasks);
 
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);
 
   const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
+    useState<boolean>(false);
+  const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -87,45 +91,52 @@ function KanbanBoard() {
   );
 
   useEffect(() => {
-    console.log("useEffect tasks : ", tasks)
-  }, [tasks])
+    console.log("useEffect tasks : ", tasks);
+  }, [tasks]);
 
   return (
-    <div
-      className="
-        h-[100vh]
-        w-[100%]
-        overflow-x-auto
-        overflow-y-hidden
-      bg-white
-    "
-    >
-      <DndContext
-        sensors={sensors}
-        onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
-        onDragOver={onDragOver}
-      >
-        <div className="m-auto flex gap-4 ">
-          <div className="flex gap-4 w-[100%] h-[100vh]">
-            <SortableContext items={columnsId}>
-              <div className="grid grid-cols-3 w-[100%] gap-2 md:grid-cols-2 sm:grid-cols-1">
-              {columns.map((col) => (
-                <ColumnContainer
-                  key={col.id}
-                  column={col}
-                  deleteColumn={deleteColumn}
-                  updateColumn={updateColumn}
-                  createTask={createTask}
-                  deleteTask={deleteTask}
-                  updateTask={updateTask}
-                  tasks={tasks.filter((task) => task.columnId === col.id)}
-                />
-              ))}
+    <Wrapper>
+      <BigNavbar
+        isAccountUserDrawerOpen={isAccountUserDrawerOpen}
+        setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
+        setIsSidebarShow={setIsSidebarShow}
+        isSidebarShow={isSidebarShow}
+      />
+      <div className="flex h-[100%]">
+        <NavLinkSidebar isSidebarShow={isSidebarShow} />
+        <NavDialog
+          isDrawerOpen={isDrawerOpen}
+          setIsDrawerOpen={setIsDrawerOpen}
+        />
+        {/* content container */}
+        <div className="m-[3rem] w-[100%]  mt-0">
+          <DndContext
+            sensors={sensors}
+            onDragStart={onDragStart}
+            onDragEnd={onDragEnd}
+            onDragOver={onDragOver}
+          >
+            <div className="m-auto flex gap-4 ">
+              <div className="flex gap-4 w-[100%] h-[100vh]">
+                <SortableContext items={columnsId}>
+                {/* bg-yellow-500 */}
+                  <div className="grid grid-cols-3 w-[100%] gap-2 md:grid-cols-2 sm:grid-cols-1 h-fit mt-9">
+                    {columns.map((col) => (
+                      <ColumnContainer
+                        key={col.id}
+                        column={col}
+                        deleteColumn={deleteColumn}
+                        updateColumn={updateColumn}
+                        createTask={createTask}
+                        deleteTask={deleteTask}
+                        updateTask={updateTask}
+                        tasks={tasks.filter((task) => task.columnId === col.id)}
+                      />
+                    ))}
+                  </div>
+                </SortableContext>
               </div>
-            </SortableContext>
-          </div>
-          {/* <button
+              {/* <button
             onClick={() => {
               createNewColumn();
             }}
@@ -148,35 +159,37 @@ function KanbanBoard() {
             <PlusIcon />
             Add Column
           </button> */}
-        </div>
+            </div>
 
-        {createPortal(
-          <DragOverlay>
-            {activeColumn && (
-              <ColumnContainer
-                column={activeColumn}
-                deleteColumn={deleteColumn}
-                updateColumn={updateColumn}
-                createTask={createTask}
-                deleteTask={deleteTask}
-                updateTask={updateTask}
-                tasks={tasks.filter(
-                  (task) => task.columnId === activeColumn.id
+            {createPortal(
+              <DragOverlay>
+                {activeColumn && (
+                  <ColumnContainer
+                    column={activeColumn}
+                    deleteColumn={deleteColumn}
+                    updateColumn={updateColumn}
+                    createTask={createTask}
+                    deleteTask={deleteTask}
+                    updateTask={updateTask}
+                    tasks={tasks.filter(
+                      (task) => task.columnId === activeColumn.id
+                    )}
+                  />
                 )}
-              />
+                {activeTask && (
+                  <TaskCard
+                    task={activeTask}
+                    deleteTask={deleteTask}
+                    updateTask={updateTask}
+                  />
+                )}
+              </DragOverlay>,
+              document.body
             )}
-            {activeTask && (
-              <TaskCard
-                task={activeTask}
-                deleteTask={deleteTask}
-                updateTask={updateTask}
-              />
-            )}
-          </DragOverlay>,
-          document.body
-        )}
-      </DndContext>
-    </div>
+          </DndContext>
+        </div>
+      </div>
+    </Wrapper>
   );
 
   function createTask(columnId: Id) {
@@ -230,8 +243,8 @@ function KanbanBoard() {
   }
 
   function onDragStart(event: DragStartEvent) {
-    console.log("onDragStart ", event)
-    console.log("Column and Task", event.active.data.current?.type)
+    console.log("onDragStart ", event);
+    console.log("Column and Task", event.active.data.current?.type);
     if (event.active.data.current?.type === "Column") {
       setActiveColumn(event.active.data.current.column);
       return;
@@ -244,24 +257,24 @@ function KanbanBoard() {
   }
 
   function onDragEnd(event: DragEndEvent) {
-    console.log("DragEndEvent", event.active.data.current?.sortable.items)
+    console.log("DragEndEvent", event.active.data.current?.sortable.items);
     setActiveColumn(null);
     setActiveTask(null);
 
     const { active, over } = event;
-    console.log("Over", active)
-    console.log("Active", active)
+    console.log("Over", active);
+    console.log("Active", active);
     if (!over) return;
 
     const activeId = active.id;
     const overId = over.id;
-    console.log("activeId", activeId)
-    console.log("overId", overId)
+    console.log("activeId", activeId);
+    console.log("overId", overId);
 
     if (activeId === overId) return;
 
     const isActiveAColumn = active.data.current?.type === "Column";
-    console.log("isActiveAColumn", isActiveAColumn)
+    console.log("isActiveAColumn", isActiveAColumn);
     if (!isActiveAColumn) return;
 
     console.log("DRAG END");
@@ -276,7 +289,7 @@ function KanbanBoard() {
   }
 
   async function onDragOver(event: DragOverEvent) {
-    console.log("onDragOver", event)
+    console.log("onDragOver", event);
     const { active, over } = event;
     if (!over) return;
 

@@ -2,6 +2,12 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { useState } from "react";
 import { Doughnut } from "react-chartjs-2";
 import { RxDotsHorizontal } from "react-icons/rx";
+import * as React from "react";
+import Dialog from "@mui/material/Dialog";
+import DialogContentText from "@mui/material/DialogContentText";
+import Slide from "@mui/material/Slide";
+import { TransitionProps } from "@mui/material/transitions";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 export type Id = string | number;
 
@@ -14,12 +20,16 @@ interface IProp {
   value: number;
   min: number;
   max: number;
-  unit:string
+  unit: string;
+  widgetId: string;
 }
 
-function Gauge({ label, value, min, max , unit }: IProp) {
+function Gauge({ label, value, min, max, unit, widgetId }: IProp) {
   // 100 x value / max + min   35
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
+    useState<boolean>(false);
+
   const sum = Number(max) + Number(min);
   console.log("sum", sum);
   const newValue = Number(value) + Number(min);
@@ -73,7 +83,7 @@ function Gauge({ label, value, min, max , unit }: IProp) {
           </button>
           <button
             onClick={() => {
-            //   props.setIsDeleteConfirmOpen(!props.isDeleteConfirmOpen);
+              setIsDeleteConfirmOpen(!isDeleteConfirmOpen);
             }}
             className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]"
           >
@@ -87,7 +97,91 @@ function Gauge({ label, value, min, max , unit }: IProp) {
       <div className="w-[100px] text-[#1966fb] absolute text-center bottom-7 text-[12.8px]">
         {value} {unit}
       </div>
+      <ConfirmDelete
+        widgetId={widgetId}
+        isDeleteConfirmOpen={isDeleteConfirmOpen}
+        setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
+      />
     </div>
+  );
+}
+
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement<any, any>;
+  },
+  ref: React.Ref<unknown>
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
+interface IProps {
+  widgetId: string;
+  isDeleteConfirmOpen: boolean;
+  setIsDeleteConfirmOpen: (active: boolean) => void;
+}
+
+function ConfirmDelete({
+  widgetId,
+  isDeleteConfirmOpen,
+  setIsDeleteConfirmOpen,
+}: IProps) {
+  const axiosPrivate = useAxiosPrivate();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const handleClose = () => {
+    setIsDeleteConfirmOpen(false);
+  };
+
+  const onDelete = async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await axiosPrivate.delete(`/widgets/${widgetId}`);
+      console.log(data);
+
+      setIsLoading(false);
+      setIsDeleteConfirmOpen(false);
+    } catch (err) {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <React.Fragment>
+      <Dialog
+        open={isDeleteConfirmOpen}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleClose}
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogContentText
+          id="confirm-delete-dashboard-dialog"
+          className="py-7 px-11"
+          component={"div"}
+          variant={"body2"}
+        >
+          <div className="text-[#dc3546] text-[15.5px] text-center">
+            Are you sure you want to delete this widget?
+          </div>
+          <div className="mt-4 flex justify-center gap-3 w-[100%]">
+            <button
+              onClick={handleClose}
+              className="text-black text-[12.5px] border-[1px] border-[#000] rounded-sm px-10 py-[0.4rem]"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                onDelete();
+              }}
+              className="bg-[#dc3546] text-[12.5px] text-white px-10 py-[0.4rem] rounded-sm"
+            >
+              Delete
+            </button>
+          </div>
+        </DialogContentText>
+      </Dialog>
+    </React.Fragment>
   );
 }
 

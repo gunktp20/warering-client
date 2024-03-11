@@ -55,6 +55,7 @@ function AddDevice() {
       setSnackBarText("Your device has been added");
       clearAlert();
       setIsLoading(false);
+      navigate('/device-list')
     } catch (err: any) {
       console.log(err);
       const msg =

@@ -41,8 +41,6 @@ function Device() {
   const [isAddDisplayShow, setIsAddDisplayShow] = useState<boolean>(false);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
-    useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   let { device_id } = useParams();
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
@@ -56,8 +54,7 @@ function Device() {
 
   const [widgets, setWidgets] = useState<any>(null);
   const [gaugeValue, setGaugeValue] = useState<number>(0);
-  const [configWidgetsDevice,setConfigWidgetsDevice] = useState<any>(null);
-
+  const [configWidgetsDevice, setConfigWidgetsDevice] = useState<any>(null);
   const fetchDeviceById = async () => {
     setIsLoading(true);
     console.log("fetchDevice");
@@ -70,7 +67,6 @@ function Device() {
       setIsLoading(false);
     }
   };
-
   const fetchAllWidgets = async () => {
     console.log("fetchAllWidgets");
     setIsLoading(true);
@@ -82,7 +78,17 @@ function Device() {
       setIsLoading(false);
     }
   };
-
+  const connectEMQX = async (data: any) => {
+    const _mqtt = await mqtt.connect(import.meta.env.VITE_EMQX_DOMAIN, {
+      protocol: "ws",
+      host: "localhost",
+      clientId: "emqx_react_" + Math.random().toString(16).substring(2, 8),
+      port: 8083,
+      username: data?.usernameDevice,
+      password: data?.password,
+    });
+    setClient(_mqtt);
+  };
   const mqttDisconnect = () => {
     if (client) {
       try {
@@ -95,24 +101,10 @@ function Device() {
       }
     }
   };
-
-  const connectEMQX = async (data: any) => {
-    const _mqtt = await mqtt.connect(import.meta.env.VITE_EMQX_DOMAIN, {
-      protocol: "ws",
-      host: "localhost",
-      clientId: "emqx_react_" + Math.random().toString(16).substring(2, 8),
-      port: 8083,
-      username: data?.usernameDevice,
-      password: data?.password,
-    });
-    setClient(_mqtt);
-  };
-
   useEffect(() => {
     fetchDeviceById();
     fetchAllWidgets();
   }, []);
-
   useEffect(() => {
     if (client) {
       client.on("connect", () => {
@@ -151,11 +143,11 @@ function Device() {
         console.log(payload.message);
         try {
           const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
-          console.log(payloadObject)
+          console.log(payloadObject);
           console.log(payloadObject?.Gauge_value);
-          setGaugeValue(payloadObject?.Gauge_value)
-          setConfigWidgetsDevice(payloadObject)
-          console.log("configWidgetsDevice",configWidgetsDevice)
+          setGaugeValue(payloadObject?.Gauge_value);
+          setConfigWidgetsDevice(payloadObject);
+          console.log("configWidgetsDevice", configWidgetsDevice);
           setPayload(payloadObject);
         } catch (error) {
           console.log(error);
@@ -163,7 +155,6 @@ function Device() {
       });
     }
   }, [client]);
-
   return (
     <Wrapper>
       {deviceInfo?.nameDevice && (
@@ -182,10 +173,6 @@ function Device() {
           topics={deviceInfo?.topics}
         />
       )}
-      <ConfirmDelete
-        isDeleteConfirmOpen={isDeleteConfirmOpen}
-        setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-      />
       <AddDisplayDialog
         isAddDisplayShow={isAddDisplayShow}
         setIsAddDisplayShow={setIsAddDisplayShow}
@@ -194,7 +181,6 @@ function Device() {
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
       />
-
       <BigNavbar
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
@@ -334,8 +320,9 @@ function Device() {
                   className=" w-[15px] h-[15px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#ffffff00] dark:focus:ring-[#2CB1BC] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
                 />
                 <div
-                  className={`ml-2 bottom-[0px] relative ${deviceInfo?.retain ? "text-[#0075ff]" : "text-[#7a7a7a]"
-                    } text-[13.4px]`}
+                  className={`ml-2 bottom-[0px] relative ${
+                    deviceInfo?.retain ? "text-[#0075ff]" : "text-[#7a7a7a]"
+                  } text-[13.4px]`}
                 >
                   {deviceInfo?.retain.toString()}
                 </div>
@@ -425,17 +412,31 @@ function Device() {
           <div className="grid grid-cols-3 gap-10 mt-8 md:grid-cols-2 sm:grid-cols-1">
             {widgets &&
               widgets.map((widget: any, index: number) => {
-                console.log(`${[widget.nameDevice]}`, widget)
-                console.log(`unit`, widget?.configWidget?.unit)
+                console.log(`${[widget.nameDevice]}`, widget);
+                console.log(`unit`, widget?.configWidget?.unit);
                 if (widget.type === "Gauge") {
-                  return <Gauge
-                    key={index}
-                    label={widget?.nameDevice}
-                    value={configWidgetsDevice?.[widget?.configWidget?.value]}
-                    min={widget?.configWidget?.min}
-                    max={widget?.configWidget?.max}
-                    unit={widget?.configWidget?.unit}
-                  />;
+                  return (
+                    <Gauge
+                      key={index}
+                      widgetId={widget.id}
+                      label={widget?.nameDevice}
+                      value={configWidgetsDevice?.[widget?.configWidget?.value]}
+                      min={widget?.configWidget?.min}
+                      max={widget?.configWidget?.max}
+                      unit={widget?.configWidget?.unit}
+                    />
+                  );
+                }
+                if (widget.type === "MessageBox") {
+                  return (
+                    <MessageBox
+                      key={index}
+                      widgetId={widget.id}
+                      label={widget?.nameDevice}
+                      value={configWidgetsDevice?.[widget?.configWidget?.value]}
+                      unit={widget?.configWidget?.unit}
+                    />
+                  );
                 }
               })}
             {/* <Gauge

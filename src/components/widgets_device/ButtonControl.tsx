@@ -3,18 +3,22 @@ import { Button } from "@mui/material";
 import { useState } from "react";
 
 interface IProp {
-    isDeleteConfirmOpen:boolean;
-    setIsDeleteConfirmOpen:(active:boolean)=>void
+  label: string;
+  value: number;
+  unit: string;
+  widgetId: string;
 }
 
-function ButtonControl(props:IProp) {
+function ButtonControl({ label, value, unit, widgetId }: IProp) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
+    useState<boolean>(false);
+
   return (
     <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center ">
       <div className="absolute left-2 top-2 text-[#1d4469] text-sm">
-        Button Control
+        {label}
       </div>
-
       <div
         onClick={() => {
           setIsOptionOpen(!isOptionOpen);
@@ -28,9 +32,12 @@ function ButtonControl(props:IProp) {
           <button className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]">
             Edit
           </button>
-          <button onClick={()=>{
-            props.setIsDeleteConfirmOpen(!props.isDeleteConfirmOpen)
-          }} className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]">
+          <button
+            onClick={() => {
+              setIsDeleteConfirmOpen(!isDeleteConfirmOpen);
+            }}
+            className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]"
+          >
             Delete
           </button>
         </div>
