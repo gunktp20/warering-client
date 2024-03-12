@@ -39,8 +39,8 @@ const initialState = {
   unit: "",
   payload:'{ "key":value , "key":value }',
   button_label:"",
-  payload_on:"",
-  payload_off:""
+  on_payload:"",
+  off_payload:""
 }
 
 export default function AddWidgetDialog(props: IProps) {
@@ -62,8 +62,6 @@ export default function AddWidgetDialog(props: IProps) {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
   const [values, setValues] = useState<any>(initialState);
-  const [payloadOn, setPayloadOn] = useState<boolean>(false);
-  const [payloadOff, setPayloadOff] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
@@ -100,6 +98,13 @@ export default function AddWidgetDialog(props: IProps) {
       setSnackBarText("Please provide all value!");
       clearAlert();
       return;
+    }
+
+    if(occupation === "ToggleSwitch"){
+      console.log("on payload",parseInt(values.on_payload))
+      console.log("off payload",parseInt(values.off_payload))
+      console.log("Not a number on payload",isNaN(values.on_payload))
+      console.log("Not a number off payload",isNaN(values.off_payload))
     }
 
     // {
@@ -156,13 +161,12 @@ export default function AddWidgetDialog(props: IProps) {
         }
       case "ToggleSwitch":
         try{
-          const replacedString = values.payload.replace(/'/g, '"');
-          JSON.parse(replacedString)
           widgetInfo.nameDevice = values?.label;
           widgetInfo.type = occupation;
           widgetInfo.configWidget =  { 
-            button_label:values.button_label,
-            payload:replacedString
+            value:values.value,
+            on_payload:isNaN(values.on_payload) ? values.on_payload: parseInt(values.on_payload),
+            off_payload:isNaN(values.off_payload) ? values.off_payload: parseInt(values.off_payload),
           };
           createWidget(widgetInfo); 
           return;
@@ -348,7 +352,7 @@ export default function AddWidgetDialog(props: IProps) {
                       type="text"
                       name="on_payload"
                       labelText="on payload"
-                      value={values.button_label}
+                      value={values.on_payload}
                       handleChange={handleChange}
                       marginTop="mt-[0.2rem]"
                     />
@@ -360,7 +364,7 @@ export default function AddWidgetDialog(props: IProps) {
                       type="text"
                       name="off_payload"
                       labelText="off payload"
-                      value={values.button_label}
+                      value={values.off_payload}
                       handleChange={handleChange}
                       marginTop="mt-[0.2rem]"
                     />
