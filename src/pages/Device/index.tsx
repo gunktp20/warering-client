@@ -78,6 +78,25 @@ function Device() {
       setIsLoading(false);
     }
   };
+
+  const mqttPublish = (payload: any) => {
+    if (client) {
+      client.publish(
+        deviceInfo?.topics[0],
+        payload,
+        {
+          qos: 0,
+          retain: true,
+        },
+        (error) => {
+          if (error) {
+            console.log("Publish error: ", error);
+          }
+        }
+      );
+    }
+  };
+
   const connectEMQX = async (data: any) => {
     const _mqtt = await mqtt.connect(import.meta.env.VITE_EMQX_DOMAIN, {
       protocol: "ws",
@@ -94,10 +113,10 @@ function Device() {
       try {
         client.end(false, () => {
           setConnectStatus("Connect");
-          console.log("disconnected successfully");
+          // console.log("disconnected successfully");
         });
       } catch (error) {
-        console.log("disconnect error:", error);
+        // console.log("disconnect error:", error);
       }
     }
   };
@@ -109,7 +128,7 @@ function Device() {
     if (client) {
       client.on("connect", () => {
         setConnectStatus("Connected");
-        console.log("connection successful");
+        // console.log("connection successful");
         if (client) {
           client.subscribe(
             deviceInfo?.topics[0],
@@ -117,7 +136,7 @@ function Device() {
               qos: deviceInfo?.qos,
             },
             (err) => {
-              console.log("not sub", err);
+              // console.log("not sub", err);
             }
           );
         }
@@ -128,7 +147,7 @@ function Device() {
       // });
       // https://github.com/mqttjs/MQTT.js#event-error
       client.on("error", (err) => {
-        console.error("Connection error: ", err);
+        // console.error("Connection error: ", err);
 
         client.end();
       });
@@ -138,19 +157,19 @@ function Device() {
       });
       // https://github.com/mqttjs/MQTT.js#event-message
       client.on("message", (topic, message) => {
-        console.log("message");
+        // console.log("message");
         const payload = { topic, message: message.toString() };
-        console.log(payload.message);
+        // console.log(payload.message);
         try {
           const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
-          console.log(payloadObject);
-          console.log(payloadObject?.Gauge_value);
+          // console.log(payloadObject);
+          // console.log(payloadObject?.Gauge_value);
           setGaugeValue(payloadObject?.Gauge_value);
           setConfigWidgetsDevice(payloadObject);
-          console.log("configWidgetsDevice", configWidgetsDevice);
+          // console.log("configWidgetsDevice", configWidgetsDevice);
           setPayload(payloadObject);
         } catch (error) {
-          console.log(error);
+          // console.log(error);
         }
       });
     }
@@ -412,8 +431,10 @@ function Device() {
           <div className="grid grid-cols-3 gap-10 mt-8 md:grid-cols-2 sm:grid-cols-1">
             {widgets &&
               widgets.map((widget: any, index: number) => {
-                console.log(`${[widget.nameDevice]}`, widget);
-                console.log(`unit`, widget?.configWidget?.unit);
+                // console.log(`${[widget.nameDevice]}`, widget);
+                // console.log(`unit`, widget?.configWidget?.unit);
+                // console.log(widget)
+                // console.log(widget?.configWidget);
                 if (widget.type === "Gauge") {
                   return (
                     <Gauge
@@ -424,6 +445,7 @@ function Device() {
                       min={widget?.configWidget?.min}
                       max={widget?.configWidget?.max}
                       unit={widget?.configWidget?.unit}
+                      fetchAllWidgets={fetchAllWidgets}
                     />
                   );
                 }
@@ -435,6 +457,20 @@ function Device() {
                       label={widget?.nameDevice}
                       value={configWidgetsDevice?.[widget?.configWidget?.value]}
                       unit={widget?.configWidget?.unit}
+                      fetchAllWidgets={fetchAllWidgets}
+                    />
+                  );
+                }
+                if (widget.type === "ButtonControl") {
+                  return (
+                    <ButtonControl
+                      key={index}
+                      widgetId={widget.id}
+                      label={widget?.nameDevice}
+                      button_label={widget?.configWidget?.button_label}
+                      payload={widget?.configWidget?.payload}
+                      fetchAllWidgets={fetchAllWidgets}
+                      publishMQTT={mqttPublish}
                     />
                   );
                 }

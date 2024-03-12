@@ -22,23 +22,24 @@ interface IProp {
   max: number;
   unit: string;
   widgetId: string;
+  fetchAllWidgets:()=>void
 }
 
-function Gauge({ label, value, min, max, unit, widgetId }: IProp) {
+function Gauge({ label, value, min, max, unit, widgetId ,fetchAllWidgets }: IProp) {
   // 100 x value / max + min   35
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
 
   const sum = Number(max) + Number(min);
-  console.log("sum", sum);
+  // console.log("sum", sum);
   const newValue = Number(value) + Number(min);
   const result = Math.round((100 * newValue) / sum);
-  console.log("result = " + Math.round(result));
+  // console.log("result = " + Math.round(result));
   const firstNum = result;
   const secondNum = 100 - result;
-  console.log("firstNum", firstNum);
-  console.log("secondNum", secondNum);
+  // console.log("firstNum", firstNum);
+  // console.log("secondNum", secondNum);
   const data = {
     labels: [],
     datasets: [
@@ -64,20 +65,21 @@ function Gauge({ label, value, min, max, unit, widgetId }: IProp) {
 
   // value = 10
   return (
-    <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2  cursor-grab">
-      <div className="absolute left-2 top-2 text-[#1d4469] text-sm">
+    <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 overflow-hidden">
+      {!value && <div className="w-[100%] h-[100%] bg-white z-10 flex absolute justify-center items-center font-bold text-[#0075ff]">IDLE</div>}
+      <div className="z-30 absolute left-2 top-2 text-[#1d4469] text-sm">
         {label}
       </div>
       <div
         onClick={() => {
           setIsOptionOpen(!isOptionOpen);
         }}
-        className="absolute right-3 top-2 text-[18px] text-[#7a7a7a] cursor-pointer hover:bg-[#f7f7f7] hover:rounded-md "
+        className="z-20 absolute right-3 top-2 text-[18px] text-[#7a7a7a] cursor-pointer hover:bg-[#f7f7f7] hover:rounded-md "
       >
         <RxDotsHorizontal />
       </div>
       {isOptionOpen && (
-        <div className="bg-white flex flex-col absolute top-6 right-2 border-[1px] rounded-md shadow-sm">
+        <div className="z-30 bg-white flex flex-col absolute top-6 right-2 border-[1px] rounded-md shadow-sm">
           <button className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]">
             Edit
           </button>
@@ -101,7 +103,9 @@ function Gauge({ label, value, min, max, unit, widgetId }: IProp) {
         widgetId={widgetId}
         isDeleteConfirmOpen={isDeleteConfirmOpen}
         setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
+        fetchAllWidgets={fetchAllWidgets}
       />
+      
     </div>
   );
 }
@@ -119,12 +123,14 @@ interface IProps {
   widgetId: string;
   isDeleteConfirmOpen: boolean;
   setIsDeleteConfirmOpen: (active: boolean) => void;
+  fetchAllWidgets:()=>void
 }
 
 function ConfirmDelete({
   widgetId,
   isDeleteConfirmOpen,
   setIsDeleteConfirmOpen,
+  fetchAllWidgets
 }: IProps) {
   const axiosPrivate = useAxiosPrivate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -137,9 +143,9 @@ function ConfirmDelete({
     try {
       const { data } = await axiosPrivate.delete(`/widgets/${widgetId}`);
       console.log(data);
-
       setIsLoading(false);
       setIsDeleteConfirmOpen(false);
+      fetchAllWidgets()
     } catch (err) {
       setIsLoading(false);
     }

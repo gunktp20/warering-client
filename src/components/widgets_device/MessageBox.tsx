@@ -12,28 +12,30 @@ interface IProp {
   value: number;
   unit: string;
   widgetId: string;
+  fetchAllWidgets:()=>void
 }
 
-function MessageBox({ label, value, unit, widgetId }: IProp) {
+function MessageBox({ label, value, unit, widgetId ,fetchAllWidgets}: IProp) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
 
   return (
-    <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center ">
-      <div className="absolute left-2 top-2 text-[#1d4469] text-sm">
+    <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2">
+      {!value && <div className="w-[100%] h-[100%] bg-white z-10 flex absolute justify-center items-center font-bold text-[#0075ff]">IDLE</div>}
+      <div className="z-30 absolute left-2 top-2 text-[#1d4469] text-sm">
         {label}
       </div>
       <div
         onClick={() => {
           setIsOptionOpen(!isOptionOpen);
         }}
-        className="absolute right-3 top-2 text-[18px] text-[#7a7a7a] cursor-pointer hover:bg-[#f7f7f7] hover:rounded-md "
+        className="z-20 absolute right-3 top-2 text-[18px] text-[#7a7a7a] cursor-pointer hover:bg-[#f7f7f7] hover:rounded-md "
       >
         <RxDotsHorizontal />
       </div>
       {isOptionOpen && (
-        <div className="bg-white flex flex-col absolute top-6 right-2 border-[1px] rounded-md shadow-sm">
+        <div className="z-30 bg-white flex flex-col absolute top-6 right-2 border-[1px] rounded-md shadow-sm">
           <button className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]">
             Edit
           </button>
@@ -57,6 +59,7 @@ function MessageBox({ label, value, unit, widgetId }: IProp) {
         widgetId={widgetId}
         isDeleteConfirmOpen={isDeleteConfirmOpen}
         setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
+        fetchAllWidgets={fetchAllWidgets}
       />
     </div>
   );
@@ -75,12 +78,14 @@ interface IProps {
   widgetId: string;
   isDeleteConfirmOpen: boolean;
   setIsDeleteConfirmOpen: (active: boolean) => void;
+  fetchAllWidgets:() => void;
 }
 
 function ConfirmDelete({
   widgetId,
   isDeleteConfirmOpen,
   setIsDeleteConfirmOpen,
+  fetchAllWidgets
 }: IProps) {
   const axiosPrivate = useAxiosPrivate();
   const [isLoading, setIsLoading] = useState<boolean>(false);

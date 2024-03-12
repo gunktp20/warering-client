@@ -17,17 +17,12 @@ interface IProp {
 }
 
 function GaugePreview({ label, value, min, max }: IProp) {
-  // 100 x value / max + min   35
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const sum = Number(max) + Number(min);
-  console.log("sum", sum);
   const newValue = Number(value) + Number(min);
   const result = Math.round((100 * newValue) / sum);
-  console.log("result = " + Math.round(result));
   const firstNum = result;
   const secondNum = 100 - result;
-  console.log("firstNum", firstNum);
-  console.log("secondNum", secondNum);
   const data = {
     labels: [],
     datasets: [

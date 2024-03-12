@@ -5,7 +5,12 @@ import DialogContent from "@mui/material/DialogContent";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
 import { FormRow, SnackBar } from "../../components";
-import { GaugePreview, MessageBoxPreview } from "../../components/widgets_preview";
+import {
+  GaugePreview,
+  MessageBoxPreview,
+  ButtonControlPreview,
+  ToggleSwitchPreview
+} from "../../components/widgets_preview";
 import { Button } from "@mui/material";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Alert } from "@mui/material";
@@ -26,6 +31,18 @@ interface IProps {
   fetchAllWidgets: () => void;
 }
 
+const initialState = {
+  label: "",
+  value: "",
+  min: 0,
+  max: 100,
+  unit: "",
+  payload:'{ "key":value , "key":value }',
+  button_label:"",
+  payload_on:"",
+  payload_off:""
+}
+
 export default function AddWidgetDialog(props: IProps) {
   const [occupation, setOccupation] = useState<string>("");
   const axiosPrivate = useAxiosPrivate();
@@ -38,18 +55,15 @@ export default function AddWidgetDialog(props: IProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const handleClose = () => {
     setOccupation("");
+    setValues(initialState)
     props.setIsAddWidgetShow(false);
   };
 
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
-  const [values, setValues] = useState<any>({
-    label: "",
-    value: "",
-    min: 0,
-    max: 100,
-    unit: "",
-  });
+  const [values, setValues] = useState<any>(initialState);
+  const [payloadOn, setPayloadOn] = useState<boolean>(false);
+  const [payloadOff, setPayloadOff] = useState<boolean>(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
@@ -70,8 +84,8 @@ export default function AddWidgetDialog(props: IProps) {
   };
 
   const onSubmit = () => {
-    const { label, value, min, max, unit } = values;
-    console.log("value", value);
+    const { label, value, min, max, unit , payload } = values;
+    const widgetInfo : any = {};
     if (occupation === "Gauge" && (!label || !value || !min || !max || !unit)) {
       setShowSnackBar(true);
       setSnackBarType("error");
@@ -79,22 +93,94 @@ export default function AddWidgetDialog(props: IProps) {
       clearAlert();
       return;
     }
-    createWidget();
-  };
 
-  const createWidget = async () => {
-    setIsLoading(true);
-    try {
-      const { data } = await axiosPrivate.post(`/widgets`, {
-        nameDevice: values?.label,
-        type: occupation,
-        configWidget: {
-          value: values.value,
+    if(occupation === "ButtonControl" && (!label || !payload)){
+      setShowSnackBar(true);
+      setSnackBarType("error");
+      setSnackBarText("Please provide all value!");
+      clearAlert();
+      return;
+    }
+
+    // {
+    //   nameDevice: values?.label,
+    //   type: occupation,
+    //   configWidget: {
+    //     value: values.value,
+    //     min: Number(values.min),
+    //     max: Number(values.max),
+    //     unit: values.unit,
+    //   },
+    // }
+    switch(occupation){
+      case "Gauge":
+          widgetInfo.nameDevice = values?.label;
+          widgetInfo.type = occupation;
+          widgetInfo.configWidget = {
+          value:values.value,
           min: Number(values.min),
           max: Number(values.max),
           unit: values.unit,
-        },
-      });
+        };
+        createWidget(widgetInfo); 
+        return;
+      case "MessageBox":
+        widgetInfo.nameDevice = values?.label;
+        widgetInfo.type = occupation;
+        widgetInfo.configWidget = {
+          value:values.value,
+          unit: values.unit,
+        };
+        createWidget(widgetInfo); 
+        return;
+
+      case "ButtonControl":
+        try{
+          const replacedString = values.payload.replace(/'/g, '"');
+          JSON.parse(replacedString)
+          widgetInfo.nameDevice = values?.label;
+          widgetInfo.type = occupation;
+          widgetInfo.configWidget =  { 
+            button_label:values.button_label,
+            payload:replacedString
+          };
+          createWidget(widgetInfo); 
+          return;
+        }catch(err:any){
+          console.log(err)
+          setShowSnackBar(true);
+          setSnackBarType("error");
+          setSnackBarText("Payload must be JSON format");
+          clearAlert();
+          return;
+        }
+      case "ToggleSwitch":
+        try{
+          const replacedString = values.payload.replace(/'/g, '"');
+          JSON.parse(replacedString)
+          widgetInfo.nameDevice = values?.label;
+          widgetInfo.type = occupation;
+          widgetInfo.configWidget =  { 
+            button_label:values.button_label,
+            payload:replacedString
+          };
+          createWidget(widgetInfo); 
+          return;
+        }catch(err:any){
+          console.log(err)
+          setShowSnackBar(true);
+          setSnackBarType("error");
+          setSnackBarText("Payload must be JSON format");
+          clearAlert();
+          return;
+        }
+    }
+  };
+
+  const createWidget = async (widgetInfo:any) => {
+    setIsLoading(true);
+    try {
+      const { data } = await axiosPrivate.post(`/widgets`,widgetInfo);
       console.log(data);
       setShowSnackBar(true);
       setSnackBarType("success");
@@ -103,6 +189,7 @@ export default function AddWidgetDialog(props: IProps) {
       setIsLoading(false);
       props.setIsAddWidgetShow(false);
       props.fetchAllWidgets();
+      setValues(initialState)
     } catch (err: any) {
       const msg =
         typeof err?.response?.data?.message === "object"
@@ -168,6 +255,8 @@ export default function AddWidgetDialog(props: IProps) {
                 <option value={""}>select widget</option>
                 <option value="Gauge">Gauge</option>
                 <option value="MessageBox">MessageBox</option>
+                <option value="ButtonControl">Button Control</option>
+                <option value="ToggleSwitch">Toggle Switch</option>
               </select>
             </div>
             {occupation && (
@@ -187,18 +276,31 @@ export default function AddWidgetDialog(props: IProps) {
                   />
                 </div>
 
-                {(occupation === "Gauge" || occupation === "MessageBox") && 
-                    <div className="w-[350px] sm:w-[100%] relative">
-                      <FormRow
-                        type="text"
-                        name="value"
-                        labelText="value"
-                        value={values.value}
-                        handleChange={handleChange}
-                        marginTop="mt-[0.2rem]"
-                      />
-                    </div>
-                  }
+                {(occupation === "ButtonControl" || occupation === "ButtonControl") && (
+                  <div className="w-[350px] sm:w-[100%]">
+                    <FormRow
+                      type="string"
+                      name="payload"
+                      labelText="payload * JSON format"
+                      value={values.payload}
+                      handleChange={handleChange}
+                      marginTop="mt-[0.2rem]"
+                    />
+                  </div>
+                )}
+      
+                {(occupation === "Gauge" || occupation === "MessageBox" || occupation === "ToggleSwitch") && (
+                  <div className="w-[350px] sm:w-[100%] relative">
+                    <FormRow
+                      type="text"
+                      name="value"
+                      labelText="value"
+                      value={values.value}
+                      handleChange={handleChange}
+                      marginTop="mt-[0.2rem]"
+                    />
+                  </div>
+                )}
               </div>
             )}
 
@@ -228,23 +330,59 @@ export default function AddWidgetDialog(props: IProps) {
                     />
                   </div>
                 )}
+                {occupation === "ButtonControl" && (
+                  <div className="w-[245px] sm:w-[100%]">
+                    <FormRow
+                      type="text"
+                      name="button_label"
+                      labelText="Button Label"
+                      value={values.button_label}
+                      handleChange={handleChange}
+                      marginTop="mt-[0.2rem]"
+                    />
+                  </div>
+                )}
+                {occupation === "ToggleSwitch" && (
+                  <div className="w-[245px] sm:w-[100%]">
+                    <FormRow
+                      type="text"
+                      name="on_payload"
+                      labelText="on payload"
+                      value={values.button_label}
+                      handleChange={handleChange}
+                      marginTop="mt-[0.2rem]"
+                    />
+                  </div>
+                )}
+                {occupation === "ToggleSwitch" && (
+                  <div className="w-[245px] sm:w-[100%]">
+                    <FormRow
+                      type="text"
+                      name="off_payload"
+                      labelText="off payload"
+                      value={values.button_label}
+                      handleChange={handleChange}
+                      marginTop="mt-[0.2rem]"
+                    />
+                  </div>
+                )}
               </div>
             )}
+
             {occupation && (
               <div className="flex gap-10 mt-3 sm:flex-col sm:gap-0">
-                {(occupation === "Gauge" || occupation === "MessageBox")
-                  && 
-                    <div className="w-[240px] sm:w-[100%]">
-                      <FormRow
-                        type="text"
-                        name="unit"
-                        labelText="unit"
-                        value={values.unit}
-                        handleChange={handleChange}
-                        marginTop="mt-[0.2rem]"
-                      />
-                    </div>
-                  }
+                {(occupation === "Gauge" || occupation === "MessageBox") && (
+                  <div className="w-[240px] sm:w-[100%]">
+                    <FormRow
+                      type="text"
+                      name="unit"
+                      labelText="unit"
+                      value={values.unit}
+                      handleChange={handleChange}
+                      marginTop="mt-[0.2rem]"
+                    />
+                  </div>
+                )}
               </div>
             )}
 
@@ -272,6 +410,21 @@ export default function AddWidgetDialog(props: IProps) {
                   label={values.label}
                   value={"550,000"}
                   unit={values.unit}
+                />
+              </div>
+            )}
+            {occupation === "ButtonControl" && (
+              <div className="flex gap-10 mt-5 sm:flex-col sm:gap-0 w-[100%]">
+                <ButtonControlPreview
+                  label={values.label}
+                  button_label={values.button_label}
+                />
+              </div>
+            )}
+            {occupation === "ToggleSwitch" && (
+              <div className="flex gap-10 mt-5 sm:flex-col sm:gap-0 w-[100%]">
+                <ToggleSwitchPreview
+                  label={values.label}
                 />
               </div>
             )}
@@ -307,7 +460,7 @@ export default function AddWidgetDialog(props: IProps) {
                 <div className="w-[250px] sm:w-[100%]">
                   <Button
                     onClick={() => {
-                      onSubmit();
+                        onSubmit();
                     }}
                     style={{
                       textTransform: "none",
