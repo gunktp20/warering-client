@@ -494,6 +494,8 @@ function Device() {
                       widgetId={widget.id}
                       label={widget?.nameDevice}
                       value={widget?.configWidget?.value}
+                      min={widget?.configWidget?.min}
+                      max={widget?.configWidget?.max}
                       fetchAllWidgets={fetchAllWidgets}
                       publishMQTT={mqttPublish}
                     />
