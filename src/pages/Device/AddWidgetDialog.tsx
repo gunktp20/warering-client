@@ -9,7 +9,8 @@ import {
   GaugePreview,
   MessageBoxPreview,
   ButtonControlPreview,
-  ToggleSwitchPreview
+  ToggleSwitchPreview,
+  RangeSliderPreview,
 } from "../../components/widgets_preview";
 import { Button } from "@mui/material";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
@@ -37,11 +38,11 @@ const initialState = {
   min: 0,
   max: 100,
   unit: "",
-  payload:'{ "key":value , "key":value }',
-  button_label:"",
-  on_payload:"",
-  off_payload:""
-}
+  payload: '{ "key":value , "key":value }',
+  button_label: "",
+  on_payload: "",
+  off_payload: "",
+};
 
 export default function AddWidgetDialog(props: IProps) {
   const [occupation, setOccupation] = useState<string>("");
@@ -55,12 +56,9 @@ export default function AddWidgetDialog(props: IProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const handleClose = () => {
     setOccupation("");
-    setValues(initialState)
+    setValues(initialState);
     props.setIsAddWidgetShow(false);
   };
-
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
-    useState<boolean>(false);
   const [values, setValues] = useState<any>(initialState);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,8 +80,9 @@ export default function AddWidgetDialog(props: IProps) {
   };
 
   const onSubmit = () => {
-    const { label, value, min, max, unit , payload } = values;
-    const widgetInfo : any = {};
+    const { label, value, min, max, unit, payload, on_payload, off_payload } =
+      values;
+    const widgetInfo: any = {};
     if (occupation === "Gauge" && (!label || !value || !min || !max || !unit)) {
       setShowSnackBar(true);
       setSnackBarType("error");
@@ -92,7 +91,7 @@ export default function AddWidgetDialog(props: IProps) {
       return;
     }
 
-    if(occupation === "ButtonControl" && (!label || !payload)){
+    if (occupation === "ButtonControl" && (!label || !payload)) {
       setShowSnackBar(true);
       setSnackBarType("error");
       setSnackBarText("Please provide all value!");
@@ -100,12 +99,33 @@ export default function AddWidgetDialog(props: IProps) {
       return;
     }
 
-    if(occupation === "ToggleSwitch"){
-      console.log("on payload",parseInt(values.on_payload))
-      console.log("off payload",parseInt(values.off_payload))
-      console.log("Not a number on payload",isNaN(values.on_payload))
-      console.log("Not a number off payload",isNaN(values.off_payload))
+    if (
+      occupation === "ToggleSwitch" &&
+      (!label || !on_payload || !off_payload || !value)
+    ) {
+      setShowSnackBar(true);
+      setSnackBarType("error");
+      setSnackBarText("Please provide all value!");
+      clearAlert();
+      return;
     }
+
+    if (
+      occupation === "RangeSlider" &&
+      (!label || !value || !min || !max)
+    ) {
+      setShowSnackBar(true);
+      setSnackBarType("error");
+      setSnackBarText("Please provide all value!");
+      clearAlert();
+      return;
+    }
+    // if(occupation === "ToggleSwitch" ){
+    //   console.log("on payload",parseInt(values.on_payload))
+    //   console.log("off payload",parseInt(values.off_payload))
+    //   console.log("Not a number on payload",isNaN(values.on_payload))
+    //   console.log("Not a number off payload",isNaN(values.off_payload))
+    // }
 
     // {
     //   nameDevice: values?.label,
@@ -117,42 +137,42 @@ export default function AddWidgetDialog(props: IProps) {
     //     unit: values.unit,
     //   },
     // }
-    switch(occupation){
+    switch (occupation) {
       case "Gauge":
-          widgetInfo.nameDevice = values?.label;
-          widgetInfo.type = occupation;
-          widgetInfo.configWidget = {
-          value:values.value,
+        widgetInfo.nameDevice = values?.label;
+        widgetInfo.type = occupation;
+        widgetInfo.configWidget = {
+          value: values.value,
           min: Number(values.min),
           max: Number(values.max),
           unit: values.unit,
         };
-        createWidget(widgetInfo); 
+        createWidget(widgetInfo);
         return;
       case "MessageBox":
         widgetInfo.nameDevice = values?.label;
         widgetInfo.type = occupation;
         widgetInfo.configWidget = {
-          value:values.value,
+          value: values.value,
           unit: values.unit,
         };
-        createWidget(widgetInfo); 
+        createWidget(widgetInfo);
         return;
 
       case "ButtonControl":
-        try{
+        try {
           const replacedString = values.payload.replace(/'/g, '"');
-          JSON.parse(replacedString)
+          JSON.parse(replacedString);
           widgetInfo.nameDevice = values?.label;
           widgetInfo.type = occupation;
-          widgetInfo.configWidget =  { 
-            button_label:values.button_label,
-            payload:replacedString
+          widgetInfo.configWidget = {
+            button_label: values.button_label,
+            payload: replacedString,
           };
-          createWidget(widgetInfo); 
+          createWidget(widgetInfo);
           return;
-        }catch(err:any){
-          console.log(err)
+        } catch (err: any) {
+          console.log(err);
           setShowSnackBar(true);
           setSnackBarType("error");
           setSnackBarText("Payload must be JSON format");
@@ -160,18 +180,41 @@ export default function AddWidgetDialog(props: IProps) {
           return;
         }
       case "ToggleSwitch":
-        try{
+        try {
           widgetInfo.nameDevice = values?.label;
           widgetInfo.type = occupation;
-          widgetInfo.configWidget =  { 
-            value:values.value,
-            on_payload:isNaN(values.on_payload) ? values.on_payload: parseInt(values.on_payload),
-            off_payload:isNaN(values.off_payload) ? values.off_payload: parseInt(values.off_payload),
+          widgetInfo.configWidget = {
+            value: values.value,
+            on_payload: isNaN(values.on_payload)
+              ? values.on_payload
+              : parseInt(values.on_payload),
+            off_payload: isNaN(values.off_payload)
+              ? values.off_payload
+              : parseInt(values.off_payload),
           };
-          createWidget(widgetInfo); 
+          createWidget(widgetInfo);
           return;
-        }catch(err:any){
-          console.log(err)
+        } catch (err: any) {
+          console.log(err);
+          setShowSnackBar(true);
+          setSnackBarType("error");
+          setSnackBarText("Payload must be JSON format");
+          clearAlert();
+          return;
+        }
+      case "RangeSlider":
+        try {
+          widgetInfo.nameDevice = values?.label;
+          widgetInfo.type = occupation;
+          widgetInfo.configWidget = {
+            value: values.value,
+            min: Number(values.min),
+            max: Number(values.max),
+          };
+          createWidget(widgetInfo);
+          return;
+        } catch (err: any) {
+          console.log(err);
           setShowSnackBar(true);
           setSnackBarType("error");
           setSnackBarText("Payload must be JSON format");
@@ -181,10 +224,10 @@ export default function AddWidgetDialog(props: IProps) {
     }
   };
 
-  const createWidget = async (widgetInfo:any) => {
+  const createWidget = async (widgetInfo: any) => {
     setIsLoading(true);
     try {
-      const { data } = await axiosPrivate.post(`/widgets`,widgetInfo);
+      const { data } = await axiosPrivate.post(`/widgets`, widgetInfo);
       console.log(data);
       setShowSnackBar(true);
       setSnackBarType("success");
@@ -193,7 +236,7 @@ export default function AddWidgetDialog(props: IProps) {
       setIsLoading(false);
       props.setIsAddWidgetShow(false);
       props.fetchAllWidgets();
-      setValues(initialState)
+      setValues(initialState);
     } catch (err: any) {
       const msg =
         typeof err?.response?.data?.message === "object"
@@ -261,6 +304,7 @@ export default function AddWidgetDialog(props: IProps) {
                 <option value="MessageBox">MessageBox</option>
                 <option value="ButtonControl">Button Control</option>
                 <option value="ToggleSwitch">Toggle Switch</option>
+                <option value="RangeSlider">Range Slider</option>
               </select>
             </div>
             {occupation && (
@@ -280,7 +324,7 @@ export default function AddWidgetDialog(props: IProps) {
                   />
                 </div>
 
-                {(occupation === "ButtonControl" || occupation === "ButtonControl") && (
+                {occupation === "ButtonControl" && (
                   <div className="w-[350px] sm:w-[100%]">
                     <FormRow
                       type="string"
@@ -292,8 +336,11 @@ export default function AddWidgetDialog(props: IProps) {
                     />
                   </div>
                 )}
-      
-                {(occupation === "Gauge" || occupation === "MessageBox" || occupation === "ToggleSwitch") && (
+
+                {(occupation === "Gauge" ||
+                  occupation === "MessageBox" ||
+                  occupation === "ToggleSwitch" ||
+                  occupation === "RangeSlider") && (
                   <div className="w-[350px] sm:w-[100%] relative">
                     <FormRow
                       type="text"
@@ -310,7 +357,7 @@ export default function AddWidgetDialog(props: IProps) {
 
             {occupation && (
               <div className="flex gap-10 mt-3 sm:flex-col sm:gap-0">
-                {occupation === "Gauge" && (
+                {(occupation === "Gauge" || occupation === "RangeSlider") && (
                   <div className="w-[350px] sm:w-[100%]">
                     <FormRow
                       type="number"
@@ -322,7 +369,7 @@ export default function AddWidgetDialog(props: IProps) {
                     />
                   </div>
                 )}
-                {occupation === "Gauge" && (
+                {(occupation === "Gauge" || occupation === "RangeSlider") && (
                   <div className="w-[350px] sm:w-[100%]">
                     <FormRow
                       type="number"
@@ -427,9 +474,12 @@ export default function AddWidgetDialog(props: IProps) {
             )}
             {occupation === "ToggleSwitch" && (
               <div className="flex gap-10 mt-5 sm:flex-col sm:gap-0 w-[100%]">
-                <ToggleSwitchPreview
-                  label={values.label}
-                />
+                <ToggleSwitchPreview label={values.label} />
+              </div>
+            )}
+            {occupation === "RangeSlider" && (
+              <div className="flex gap-10 mt-5 sm:flex-col sm:gap-0 w-[100%]">
+                <RangeSliderPreview label={values.label} />
               </div>
             )}
 
@@ -464,7 +514,7 @@ export default function AddWidgetDialog(props: IProps) {
                 <div className="w-[250px] sm:w-[100%]">
                   <Button
                     onClick={() => {
-                        onSubmit();
+                      onSubmit();
                     }}
                     style={{
                       textTransform: "none",

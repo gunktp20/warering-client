@@ -2,17 +2,26 @@ import { styled } from "@mui/material/styles";
 import Switch, { SwitchProps } from "@mui/material/Switch";
 
 interface IProp extends SwitchProps {
-  isActive: boolean;
-  setIsActive: (active: boolean) => void;
+  isActive:boolean
+  value:string
+  setIsActive:(_:boolean)=>void;
+  on_payload : string | number
+  off_payload: string | number
+  publishMQTT: (payload: any) => void;
 }
 
 const SwitchMui = styled((props: IProp) => (
   <Switch
     onChange={() => {
-      props.setIsActive(!props.isActive);
+      const payload = {
+        [props.value]: props.isActive ? props.off_payload : props.on_payload,
+      };
+      props.publishMQTT(JSON.stringify(payload))
+      props.setIsActive(!props.isActive)
     }}
     focusVisibleClassName=".Mui-focusVisible"
     disableRipple
+    checked={props.isActive}
     {...props}
   />
 ))(({ theme }) => ({

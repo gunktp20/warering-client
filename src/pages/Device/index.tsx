@@ -24,7 +24,6 @@ import {
 } from "../../components/widgets_device";
 import { Button } from "@mui/material";
 import AddDisplayDialog from "./AddDisplayDialog";
-import ConfirmDelete from "./ConfirmDelete";
 import { useParams } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { JsonView, allExpanded, defaultStyles } from "react-json-view-lite";
@@ -32,7 +31,6 @@ import "react-json-view-lite/dist/index.css";
 import moment from "moment";
 import TopicsDialog from "./TopicsDialog";
 import AddWidgetDialog from "./AddWidgetDialog";
-import { GaugePreview } from "../../components/widgets_preview";
 
 function Device() {
   const navigate = useNavigate();
@@ -160,6 +158,7 @@ function Device() {
         // console.log("message");
         const payload = { topic, message: message.toString() };
         // console.log(payload.message);
+        // console.log(topic,message.toString())
         try {
           const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
           // console.log(payloadObject);
@@ -469,6 +468,32 @@ function Device() {
                       label={widget?.nameDevice}
                       button_label={widget?.configWidget?.button_label}
                       payload={widget?.configWidget?.payload}
+                      fetchAllWidgets={fetchAllWidgets}
+                      publishMQTT={mqttPublish}
+                    />
+                  );
+                }
+                if (widget.type === "ToggleSwitch") {
+                  return (
+                    <ToggleSwitch
+                      key={index}
+                      widgetId={widget.id}
+                      label={widget?.nameDevice}
+                      on_payload={widget?.configWidget?.on_payload}
+                      off_payload={widget?.configWidget?.off_payload}
+                      value={widget?.configWidget?.value}
+                      fetchAllWidgets={fetchAllWidgets}
+                      publishMQTT={mqttPublish}
+                    />
+                  );
+                }
+                if (widget.type === "RangeSlider") {
+                  return (
+                    <RangeSlider
+                      key={index}
+                      widgetId={widget.id}
+                      label={widget?.nameDevice}
+                      value={widget?.configWidget?.value}
                       fetchAllWidgets={fetchAllWidgets}
                       publishMQTT={mqttPublish}
                     />
