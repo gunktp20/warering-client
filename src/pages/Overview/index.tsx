@@ -81,6 +81,7 @@ function Overview() {
           <div className="text-[23px] text-[#1d4469] font-bold mb-10">
             Overview
           </div>
+          {isLoading && <div className="loader"></div>}
           <div className="grid w-[100%] gap-[3rem] grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 ">
             <div className="w-[100%] device-status border-solid border-t-[4px] border-[#45a2f9] h-fit p-3 pl-5 bg-[#fff] shadow-md">
               <div className="mb-2 text-[#1966fb]">All Device</div>

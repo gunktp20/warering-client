@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import api from "../../services/api";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { IDeviceState } from "./types";
 
 const initialState: IDeviceState = {

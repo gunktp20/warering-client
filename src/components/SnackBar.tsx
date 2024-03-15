@@ -11,7 +11,6 @@ interface IProp {
 export default function SnackBar({
   severity,
   showSnackBar,
-  setShowSnackBar,
   snackBarText,
 }: IProp) {
   const vertical = "top";

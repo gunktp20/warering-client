@@ -3,7 +3,6 @@ interface IProp {
   value: string;
   unit: string;
 }
-
 function MessageBoxPreview({ label, value, unit }: IProp) {
   return (
     <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center ">

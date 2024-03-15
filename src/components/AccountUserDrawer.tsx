@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { FaRegUser } from "react-icons/fa6";
 import { FiEdit3 } from "react-icons/fi";
 import { CiLogout } from "react-icons/ci";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { useAppDispatch } from "../app/hooks";
 import { axiosPrivate } from "../services/api";
 import { logout } from "../features/auth/authSlice";
 

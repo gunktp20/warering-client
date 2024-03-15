@@ -1,23 +1,15 @@
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { useState } from "react";
 import { Doughnut } from "react-chartjs-2";
-import { RxDotsHorizontal } from "react-icons/rx";
-
 export type Id = string | number;
-
 ChartJS.register(ArcElement, Tooltip, Legend);
-
 const options = {};
-
 interface IProp {
   label: string;
   value: number;
   min: number;
   max: number;
 }
-
 function GaugePreview({ label, value, min, max }: IProp) {
-  const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const sum = Number(max) + Number(min);
   const newValue = Number(value) + Number(min);
   const result = Math.round((100 * newValue) / sum);
@@ -38,15 +30,6 @@ function GaugePreview({ label, value, min, max }: IProp) {
       },
     ],
   };
-
-  // min = 20
-  // 100 x value / max + min   35
-  //
-  // max = 70
-  // 1% = 20
-  // 100% = 70
-
-  // value = 10
   return (
     <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2  cursor-grab">
       <div className="absolute left-2 top-2 text-[#1d4469] text-sm">

@@ -27,8 +27,7 @@ function ToggleSwitch({
   publishMQTT,
 }: IProp) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
-  const [isActive, setIsActive] = useState<boolean>(false);
-  const [currentStatus, setCurrentStatus] = useState(on_payload);
+  const [isActive, setIsActive] = useState<boolean>(true);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
 
@@ -155,6 +154,7 @@ function ConfirmDelete({
               Cancel
             </button>
             <button
+              disabled={isLoading}
               onClick={() => {
                 onDelete();
               }}

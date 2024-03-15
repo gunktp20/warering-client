@@ -18,7 +18,6 @@ import RangeSlider from "../../components/widgets/RangeSlider";
 function ColumnContainer({
   column,
   updateColumn,
-  createTask,
   tasks,
 }: Props) {
   const [editMode, setEditMode] = useState(false);

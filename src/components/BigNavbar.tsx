@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../app/hooks";
@@ -24,7 +24,7 @@ function BigNavbar(props: IProps) {
         onClick={() => {
           navigate("/home");
         }}
-        className={`text-[#1d4469] font-bold text-[25px] ${!props.isSidebarShow ? "ml-[-5.9rem]" : "ml-[5.5rem]"} flex justify-center sm:pl-2 transition-all`}
+        className={`text-[#1d4469] font-bold text-[25px] ${!props.isSidebarShow ? "ml-[-5.9rem]" : "ml-[5.5rem]"} flex justify-center sm:pl-2 transition-all sm:ml-0`}
       >
         WR
       </button>

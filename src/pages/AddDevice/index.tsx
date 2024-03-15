@@ -15,7 +15,6 @@ import { useNavigate } from "react-router-dom";
 import { SnackBar } from "../../components";
 import { Alert } from "@mui/material";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { useAppDispatch } from "../../app/hooks";
 
 interface IDeviceInfo {
   nameDevice: string;
@@ -31,7 +30,6 @@ interface IDeviceInfo {
 function AddDevice() {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
-  const dispatch = useAppDispatch();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);

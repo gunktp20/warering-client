@@ -64,21 +64,17 @@ export default function AddWidgetDialog(props: IProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
-  // Function to clear all running timeouts
   const clearAllTimeouts = () => {
     timeoutIds.forEach((timeoutId: any) => clearTimeout(timeoutId));
-    setTimeoutIds([]); // Clear the timeout IDs from state
+    setTimeoutIds([]);
   };
-  // Function to set a new timeout
   const clearAlert = () => {
-    clearAllTimeouts(); // Clear existing timeouts before setting a new one
+    clearAllTimeouts();
     const newTimeoutId = setTimeout(() => {
-      // Your timeout function logic here
       setShowSnackBar(false);
     }, 3000);
-    setTimeoutIds([newTimeoutId]); // Store the new timeout ID in state
+    setTimeoutIds([newTimeoutId]);
   };
-
   const onSubmit = () => {
     const { label, value, min, max, unit, payload, on_payload, off_payload } =
       values;
@@ -90,7 +86,13 @@ export default function AddWidgetDialog(props: IProps) {
       clearAlert();
       return;
     }
-
+    if(occupation === "Gauge" && min > max){
+      setShowSnackBar(true);
+      setSnackBarType("error");
+      setSnackBarText("min value must be < max value");
+      clearAlert();
+      return;
+    }
     if (occupation === "ButtonControl" && (!label || !payload)) {
       setShowSnackBar(true);
       setSnackBarType("error");
@@ -98,7 +100,6 @@ export default function AddWidgetDialog(props: IProps) {
       clearAlert();
       return;
     }
-
     if (
       occupation === "ToggleSwitch" &&
       (!label || !on_payload || !off_payload || !value)
@@ -109,7 +110,6 @@ export default function AddWidgetDialog(props: IProps) {
       clearAlert();
       return;
     }
-
     if (
       occupation === "RangeSlider" &&
       (!label || !value || !min || !max)
@@ -120,23 +120,13 @@ export default function AddWidgetDialog(props: IProps) {
       clearAlert();
       return;
     }
-    // if(occupation === "ToggleSwitch" ){
-    //   console.log("on payload",parseInt(values.on_payload))
-    //   console.log("off payload",parseInt(values.off_payload))
-    //   console.log("Not a number on payload",isNaN(values.on_payload))
-    //   console.log("Not a number off payload",isNaN(values.off_payload))
-    // }
-
-    // {
-    //   nameDevice: values?.label,
-    //   type: occupation,
-    //   configWidget: {
-    //     value: values.value,
-    //     min: Number(values.min),
-    //     max: Number(values.max),
-    //     unit: values.unit,
-    //   },
-    // }
+    if(occupation === "RangeSlider" && min > max){
+      setShowSnackBar(true);
+      setSnackBarType("error");
+      setSnackBarText("min value must be < max value");
+      clearAlert();
+      return;
+    }
     switch (occupation) {
       case "Gauge":
         widgetInfo.nameDevice = values?.label;
@@ -223,7 +213,6 @@ export default function AddWidgetDialog(props: IProps) {
         }
     }
   };
-
   const createWidget = async (widgetInfo: any) => {
     setIsLoading(true);
     try {
