@@ -6,16 +6,6 @@ import { IoArrowBackSharp } from "react-icons/io5";
 
 const Account = () => {
   const navigate = useNavigate();
-  const accountData = {
-    img: "https://img.freepik.com/free-psd/3d-illustration-person-with-long-hair_23-2149436197.jpg?w=740&t=st=1708260597~exp=1708261197~hmac=6e04022c7ee16156ca21397efa80e383f0a513a6abc241afc626e3c6774b120d",
-    email: "Kruluz_Utsman@gmail.com",
-    profileInfo: "KruluzUtsman",
-    firstname: "Kruluz_Utsman",
-    username: "Kruluz",
-    lastname: "Utsman",
-    password: "KruluzUtsman21wqq",
-  };
-
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
 

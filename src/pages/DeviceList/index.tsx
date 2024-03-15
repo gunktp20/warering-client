@@ -2,7 +2,6 @@ import {
   BigNavbar,
   FormRow,
   NavLinkSidebar,
-  FormControl,
   NavDialog,
   AccountUserDrawer,
 } from "../../components";
@@ -35,7 +34,8 @@ function DeviceList() {
     useState<boolean>(false);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
-  const [limitQuery, setLimitQuery] = useState<number>(5);
+  // const [limitQuery, setLimitQuery] = useState<number>(5);
+  const limitQuery: number = 5
   const [numOfPage, setNumOfPage] = useState<number>(1);
   const [pageCount, setPageCount] = useState<number>(0);
   const [selectedDevice, setSelectedDevice] = useState<any>();
@@ -44,13 +44,6 @@ function DeviceList() {
   const [filterByisSaveData, setFilterByIsSaveData] = useState<string>("");
   const elements = [];
 
-  interface IDevice {
-    active: boolean;
-    nameDevice: string;
-    save: boolean;
-    lastLoggedIn: string;
-    Registration: string;
-  }
   const [timeoutIds, setTimeoutIds] = useState<any>([]);
   const clearAllTimeouts = () => {
     timeoutIds.forEach((timeoutId: any) => clearTimeout(timeoutId));
@@ -107,9 +100,11 @@ function DeviceList() {
           permission: permission,
         }
       );
+      console.log(data)
       fetchAllDevice();
       setIsLoading(false);
     } catch (err: any) {
+      console.log(err)
       setIsLoading(false);
     }
   };
@@ -129,11 +124,10 @@ function DeviceList() {
           setNumOfPage(i);
         }}
         key={i}
-        className={`${
-          numOfPage === i
-            ? "bg-[#1966fb] text-white"
-            : "bg-white text-[#7a7a7a]"
-        } cursor-pointer  border-[#cccccc] border-[1px] text-[13.5px] rounded-md w-[30px] h-[30px] flex items-center justify-center`}
+        className={`${numOfPage === i
+          ? "bg-[#1966fb] text-white"
+          : "bg-white text-[#7a7a7a]"
+          } cursor-pointer  border-[#cccccc] border-[1px] text-[13.5px] rounded-md w-[30px] h-[30px] flex items-center justify-center`}
       >
         {i}
       </button>
@@ -304,10 +298,11 @@ function DeviceList() {
               </div>
             )}
 
+            {isLoading && <div className="loader"></div>}
+
             <div
-              className={`overflow-auto rounded-lg shadow block sm:shadow-none ${
-                devices.length === 0 && "hidden"
-              }`}
+              className={`overflow-auto rounded-lg shadow block sm:shadow-none ${devices.length === 0 && "hidden"
+                }`}
             >
               <table className="w-full">
                 <thead className="border-b-2 border-gray-200 sm:hidden">
@@ -339,11 +334,10 @@ function DeviceList() {
                           className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10"
                         >
                           <td
-                            className={`cursor-pointer flex sm:hidden items-center justify-center capitalize p-3 text-[13px] select-none ${
-                              i.permission === "allow"
-                                ? "text-green-500"
-                                : "text-red-500"
-                            } whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}
+                            className={`cursor-pointer flex sm:hidden items-center justify-center capitalize p-3 text-[13px] select-none ${i.permission === "allow"
+                              ? "text-green-500"
+                              : "text-red-500"
+                              } whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}
                             onClick={() => {
                               onTogglePermission(
                                 i.id,
@@ -352,11 +346,10 @@ function DeviceList() {
                             }}
                           >
                             <button
-                              className={`w-[8px] h-[8px] ${
-                                i.permission === "allow"
-                                  ? "bg-green-500"
-                                  : "bg-red-500"
-                              } rounded-full mr-2`}
+                              className={`w-[8px] h-[8px] ${i.permission === "allow"
+                                ? "bg-green-500"
+                                : "bg-red-500"
+                                } rounded-full mr-2`}
                             ></button>
                             {i.permission}
                           </td>
@@ -371,11 +364,10 @@ function DeviceList() {
                           </td>
 
                           <td
-                            className={`hidden items-center sm:flex capitalize p-3 text-[13px] ${
-                              i.permission === "allow"
-                                ? "text-green-500"
-                                : "text-red-500"
-                            } whitespace-nowrap text-center sm:text-start`}
+                            className={`hidden items-center sm:flex capitalize p-3 text-[13px] ${i.permission === "allow"
+                              ? "text-green-500"
+                              : "text-red-500"
+                              } whitespace-nowrap text-center sm:text-start`}
                             onClick={() => {
                               onTogglePermission(
                                 i.id,
@@ -384,11 +376,10 @@ function DeviceList() {
                             }}
                           >
                             <div
-                              className={`w-[8px] h-[8px] ${
-                                i.permission === "allow"
-                                  ? "bg-green-500"
-                                  : "bg-red-500"
-                              } rounded-full mr-2`}
+                              className={`w-[8px] h-[8px] ${i.permission === "allow"
+                                ? "bg-green-500"
+                                : "bg-red-500"
+                                } rounded-full mr-2`}
                             ></div>
                             {i.permission}
                           </td>

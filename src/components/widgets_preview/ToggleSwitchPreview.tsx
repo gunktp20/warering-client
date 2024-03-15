@@ -1,4 +1,3 @@
-import { RxDotsHorizontal } from "react-icons/rx";
 import { styled } from "@mui/material/styles";
 import Switch, { SwitchProps } from "@mui/material/Switch";
 import { useState } from "react";

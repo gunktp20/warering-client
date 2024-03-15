@@ -6,7 +6,6 @@ import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-
 interface IProp {
   label: string;
   value: number;
@@ -14,12 +13,10 @@ interface IProp {
   widgetId: string;
   fetchAllWidgets:()=>void
 }
-
 function MessageBox({ label, value, unit, widgetId ,fetchAllWidgets}: IProp) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
-
   return (
     <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2">
       {!value && <div className="w-[100%] h-[100%] bg-white z-10 flex absolute justify-center items-center font-bold text-[#0075ff]">IDLE</div>}
@@ -64,7 +61,6 @@ function MessageBox({ label, value, unit, widgetId ,fetchAllWidgets}: IProp) {
     </div>
   );
 }
-
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
     children: React.ReactElement<any, any>;
@@ -73,7 +69,6 @@ const Transition = React.forwardRef(function Transition(
 ) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
-
 interface IProps {
   widgetId: string;
   isDeleteConfirmOpen: boolean;
@@ -98,9 +93,9 @@ function ConfirmDelete({
     try {
       const { data } = await axiosPrivate.delete(`/widgets/${widgetId}`);
       console.log(data);
-
       setIsLoading(false);
       setIsDeleteConfirmOpen(false);
+      fetchAllWidgets()
     } catch (err) {
       setIsLoading(false);
     }
@@ -132,6 +127,7 @@ function ConfirmDelete({
               Cancel
             </button>
             <button
+              disabled={isLoading}
               onClick={() => {
                 onDelete();
               }}

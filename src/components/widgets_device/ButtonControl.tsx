@@ -151,6 +151,7 @@ function ConfirmDelete({
               Cancel
             </button>
             <button
+              disabled={isLoading}
               onClick={() => {
                 onDelete();
               }}

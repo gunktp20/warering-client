@@ -51,7 +51,6 @@ function Device() {
   const [isAddWidgetShow, setIsAddWidgetShow] = useState<boolean>(false);
 
   const [widgets, setWidgets] = useState<any>(null);
-  const [gaugeValue, setGaugeValue] = useState<number>(0);
   const [configWidgetsDevice, setConfigWidgetsDevice] = useState<any>(null);
   const fetchDeviceById = async () => {
     setIsLoading(true);
@@ -76,11 +75,10 @@ function Device() {
       setIsLoading(false);
     }
   };
-
   const mqttPublish = (payload: any) => {
     if (client) {
       client.publish(
-        deviceInfo?.topics[0],
+        deviceInfo?.topics[1],
         payload,
         {
           qos: 0,
@@ -94,7 +92,6 @@ function Device() {
       );
     }
   };
-
   const connectEMQX = async (data: any) => {
     const _mqtt = await mqtt.connect(import.meta.env.VITE_EMQX_DOMAIN, {
       protocol: "ws",
@@ -105,19 +102,20 @@ function Device() {
       password: data?.password,
     });
     setClient(_mqtt);
+    console.log(connectStatus)
   };
-  const mqttDisconnect = () => {
-    if (client) {
-      try {
-        client.end(false, () => {
-          setConnectStatus("Connect");
-          // console.log("disconnected successfully");
-        });
-      } catch (error) {
-        // console.log("disconnect error:", error);
-      }
-    }
-  };
+  // const mqttDisconnect = () => {
+  //   if (client) {
+  //     try {
+  //       client.end(false, () => {
+  //         setConnectStatus("Connect");
+  //         // console.log("disconnected successfully");
+  //       });
+  //     } catch (error) {
+  //       // console.log("disconnect error:", error);
+  //     }
+  //   }
+  // };
   useEffect(() => {
     fetchDeviceById();
     fetchAllWidgets();
@@ -134,7 +132,7 @@ function Device() {
               qos: deviceInfo?.qos,
             },
             (err) => {
-              // console.log("not sub", err);
+              console.log("not sub", err);
             }
           );
         }
@@ -145,7 +143,7 @@ function Device() {
       // });
       // https://github.com/mqttjs/MQTT.js#event-error
       client.on("error", (err) => {
-        // console.error("Connection error: ", err);
+        console.error("Connection error: ", err);
 
         client.end();
       });
@@ -157,13 +155,13 @@ function Device() {
       client.on("message", (topic, message) => {
         // console.log("message");
         const payload = { topic, message: message.toString() };
+        console.log(payload)
         // console.log(payload.message);
         // console.log(topic,message.toString())
         try {
           const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
           // console.log(payloadObject);
           // console.log(payloadObject?.Gauge_value);
-          setGaugeValue(payloadObject?.Gauge_value);
           setConfigWidgetsDevice(payloadObject);
           // console.log("configWidgetsDevice", configWidgetsDevice);
           setPayload(payloadObject);
@@ -213,6 +211,7 @@ function Device() {
           setIsDrawerOpen={setIsDrawerOpen}
         />
         {/* content container */}
+        {isLoading && <div className="loader"></div>}
         <div className="m-[3rem] top-[5rem] min-h-vh w-[100%] flex flex-col rounded-md sm:m-[1rem] sm:mt-[2.5rem]">
           <div className="flex justify-between">
             <button
@@ -493,6 +492,8 @@ function Device() {
                       key={index}
                       widgetId={widget.id}
                       label={widget?.nameDevice}
+                      min={widget?.configWidget?.min}
+                      max={widget?.configWidget?.max}
                       value={widget?.configWidget?.value}
                       fetchAllWidgets={fetchAllWidgets}
                       publishMQTT={mqttPublish}

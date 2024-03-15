@@ -1,5 +1,4 @@
-import React, { FunctionComponent, useState } from "react";
-import { TbEye, TbEyeOff } from "react-icons/tb";
+import { FunctionComponent } from "react";
 
 interface IFormRow {
   setValue: (_: any) => void;
@@ -20,7 +19,6 @@ const FormSelect: FunctionComponent<IFormRow> = ({
   options,
   name
 }: IFormRow): JSX.Element => {
-  const [hide, setHide] = useState<boolean>(true);
 
   return (
     <div

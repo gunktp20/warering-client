@@ -3,7 +3,6 @@ import Dialog from "@mui/material/Dialog";
 import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
-import { LuClipboardCopy } from "react-icons/lu";
 import { FaCopy } from "react-icons/fa";
 import copy from "copy-to-clipboard";
 

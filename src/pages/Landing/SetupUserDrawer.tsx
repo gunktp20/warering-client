@@ -9,7 +9,6 @@ import {
   register,
   login,
   forgetPassword,
-  demoAuth
 } from "../../features/auth/authSlice";
 import { Link } from "react-router-dom";
 

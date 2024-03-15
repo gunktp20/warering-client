@@ -8,19 +8,17 @@ import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
 
-const MAX = 10;
-const MIN = 0;
-const marks = [
-  {
-    value: MIN,
-    label: "",
-  },
-  {
-    value: MAX,
-    label: "",
-  },
-];
-
+// const MAX = 10;
+// const MIN = 0;
+// const marks = [
+//   {
+//     value: MIN,
+//     label: "",
+//   },{
+//     value: MAX,
+//     label: "",
+//   },
+// ];
 const CustomSliderStyles = {
     '& .MuiSlider-thumb': {
         color: "#1966fb"
@@ -34,10 +32,7 @@ const CustomSliderStyles = {
         height: 8,
     },
     '& .MuiSlider-active': {
-        
-    }
-}
-
+    }}
 interface IProp {
     label:string
     min:number
@@ -47,16 +42,14 @@ interface IProp {
     fetchAllWidgets:()=>void
     publishMQTT: (payload: any) => void;
 }
-
 export default function RangeSlider({label,min,max,widgetId,value,fetchAllWidgets,publishMQTT}:IProp) {
-  const [val, setVal] = React.useState<number>(MIN);
+  const [val, setVal] = React.useState<number>(min);
   const handleChange = (_: Event, newValue: number | number[]) => {
     setVal(newValue as number);
   };
   const [isOptionOpen, setIsOptionOpen] = React.useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
   React.useState<boolean>(false);
-
   return (
     <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center ">
       <div className="absolute left-2 top-2 text-[#1d4469] text-sm">
@@ -93,7 +86,6 @@ export default function RangeSlider({label,min,max,widgetId,value,fetchAllWidget
           };
           publishMQTT(JSON.stringify(payload))
         }}
-        marks={marks}
         step={1}
         value={val}
         valueLabelDisplay="auto"
@@ -102,22 +94,6 @@ export default function RangeSlider({label,min,max,widgetId,value,fetchAllWidget
         onChange={handleChange}
         sx={CustomSliderStyles}
       />
-      {/* <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-        <Typography
-          variant="body2"
-          onClick={() => setVal(MIN)}
-          sx={{ cursor: 'pointer' }}
-        >
-          {MIN} min
-        </Typography>
-        <Typography
-          variant="body2"
-          onClick={() => setVal(MAX)}
-          sx={{ cursor: 'pointer' }}
-        >
-          {MAX} max
-        </Typography>
-      </Box> */}
     </Box>
     <ConfirmDelete
         widgetId={widgetId}
@@ -164,6 +140,7 @@ function ConfirmDelete({
       console.log(data);
       setIsLoading(false);
       setIsDeleteConfirmOpen(false);
+      fetchAllWidgets()
     } catch (err) {
       setIsLoading(false);
     }
@@ -195,6 +172,7 @@ function ConfirmDelete({
               Cancel
             </button>
             <button
+              disabled={isLoading}
               onClick={() => {
                 onDelete();
               }}

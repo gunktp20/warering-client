@@ -1,6 +1,5 @@
 import { FiCpu } from "react-icons/fi";
 import { PiNotebookBold } from "react-icons/pi";
-import { RiMenu2Fill } from "react-icons/ri";
 import { VscGraph } from "react-icons/vsc";
 import { NavLink } from "react-router-dom";
 

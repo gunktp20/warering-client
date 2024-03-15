@@ -26,20 +26,14 @@ interface IProp {
 }
 
 function Gauge({ label, value, min, max, unit, widgetId ,fetchAllWidgets }: IProp) {
-  // 100 x value / max + min   35
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
-
   const sum = Number(max) + Number(min);
-  // console.log("sum", sum);
   const newValue = Number(value) + Number(min);
   const result = Math.round((100 * newValue) / sum);
-  // console.log("result = " + Math.round(result));
   const firstNum = result;
   const secondNum = 100 - result;
-  // console.log("firstNum", firstNum);
-  // console.log("secondNum", secondNum);
   const data = {
     labels: [],
     datasets: [
@@ -55,15 +49,6 @@ function Gauge({ label, value, min, max, unit, widgetId ,fetchAllWidgets }: IPro
       },
     ],
   };
-
-  // min = 20
-  // 100 x value / max + min   35
-  //
-  // max = 70
-  // 1% = 20
-  // 100% = 70
-
-  // value = 10
   return (
     <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 overflow-hidden">
       {!value && <div className="w-[100%] h-[100%] bg-white z-10 flex absolute justify-center items-center font-bold text-[#0075ff]">IDLE</div>}
@@ -177,6 +162,7 @@ function ConfirmDelete({
               Cancel
             </button>
             <button
+              disabled={isLoading}
               onClick={() => {
                 onDelete();
               }}
