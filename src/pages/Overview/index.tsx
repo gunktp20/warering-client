@@ -79,7 +79,9 @@ function Overview() {
           <div id="title-outlet" className="text-[23px] text-[#1d4469] font-bold mb-10">
             Overview
           </div>
-          {isLoading && <div className="loader"></div>}
+          {isLoading && <div className="w-[100%] flex justify-center items-center h-[300px]">
+            <div className="loader"></div>
+          </div>}
           <div className="grid w-[100%] gap-[3rem] grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 ">
             {!isLoading && (
               <div className="w-[100%] device-status border-solid border-t-[4px] border-[#45a2f9] h-fit p-3 pl-5 bg-[#fff] shadow-md">

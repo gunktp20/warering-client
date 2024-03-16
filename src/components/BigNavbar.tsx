@@ -32,6 +32,7 @@ function BigNavbar(props: IProps) {
       <div className=" flex items-center pr-[3rem] sm:pr-2">
         <div className="text-[13.5px] sm:hidden text-[#1d4469]">{user?.username}</div>
         <img
+          id="account-user-drawer-toggle"
           src={
             "https://www.wilsoncenter.org/sites/default/files/media/images/person/james-person-1.jpg"
           }

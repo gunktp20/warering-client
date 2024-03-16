@@ -23,7 +23,7 @@ function Landing() {
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
       />
-      <BigNavbar setIsMember={setIsMember} setIsDrawerOpen={setIsDrawerOpen} />
+      <BigNavbar setIsMember={setIsMember} setIsDrawerOpen={setIsDrawerOpen} isAccountUserDrawerOpen={isAccountUserDrawerOpen} setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}/>
       <SmallNavbar
         setIsMember={setIsMember}
         setIsDrawerOpen={setIsDrawerOpen}

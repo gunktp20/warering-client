@@ -16,6 +16,7 @@ import Device from "./pages/Device";
 import AddDevice from "./pages/AddDevice";
 import Account from "./pages/Account";
 import EditProfile from "./pages/EditProfile";
+import VerifiedSuccess from "./pages/VerifiedSuccess";
 function App() {
   return (
     <BrowserRouter>
@@ -38,6 +39,7 @@ function App() {
           <Route path="/admin" element={<AdminDashboard />} />
         </Route>
         <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="/verified-success" element={<VerifiedSuccess />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

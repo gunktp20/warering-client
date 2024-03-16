@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 interface IBigNavbar {
   setIsDrawerOpen: (active: boolean) => void;
   setIsMember: (member: boolean) => void;
+  isAccountUserDrawerOpen: boolean;
+  setIsAccountUserDrawerOpen: (_: boolean) => void
 }
 
 const BigNavbar: FunctionComponent<IBigNavbar> = (props: IBigNavbar) => {
@@ -38,12 +40,19 @@ const BigNavbar: FunctionComponent<IBigNavbar> = (props: IBigNavbar) => {
             >
               Project
             </button>
-            <div className="text-sm mr-3 text-[#303030]">{user?.username}</div>
-            <img
-              className="w-[45px] h-[45px] object-cover rounded-2xl"
-              src="https://www.wilsoncenter.org/sites/default/files/media/images/person/james-person-1.jpg"
-              alt=""
-            />
+            <div className=" flex items-center sm:pr-2">
+              <div className="text-[13.5px] sm:hidden text-[#1d4469]">{user?.username}</div>
+              <img
+                id="account-user-drawer-toggle"
+                src={
+                  "https://www.wilsoncenter.org/sites/default/files/media/images/person/james-person-1.jpg"
+                }
+                className="ml-5 w-[42px] h-[42px] object-cover rounded-[100px]"
+                onClick={() => {
+                  props.setIsAccountUserDrawerOpen(!props.isAccountUserDrawerOpen);
+                }}
+              ></img>
+            </div>
           </div>
         )}
         {!user && (

@@ -284,20 +284,22 @@ function DeviceList() {
               </div>
             </div>
 
-            {devices.length === 0 && (
+            {(devices.length === 0 && !isLoading) && (
               <div className="text-[80px] flex justify-center w-[100%] my-5 text-[#c0c0c0]">
                 {" "}
                 <MdSearchOff />
               </div>
             )}
-            {devices.length === 0 && (
+            {(devices.length === 0 && !isLoading) && (
               <div className="text-md text-center w-[100%] my-5 text-[#c0c0c0]">
                 {" "}
                 Not found any device
               </div>
             )}
 
-            {isLoading && <div className="loader"></div>}
+            {isLoading && <div className="w-[100%] flex justify-center h-[165px] items-center">
+                <div className="loader"></div>
+              </div>}
 
             <div
               className={`overflow-auto rounded-lg shadow block sm:shadow-none ${devices.length === 0 && "hidden"
