@@ -34,10 +34,9 @@ export default function TopicsDialog(props: IProps) {
                 TransitionComponent={Transition}
                 keepMounted
                 onClose={handleClose}
-                aria-describedby="alert-dialog-slide-description"
             >
                 <DialogContentText
-                    id="confirm-delete-dashboard-dialog"
+                    id="topics-dialog-detail"
                     className="py-7 px-11 pb-10"
                     component={"div"}
                     variant={"body2"}

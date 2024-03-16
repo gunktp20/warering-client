@@ -55,7 +55,6 @@ function AddDevice() {
       setIsLoading(false);
       navigate('/device-list')
     } catch (err: any) {
-      console.log(err);
       const msg =
         typeof err?.response?.data?.message === "object"
           ? err?.response?.data?.message[0]
@@ -161,6 +160,7 @@ function AddDevice() {
                 navigate("/device-list");
               }}
               className="flex cursor-pointer text-sm text-[#1D4469] font-bold items-center left-0 mb-10"
+              id="back-prev-btn"
             >
               <IoArrowBackSharp className="text-sm mr-2" />
               Back
@@ -168,8 +168,8 @@ function AddDevice() {
           </div>
 
           <div className="flex w-[100%] justify-between sm:hidden">
-            <div className="text-[23px] text-[#1d4469] font-bold mb-10">
-              Add Dashboard
+            <div id="title-outlet" className="text-[23px] text-[#1d4469] font-bold mb-10">
+              Add Device
             </div>
           </div>
           <div className="bg-white shadow-md py-8 px-10 rounded-md">
@@ -305,15 +305,16 @@ function AddDevice() {
                   },
                 }}
                 variant="contained"
-                id="setup-user-submit"
+                id="add-device-submit-btn"
                 disabled={isLoading}
               >
                 { isLoading ? <div className="loader"></div>: "Add Device"}
               </Button>
             </div>
             {showSnackBar && (
-              <div className="block sm:hidden">
+              <div id="add-device-snackbar" className="block sm:hidden">
                 <SnackBar
+                  id="add-device-snackbar"
                   severity={snackBarType}
                   showSnackBar={showSnackBar}
                   snackBarText={snackBarText}

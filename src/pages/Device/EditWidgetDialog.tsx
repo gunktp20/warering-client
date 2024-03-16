@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogContent from "@mui/material/DialogContent";
@@ -26,11 +26,11 @@ const Transition = React.forwardRef(function Transition(
 });
 
 interface IProps {
-  device_id:string | undefined
-  isAddWidgetShow: boolean;
-  setIsAddWidgetShow: (active: boolean) => void;
-  nameDevice: string;
+  widget_id: string | undefined;
+  isEditDisplayShow: boolean;
+  setIsEditDisplayShow: (active: boolean) => void;
   fetchAllWidgets: () => void;
+  setSelectedWidget: (_: any) => void;
 }
 
 const initialState = {
@@ -45,7 +45,7 @@ const initialState = {
   off_payload: "",
 };
 
-export default function AddWidgetDialog(props: IProps) {
+export default function EditWidgetDialog(props: IProps) {
   const [occupation, setOccupation] = useState<string>("");
   const axiosPrivate = useAxiosPrivate();
   const [timeoutIds, setTimeoutIds] = useState<any>([]);
@@ -58,10 +58,24 @@ export default function AddWidgetDialog(props: IProps) {
   const handleClose = () => {
     setOccupation("");
     setValues(initialState);
-    props.setIsAddWidgetShow(false);
+    props.setSelectedWidget(null);
+    props.setIsEditDisplayShow(false);
   };
   const [values, setValues] = useState<any>(initialState);
-
+  const fetchWidgetInfo = async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await axiosPrivate.get(
+        `/widgets/${props?.widget_id}/widget`
+      );
+      const deviceValues = { ...data?.configWidget, label: data?.label };
+      setOccupation(data.type);
+      setValues(deviceValues);
+      setIsLoading(false);
+    } catch (err: any) {
+      setIsLoading(false);
+    }
+  };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
@@ -87,7 +101,7 @@ export default function AddWidgetDialog(props: IProps) {
       clearAlert();
       return;
     }
-    if(occupation === "Gauge" && min > max){
+    if (occupation === "Gauge" && min > max) {
       setShowSnackBar(true);
       setSnackBarType("error");
       setSnackBarText("min value must be < max value");
@@ -111,17 +125,14 @@ export default function AddWidgetDialog(props: IProps) {
       clearAlert();
       return;
     }
-    if (
-      occupation === "RangeSlider" &&
-      (!label || !value || min === null || !max)
-    ) {
+    if (occupation === "RangeSlider" && (!label || !value || min === null || !max)) {
       setShowSnackBar(true);
       setSnackBarType("error");
       setSnackBarText("Please provide all value!");
       clearAlert();
       return;
     }
-    if(occupation === "RangeSlider" && min > max){
+    if (occupation === "RangeSlider" && min > max) {
       setShowSnackBar(true);
       setSnackBarType("error");
       setSnackBarText("min value must be < max value");
@@ -138,7 +149,7 @@ export default function AddWidgetDialog(props: IProps) {
           max: Number(values.max),
           unit: values.unit,
         };
-        createWidget(widgetInfo);
+        editWidget(widgetInfo);
         return;
       case "MessageBox":
         widgetInfo.label = values?.label;
@@ -147,7 +158,7 @@ export default function AddWidgetDialog(props: IProps) {
           value: values.value,
           unit: values.unit,
         };
-        createWidget(widgetInfo);
+        editWidget(widgetInfo);
         return;
 
       case "ButtonControl":
@@ -160,7 +171,7 @@ export default function AddWidgetDialog(props: IProps) {
             button_label: values.button_label,
             payload: replacedString,
           };
-          createWidget(widgetInfo);
+          editWidget(widgetInfo);
           return;
         } catch (err: any) {
           setShowSnackBar(true);
@@ -182,7 +193,7 @@ export default function AddWidgetDialog(props: IProps) {
               ? values.off_payload
               : parseInt(values.off_payload),
           };
-          createWidget(widgetInfo);
+          editWidget(widgetInfo);
           return;
         } catch (err: any) {
           setShowSnackBar(true);
@@ -200,7 +211,7 @@ export default function AddWidgetDialog(props: IProps) {
             min: Number(values.min),
             max: Number(values.max),
           };
-          createWidget(widgetInfo);
+          editWidget(widgetInfo);
           return;
         } catch (err: any) {
           setShowSnackBar(true);
@@ -211,18 +222,18 @@ export default function AddWidgetDialog(props: IProps) {
         }
     }
   };
-  const createWidget = async (widgetInfo: any) => {
+
+  const editWidget = async (widgetInfo: any) => {
     setIsLoading(true);
     try {
-      await axiosPrivate.post(`/widgets/${props.device_id}`, widgetInfo);
+      await axiosPrivate.patch(`/widgets/${props.widget_id}`, widgetInfo);
       setShowSnackBar(true);
       setSnackBarType("success");
-      setSnackBarText("Created your widget successfully");
+      setSnackBarText("Edited your widget successfully");
       clearAlert();
-      setIsLoading(false);
-      props.setIsAddWidgetShow(false);
+      props.setIsEditDisplayShow(false);
       props.fetchAllWidgets();
-      setValues(initialState);
+      setIsLoading(false);
     } catch (err: any) {
       const msg =
         typeof err?.response?.data?.message === "object"
@@ -236,24 +247,28 @@ export default function AddWidgetDialog(props: IProps) {
     }
   };
 
+  useEffect(() => {
+    fetchWidgetInfo();
+  }, []);
+
   return (
     <div>
       <Dialog
-        open={props.isAddWidgetShow}
+        open={props.isEditDisplayShow}
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
       >
         <DialogContent>
           <DialogContentText
-            id="add-widget-dialog"
+            id="edit-widget-dialog"
             className="p-3"
             component={"div"}
             variant={"body2"}
           >
             <div className="w-[100%] flex flex-col">
-              <div className="text-[17px] font-bold text-[#1D4469]">
-                Add widget
+              <div id="title-edit-widget-dialog" className="text-[17px] font-bold text-[#1D4469]">
+                Edit widget
               </div>
               <div className="text-[12px] mt-2">
                 Please select widget occupation and provide your values.
@@ -274,7 +289,7 @@ export default function AddWidgetDialog(props: IProps) {
               </div>
             )}
 
-            <div className="pb-2 sm:w-[100%] mt-5">
+            {/* <div className="pb-2 sm:w-[100%] mt-5">
               <label className="text-[12px] text-[#000]">Occupation</label>
               <select
                 id="select_widget"
@@ -291,7 +306,7 @@ export default function AddWidgetDialog(props: IProps) {
                 <option value="ToggleSwitch">Toggle Switch</option>
                 <option value="RangeSlider">Range Slider</option>
               </select>
-            </div>
+            </div> */}
             {occupation && (
               <div className="flex gap-10 mt-11 sm:flex-col sm:gap-0 relative">
                 <div className="text-[#1d4469] text-[12.3px] font-bold absolute top-[-1.9rem]">
@@ -517,7 +532,7 @@ export default function AddWidgetDialog(props: IProps) {
                       },
                     }}
                     variant="contained"
-                    id="add-widget-submit-btn"
+                    id="edit-widget-submit-btn"
                     disabled={isLoading}
                   >
                     Done
@@ -526,7 +541,7 @@ export default function AddWidgetDialog(props: IProps) {
                 {showSnackBar && (
                   <div className="block sm:hidden">
                     <SnackBar
-                      id="add-widget-snackbar"
+                      id="edit-widget-snackbar"
                       severity={snackBarType}
                       showSnackBar={showSnackBar}
                       snackBarText={snackBarText}

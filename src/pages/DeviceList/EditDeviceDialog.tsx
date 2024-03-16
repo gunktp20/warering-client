@@ -77,11 +77,13 @@ export default function EditDeviceDialog(props: IDrawer) {
       const { data } = await axiosPrivate.get(
         `/devices/${props.selectedDevice}`
       );
+      console.log(data)
       const {
         nameDevice,
         usernameDevice,
         description,
         topics,
+        password,
         qos,
         retain,
         isSaveData,
@@ -91,7 +93,7 @@ export default function EditDeviceDialog(props: IDrawer) {
         nameDevice,
         usernameDevice,
         description,
-        password: "",
+        password,
         topics:topics[0].split('/')[1],
         isSaveData,
       });
@@ -99,7 +101,7 @@ export default function EditDeviceDialog(props: IDrawer) {
         nameDevice,
         usernameDevice,
         description,
-        password: "",
+        password,
         topics:topics[0].split('/')[1],
         qos,
         retain,
@@ -112,7 +114,6 @@ export default function EditDeviceDialog(props: IDrawer) {
       setIsLoading(false);
     }
   };
-
   const onSubmit = async() =>{
     const {
       nameDevice,
@@ -125,6 +126,7 @@ export default function EditDeviceDialog(props: IDrawer) {
       !nameDevice ||
       !usernameDevice ||
       !description ||
+      !password ||
       !topics 
     ) {
       setShowSnackBar(true);
@@ -133,7 +135,6 @@ export default function EditDeviceDialog(props: IDrawer) {
       clearAlert();
       return;
     }
-
     const deviceInfo = {
       ...values,
       nameDevice:nameDevice === currentDeviceInfo.nameDevice ? undefined : nameDevice ,
@@ -146,17 +147,17 @@ export default function EditDeviceDialog(props: IDrawer) {
     }
     await editDevice(deviceInfo)
   }
-
   const editDevice = async (deviceInfo: any) => {
     setIsLoading(true);
     try {
-      await axiosPrivate.put(`/devices/${props.selectedDevice}`, deviceInfo);
+      const { data } = await axiosPrivate.put(`/devices/${props.selectedDevice}`, deviceInfo);
       setIsLoading(false);
       setShowSnackBar(true);
       setSnackBarType("success");
       setSnackBarText("Your device information has been edited successfully");
       clearAlert();
       setIsLoading(false);
+      console.log(data)
     } catch (err: any) {
       setValues(currentDeviceInfo)
       const msg =
@@ -170,28 +171,22 @@ export default function EditDeviceDialog(props: IDrawer) {
       setIsLoading(false);
     }
   };
-
-  // Function to clear all running timeouts
   const clearAllTimeouts = () => {
     timeoutIds.forEach((timeoutId: any) => clearTimeout(timeoutId));
-    setTimeoutIds([]); // Clear the timeout IDs from state
+    setTimeoutIds([]);
   };
-  // Function to set a new timeout
   const clearAlert = () => {
-    clearAllTimeouts(); // Clear existing timeouts before setting a new one
+    clearAllTimeouts();
     const newTimeoutId = setTimeout(() => {
-      // Your timeout function logic here
       setShowSnackBar(false);
     }, 3000);
-    setTimeoutIds([newTimeoutId]); // Store the new timeout ID in state
+    setTimeoutIds([newTimeoutId]);
   };
-
   useEffect(() => {
     if (props.selectedDevice) {
       fetchDeviceInfo();
     }
   }, [props.selectedDevice]);
-
   return (
     <div>
       <Dialog
@@ -203,13 +198,15 @@ export default function EditDeviceDialog(props: IDrawer) {
       >
         <DialogContent>
           <DialogContentText
-            id="alert-dialog-slide-description"
+            id="edit-device-dialog"
             className="p-3 "
             component={"div"}
             variant={"body2"}
           >
             <div className=" w-[100%] flex flex-col">
-              <div className="text-[17px] font-bold text-[#1D4469]">
+              <div 
+                id="edit-device-title"
+                className="text-[17px] font-bold text-[#1D4469]">
                 Edit Device
               </div>
               <div className="text-sm text-[#a4a4a4] mt-3">
@@ -219,6 +216,7 @@ export default function EditDeviceDialog(props: IDrawer) {
             {showSnackBar && snackBarType && (
               <div className="hidden sm:block">
                 <Alert
+                  id="alert-edit-device"
                   severity={snackBarType}
                   sx={{
                     fontSize: "11.8px",
@@ -342,7 +340,7 @@ export default function EditDeviceDialog(props: IDrawer) {
                     },
                   }}
                   variant="outlined"
-                  id="setup-user-submit"
+                  id="cancel-edit-device-btn"
                 >
                   Cancel
                 </Button>
@@ -368,7 +366,7 @@ export default function EditDeviceDialog(props: IDrawer) {
                     },
                   }}
                   variant="contained"
-                  id="setup-user-submit"
+                  id="edit-device-submit-btn"
                   disabled={isLoading}
                 >
                   Save
@@ -377,6 +375,7 @@ export default function EditDeviceDialog(props: IDrawer) {
               {showSnackBar && (
               <div className="block sm:hidden">
                 <SnackBar
+                  id="edit-widget-snackbar"
                   severity={snackBarType}
                   showSnackBar={showSnackBar}
                   snackBarText={snackBarText}

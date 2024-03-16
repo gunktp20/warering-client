@@ -5,12 +5,13 @@ import {
   AccountUserDrawer,
 } from "../../components";
 import { useEffect, useState } from "react";
+import { IoMdCheckmark } from "react-icons/io";
 import { RiMenu2Fill } from "react-icons/ri";
 import { IoArrowBackSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { SiMicrosoftexcel } from "react-icons/si";
 import { BsFiletypeJson } from "react-icons/bs";
-import { FaClipboardList } from "react-icons/fa";
+// import { FaClipboardList } from "react-icons/fa";
 import Wrapper from "../../assets/wrappers/Device";
 import mqtt, { MqttClient } from "mqtt";
 import { LuEye } from "react-icons/lu";
@@ -23,7 +24,6 @@ import {
   RangeSlider,
 } from "../../components/widgets_device";
 import { Button } from "@mui/material";
-import AddDisplayDialog from "./AddDisplayDialog";
 import { useParams } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { JsonView, allExpanded, defaultStyles } from "react-json-view-lite";
@@ -31,30 +31,42 @@ import "react-json-view-lite/dist/index.css";
 import moment from "moment";
 import TopicsDialog from "./TopicsDialog";
 import AddWidgetDialog from "./AddWidgetDialog";
+import EditWidgetDialog from "./EditWidgetDialog";
+
+interface IDevice {
+  nameDevice: string;
+  qos: 0 | 1 | 2 | any;
+  topics: any[];
+  description: string;
+  createdAt: string;
+  usernameDevice: string;
+  password: string;
+  retain: boolean;
+}
 
 function Device() {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
-  const [isAddDisplayShow, setIsAddDisplayShow] = useState<boolean>(false);
+  const [isEditDisplayShow, setIsEditDisplayShow] = useState<boolean>(false);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   let { device_id } = useParams();
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
-  const [deviceInfo, setDeviceInfo] = useState<any>(null);
+  const [deviceInfo, setDeviceInfo] = useState<IDevice>();
   const [client, setClient] = useState<MqttClient | null>(null);
   const [connectStatus, setConnectStatus] = useState("Connect");
   const [payload, setPayload] = useState({});
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
   const [isTopicsShow, setIsTopicsShow] = useState<boolean>(false);
   const [isAddWidgetShow, setIsAddWidgetShow] = useState<boolean>(false);
-
+  const [selectedWidget, setSelectedWidget] = useState<any>(null);
   const [widgets, setWidgets] = useState<any>(null);
   const [configWidgetsDevice, setConfigWidgetsDevice] = useState<any>(null);
+
   const fetchDeviceById = async () => {
     setIsLoading(true);
-    console.log("fetchDevice");
     try {
       const { data } = await axiosPrivate.get(`/devices/${device_id}`);
       setDeviceInfo(data);
@@ -65,10 +77,9 @@ function Device() {
     }
   };
   const fetchAllWidgets = async () => {
-    console.log("fetchAllWidgets");
     setIsLoading(true);
     try {
-      const { data } = await axiosPrivate.get(`/widgets/`);
+      const { data } = await axiosPrivate.get(`/widgets/${device_id}`);
       setWidgets(data);
       setIsLoading(false);
     } catch (err: any) {
@@ -102,7 +113,6 @@ function Device() {
       password: data?.password,
     });
     setClient(_mqtt);
-    console.log(connectStatus)
   };
   // const mqttDisconnect = () => {
   //   if (client) {
@@ -125,6 +135,7 @@ function Device() {
       client.on("connect", () => {
         setConnectStatus("Connected");
         // console.log("connection successful");
+        console.log(connectStatus);
         if (client) {
           client.subscribe(
             deviceInfo?.topics[0],
@@ -137,48 +148,54 @@ function Device() {
           );
         }
       });
-
       // client.end(() => {
       //   setConnectStatus('Disconnected');
       // });
-      // https://github.com/mqttjs/MQTT.js#event-error
-      client.on("error", (err) => {
-        console.error("Connection error: ", err);
-
-        client.end();
-      });
-      // https://github.com/mqttjs/MQTT.js#event-reconnect
+      // client.on("error", (err) => {
+      //   console.error("Connection error: ", err);
+      //   client.end();
+      // });
       client.on("reconnect", () => {
         setConnectStatus("Reconnecting");
       });
-      // https://github.com/mqttjs/MQTT.js#event-message
+
       client.on("message", (topic, message) => {
-        // console.log("message");
         const payload = { topic, message: message.toString() };
-        console.log(payload)
-        // console.log(payload.message);
-        // console.log(topic,message.toString())
         try {
           const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
-          // console.log(payloadObject);
-          // console.log(payloadObject?.Gauge_value);
           setConfigWidgetsDevice(payloadObject);
-          // console.log("configWidgetsDevice", configWidgetsDevice);
           setPayload(payloadObject);
         } catch (error) {
-          // console.log(error);
+          console.log(error);
         }
       });
     }
   }, [client]);
+
+  const selectWidget = async (widgetID: any) => {
+    setSelectedWidget(widgetID);
+    console.log(widgetID);
+    setIsEditDisplayShow(true);
+  };
+
   return (
     <Wrapper>
       {deviceInfo?.nameDevice && (
         <AddWidgetDialog
+          device_id={device_id}
           isAddWidgetShow={isAddWidgetShow}
           setIsAddWidgetShow={setIsAddWidgetShow}
           nameDevice={deviceInfo?.nameDevice}
           fetchAllWidgets={fetchAllWidgets}
+        />
+      )}
+      {selectedWidget && (
+        <EditWidgetDialog
+          widget_id={selectedWidget}
+          isEditDisplayShow={isEditDisplayShow}
+          setIsEditDisplayShow={setIsEditDisplayShow}
+          fetchAllWidgets={fetchAllWidgets}
+          setSelectedWidget={setSelectedWidget}
         />
       )}
 
@@ -189,10 +206,6 @@ function Device() {
           topics={deviceInfo?.topics}
         />
       )}
-      <AddDisplayDialog
-        isAddDisplayShow={isAddDisplayShow}
-        setIsAddDisplayShow={setIsAddDisplayShow}
-      />
       <AccountUserDrawer
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
@@ -235,26 +248,18 @@ function Device() {
             </button>
           </div>
           <div className="flex w-[100%] justify-between sm:hidden">
-            <div className="text-[23px] text-[#1d4469] font-bold mb-10">
-              การเกษตรรวม
+            <div id="title-outlet" className="text-[22px] text-[#1d4469] font-bold mb-10">
+              {deviceInfo?.nameDevice}
             </div>
           </div>
-          {/* <button
-            onClick={() => {
-              setIsDrawerOpen(true);
-            }}
-            className="hidden p-1 w-fit h-fit left-[0rem] sm:block top-[-7rem] text-[#8f8f8f]"
-            id="small-open-sidebar-btn"
-          >
-            <RiMenu2Fill className="text-[23px]" />
-          </button>
-          <div className="absolute left-0 top-[-4rem] text-[23px] text-[#1d4469] font-bold">
-            การเกษตรรวม
-          </div>  */}
+
+          <div className="absolute left-0 top-[-4rem] text-[21px] text-[#1d4469] font-bold">
+            {deviceInfo?.nameDevice}
+          </div>
 
           {/* Back button */}
 
-          {/* <button
+          <button
             onClick={() => {
               navigate("/device-list");
             }}
@@ -262,7 +267,7 @@ function Device() {
           >
             <IoArrowBackSharp className="text-sm" />
             Back
-          </button> */}
+          </button>
 
           {/* Back button
             
@@ -310,7 +315,7 @@ function Device() {
                   className={`ml-2 relative focus:outline-none outline-none focus:border-none w-[100%]`}
                   type={passwordVisible ? "text" : "password"}
                   readOnly={true}
-                  value={deviceInfo?.password}
+                  value={deviceInfo?.password ? deviceInfo?.password : ""}
                 ></input>
               </div>
             </div>
@@ -323,19 +328,20 @@ function Device() {
 
             <div className="flex flex-col">
               <label
-                htmlFor="link-checkbox"
+                htmlFor="retain-checkbox"
                 className="ms-2 text-sm mr-2 font-medium text-[#1D4469] dark:text-gray-300"
               >
                 Retain
               </label>
+
               <div className="flex items-center ml-2 mt-2">
-                <input
-                  checked={deviceInfo?.retain}
-                  id="link-checkbox"
-                  type="checkbox"
-                  value=""
-                  className=" w-[15px] h-[15px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#ffffff00] dark:focus:ring-[#2CB1BC] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                />
+                {deviceInfo?.retain ? (
+                  <div className="bg-[#0075ff] rounded-sm text-white">
+                    <IoMdCheckmark />
+                  </div>
+                ) : (
+                  <div className="w-[15px] h-[15px] border-[#adadad7c] border-[1px] bg-[#f3f3f34d] rounded-sm"></div>
+                )}
                 <div
                   className={`ml-2 bottom-[0px] relative ${
                     deviceInfo?.retain ? "text-[#0075ff]" : "text-[#7a7a7a]"
@@ -351,6 +357,7 @@ function Device() {
                   setIsTopicsShow(!isTopicsShow);
                 }}
                 className="text-[#0075ff] px-3 py-1 border-[1px] text-[12.4px] rounded-md border-[#0075ff] flex font-medium mt-2 "
+                id="view-topics-btn"
               >
                 View Topics
               </button>
@@ -388,12 +395,12 @@ function Device() {
                 JSON
               </div>
             </div>
-            <div className="flex flex-col justify-center items-center">
+            {/* <div className="flex flex-col justify-center items-center">
               <FaClipboardList className="text-[#1d4469] text-[25px]" />
               <div className="text-[13px] mt-3 text-[#1d4469] font-bold">
                 Clip Board
               </div>
-            </div>
+            </div> */}
           </div>
 
           <div className="w-[300px] mt-8 sm:w-[100%]">
@@ -418,7 +425,7 @@ function Device() {
                 },
               }}
               variant="outlined"
-              id="setup-user-submit"
+              id="add-widget-btn"
             >
               Add widget
             </Button>
@@ -437,13 +444,14 @@ function Device() {
                   return (
                     <Gauge
                       key={index}
-                      widgetId={widget.id}
-                      label={widget?.nameDevice}
+                      widgetId={widget?.id}
+                      label={widget?.label}
                       value={configWidgetsDevice?.[widget?.configWidget?.value]}
                       min={widget?.configWidget?.min}
                       max={widget?.configWidget?.max}
                       unit={widget?.configWidget?.unit}
                       fetchAllWidgets={fetchAllWidgets}
+                      selectWidget={selectWidget}
                     />
                   );
                 }
@@ -451,11 +459,12 @@ function Device() {
                   return (
                     <MessageBox
                       key={index}
-                      widgetId={widget.id}
-                      label={widget?.nameDevice}
+                      widgetId={widget?.id}
+                      label={widget?.label}
                       value={configWidgetsDevice?.[widget?.configWidget?.value]}
                       unit={widget?.configWidget?.unit}
                       fetchAllWidgets={fetchAllWidgets}
+                      selectWidget={selectWidget}
                     />
                   );
                 }
@@ -463,12 +472,13 @@ function Device() {
                   return (
                     <ButtonControl
                       key={index}
-                      widgetId={widget.id}
-                      label={widget?.nameDevice}
+                      widgetId={widget?.id}
+                      label={widget?.label}
                       button_label={widget?.configWidget?.button_label}
                       payload={widget?.configWidget?.payload}
                       fetchAllWidgets={fetchAllWidgets}
                       publishMQTT={mqttPublish}
+                      selectWidget={selectWidget}
                     />
                   );
                 }
@@ -476,13 +486,14 @@ function Device() {
                   return (
                     <ToggleSwitch
                       key={index}
-                      widgetId={widget.id}
-                      label={widget?.nameDevice}
+                      widgetId={widget?.id}
+                      label={widget?.label}
                       on_payload={widget?.configWidget?.on_payload}
                       off_payload={widget?.configWidget?.off_payload}
                       value={widget?.configWidget?.value}
                       fetchAllWidgets={fetchAllWidgets}
                       publishMQTT={mqttPublish}
+                      selectWidget={selectWidget}
                     />
                   );
                 }
@@ -490,15 +501,14 @@ function Device() {
                   return (
                     <RangeSlider
                       key={index}
-                      widgetId={widget.id}
-                      label={widget?.nameDevice}
+                      widgetId={widget?.id}
+                      label={widget?.label}
                       min={widget?.configWidget?.min}
                       max={widget?.configWidget?.max}
                       value={widget?.configWidget?.value}
-                      min={widget?.configWidget?.min}
-                      max={widget?.configWidget?.max}
                       fetchAllWidgets={fetchAllWidgets}
                       publishMQTT={mqttPublish}
+                      selectWidget={selectWidget}
                     />
                   );
                 }

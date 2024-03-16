@@ -2,6 +2,7 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 
 interface IProp {
+  id:string
   severity: "error" | "success" | "warning" | "info";
   showSnackBar: boolean;
   snackBarText: string;
@@ -9,6 +10,7 @@ interface IProp {
 }
 
 export default function SnackBar({
+  id,
   severity,
   showSnackBar,
   snackBarText,
@@ -19,6 +21,7 @@ export default function SnackBar({
   return (
     <div>
       <Snackbar
+        id={id}
         open={showSnackBar}
         autoHideDuration={6000}
         anchorOrigin={{ vertical, horizontal }}

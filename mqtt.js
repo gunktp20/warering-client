@@ -21,9 +21,9 @@ const options = {
   // clean: true,
   connectTimeout: 4000,
   // Authentication
-  clientId: "TestMQTT",
-  username: "TestMQTT",
-  password: "TestMQTT",
+  clientId: "TestMQTT1",
+  username: "TestMQTT1",
+  password: "TestMQTT1",
 };
 const client = mqtt.connect(url, options);
 
@@ -32,7 +32,7 @@ client.on("connect", function () {
   setInterval(() => {
     console.log("publish");
     client.publish(
-      "65e0677aefe5e03555724f3e/TestMQTT/publish",
+      "65e2e2e1946718f317756f47/TestMQTT1/publish",
       JSON.stringify({
         tem_val: (Math.random() * 100).toFixed(2),
         speed_val: (Math.random() * 100).toFixed(2),

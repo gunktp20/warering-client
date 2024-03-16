@@ -50,12 +50,14 @@ export default function SmallNavLinks(props: INavDialog) {
             <div
               onClick={handleClose}
               className="cursor-pointer absolute top-2 right-3 text-[21px]"
+              id="close-navlink-dialog"
             >
               X
             </div>
             <NavLink
               to="/"
               key={1}
+              id="overview-navlink-dialog"
               onClick={() => {}}
               className={({ isActive }) =>
                 `flex pl-10 p-5 items-center text-[14px] ${
@@ -70,6 +72,7 @@ export default function SmallNavLinks(props: INavDialog) {
             <NavLink
               to="/dashboard-list"
               key={2}
+              id="dashboard-navlink-dialog"
               onClick={() => {}}
               className={({ isActive }) =>
                 `flex pl-10 p-5 items-center text-[14px] ${
@@ -84,6 +87,7 @@ export default function SmallNavLinks(props: INavDialog) {
             <NavLink
               to="/device-list"
               key={3}
+              id="device-navlink-dialog"
               onClick={() => {}}
               className={({ isActive }) =>
                 `flex pl-10 p-5 items-center text-[14px] ${

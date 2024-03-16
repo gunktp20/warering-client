@@ -60,9 +60,7 @@ function Overview() {
         isSidebarShow={isSidebarShow}
       />
       <div className="flex h-[100vh]">
-        <NavLinkSidebar
-          isSidebarShow={isSidebarShow}
-        />
+        <NavLinkSidebar isSidebarShow={isSidebarShow} />
         <NavDialog
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
@@ -78,77 +76,85 @@ function Overview() {
             <RiMenu2Fill className="text-[23px]" />
           </button>
 
-          <div className="text-[23px] text-[#1d4469] font-bold mb-10">
+          <div id="title-outlet" className="text-[23px] text-[#1d4469] font-bold mb-10">
             Overview
           </div>
           {isLoading && <div className="loader"></div>}
           <div className="grid w-[100%] gap-[3rem] grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 ">
-            <div className="w-[100%] device-status border-solid border-t-[4px] border-[#45a2f9] h-fit p-3 pl-5 bg-[#fff] shadow-md">
-              <div className="mb-2 text-[#1966fb]">All Device</div>
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <div className="text-[30px] text-[#1966fb]">
-                    {totalDevice ? totalDevice : "0"}
+            {!isLoading && (
+              <div className="w-[100%] device-status border-solid border-t-[4px] border-[#45a2f9] h-fit p-3 pl-5 bg-[#fff] shadow-md">
+                <div className="mb-2 text-[#1966fb]">All Device</div>
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <div id="total-device-val" className="text-[30px] text-[#1966fb]">
+                      {totalDevice ? totalDevice : "0"}
+                    </div>
+                    <div>
+                      <GoCpu className="text-[25px] text-[#45a2f9]" />
+                    </div>
                   </div>
-                  <div>
-                    <GoCpu className="text-[25px] text-[#45a2f9]" />
+                  <div className="text-[13px] text-[#7a7a7a]">
+                    SN: Device0001 - 2024-01-07 12:57:46
                   </div>
-                </div>
-                <div className="text-[13px] text-[#7a7a7a]">
-                  SN: Device0001 - 2024-01-07 12:57:46
                 </div>
               </div>
-            </div>
+            )}
 
-            <div className="w-[100%] device-status border-solid border-t-[4px] border-[#2e7d32] h-fit p-3 pl-5 bg-[#fff] shadow-md">
-              <div className="mb-2 text-[#2e7d32]">Online Device</div>
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <div className="text-[30px] text-[#2e7d32]">
-                    {deviceOnline ? deviceOnline : "0"}
+            {!isLoading && (
+              <div className="w-[100%] device-status border-solid border-t-[4px] border-[#2e7d32] h-fit p-3 pl-5 bg-[#fff] shadow-md">
+                <div className="mb-2 text-[#2e7d32]">Online Device</div>
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <div id="device-online-val" className="text-[30px] text-[#2e7d32]">
+                      {deviceOnline ? deviceOnline : "0"}
+                    </div>
+                    <div>
+                      <HiOutlineStatusOnline className="text-[25px] text-[#2e7d32]" />
+                    </div>
                   </div>
-                  <div>
-                    <HiOutlineStatusOnline className="text-[25px] text-[#2e7d32]" />
+                  <div className="text-[13px] text-[#7a7a7a]">
+                    SN: Device0001 - 2024-01-07 12:57:46
                   </div>
-                </div>
-                <div className="text-[13px] text-[#7a7a7a]">
-                  SN: Device0001 - 2024-01-07 12:57:46
                 </div>
               </div>
-            </div>
-            <div className="w-[100%] device-status border-solid border-t-[4px] border-[#7a7a7a] h-fit p-3 pl-5 bg-[#fff] shadow-md">
-              <div className="mb-2 text-[#7a7a7a]">Offline Device</div>
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <div className="text-[30px] text-[#7a7a7a]">
-                    {deviceOffline ? deviceOffline : "0"}
+            )}
+            {!isLoading && (
+              <div className="w-[100%] device-status border-solid border-t-[4px] border-[#7a7a7a] h-fit p-3 pl-5 bg-[#fff] shadow-md">
+                <div className="mb-2 text-[#7a7a7a]">Offline Device</div>
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <div id="device-offline-val" className="text-[30px] text-[#7a7a7a]">
+                      {deviceOffline ? deviceOffline : "0"}
+                    </div>
+                    <div>
+                      <MdOutlineWifiOff className="text-[25px] text-[#7a7a7a]" />
+                    </div>
                   </div>
-                  <div>
-                    <MdOutlineWifiOff className="text-[25px] text-[#7a7a7a]" />
+                  <div className="text-[13px] text-[#7a7a7a]">
+                    SN: Device0001 - 2024-01-07 12:57:46
                   </div>
-                </div>
-                <div className="text-[13px] text-[#7a7a7a]">
-                  SN: Device0001 - 2024-01-07 12:57:46
                 </div>
               </div>
-            </div>
+            )}
 
-            <div className="w-[100%] device-status border-solid border-t-[4px] border-[#dc3546] h-fit p-3 pl-5 bg-[#fff] shadow-md">
-              <div className="mb-2 text-[#dc3546]">Denied Device</div>
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <div className="text-[30px] text-[#dc3546]">
-                    {totalDeviceDeny ? totalDeviceDeny : "0"}
+            {!isLoading && (
+              <div className="w-[100%] device-status border-solid border-t-[4px] border-[#dc3546] h-fit p-3 pl-5 bg-[#fff] shadow-md">
+                <div className="mb-2 text-[#dc3546]">Denied Device</div>
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <div id="total-device-val" className="text-[30px] text-[#dc3546]">
+                      {totalDeviceDeny ? totalDeviceDeny : "0"}
+                    </div>
+                    <div>
+                      <IoBan className="text-[25px] text-[#dc3546]" />
+                    </div>
                   </div>
-                  <div>
-                    <IoBan className="text-[25px] text-[#dc3546]" />
+                  <div className="text-[13px] text-[#7a7a7a]">
+                    SN: Device0001 - 2024-01-07 12:57:46
                   </div>
-                </div>
-                <div className="text-[13px] text-[#7a7a7a]">
-                  SN: Device0001 - 2024-01-07 12:57:46
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

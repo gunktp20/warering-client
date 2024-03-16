@@ -23,9 +23,10 @@ interface IProp {
   unit: string;
   widgetId: string;
   fetchAllWidgets:()=>void
+  selectWidget:(widget_id:any)=>void
 }
 
-function Gauge({ label, value, min, max, unit, widgetId ,fetchAllWidgets }: IProp) {
+function Gauge({ label, value, min, max, unit, widgetId ,fetchAllWidgets ,selectWidget }: IProp) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
@@ -65,7 +66,9 @@ function Gauge({ label, value, min, max, unit, widgetId ,fetchAllWidgets }: IPro
       </div>
       {isOptionOpen && (
         <div className="z-30 bg-white flex flex-col absolute top-6 right-2 border-[1px] rounded-md shadow-sm">
-          <button className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]">
+          <button onClick={()=>{
+            selectWidget(widgetId)
+          }} className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]">
             Edit
           </button>
           <button

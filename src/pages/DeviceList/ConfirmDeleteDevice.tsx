@@ -52,10 +52,9 @@ export default function ConfirmDelete(props: IProps) {
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
-        aria-describedby="alert-dialog-slide-description"
       >
         <DialogContentText
-          id="confirm-delete-dashboard-dialog"
+          id="confirm-delete-device-dialog"
           className="py-7 px-11"
           component={"div"}
           variant={"body2"}
@@ -67,13 +66,16 @@ export default function ConfirmDelete(props: IProps) {
             <button
               onClick={handleClose}
               disabled={isLoading}
+              id="cancel-delete-device"
               className="text-black text-[12.5px] border-[1px] border-[#000] rounded-sm px-10 py-[0.4rem]"
             >
               Cancel
             </button>
             <button onClick={()=>{
                 deleteDevice()
-            }} disabled={isLoading} className="bg-[#dc3546] text-[12.5px] text-white px-10 py-[0.4rem] rounded-sm">
+            }}
+             id="confirm-delete-device"
+             disabled={isLoading} className="bg-[#dc3546] text-[12.5px] text-white px-10 py-[0.4rem] rounded-sm">
               Delete
             </button>
           </div>

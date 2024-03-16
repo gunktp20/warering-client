@@ -26,7 +26,6 @@ function DeviceList() {
   const { devices } = useAppSelector((state) => state.device);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState<boolean>(false);
-
   const axiosPrivate = useAxiosPrivate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
@@ -86,6 +85,9 @@ function DeviceList() {
       dispatch(setDevices(data.data));
       setIsLoading(false);
       setPageCount(data.metadata.pageCount);
+      if(data.metadata.pageCount === 1 && numOfPage !== 1){
+          setNumOfPage(1)
+      }
     } catch (err: any) {
       setIsLoading(false);
     }
@@ -94,17 +96,15 @@ function DeviceList() {
   const setDevicePermission = async (deviceId: string, permission: string) => {
     setIsLoading(true);
     try {
-      const { data } = await axiosPrivate.put(
+      await axiosPrivate.put(
         `/devices/permission/${deviceId}`,
         {
           permission: permission,
         }
       );
-      console.log(data)
       fetchAllDevice();
       setIsLoading(false);
     } catch (err: any) {
-      console.log(err)
       setIsLoading(false);
     }
   };
@@ -189,7 +189,7 @@ function DeviceList() {
           </button>
 
           <div className="flex w-[100%] justify-between">
-            <div className="text-[23px] text-[#1d4469] font-bold mb-10">
+            <div id="title-outlet" className="text-[23px] text-[#1d4469] font-bold mb-10">
               Device List
             </div>
 
@@ -273,7 +273,6 @@ function DeviceList() {
                       if (!e.target.value) {
                         return;
                       }
-                      console.log(e.target.value);
                       setFilterByIsSaveData(e.target.value);
                     }}
                   >
@@ -344,6 +343,7 @@ function DeviceList() {
                                 i.permission === "allow" ? "deny" : "allow"
                               );
                             }}
+                            id="toggle-activity-desktop"
                           >
                             <button
                               className={`w-[8px] h-[8px] ${i.permission === "allow"
@@ -374,6 +374,7 @@ function DeviceList() {
                                 i.permission === "allow" ? "deny" : "allow"
                               );
                             }}
+                            id="toggle-activity-mobile"
                           >
                             <div
                               className={`w-[8px] h-[8px] ${i.permission === "allow"
@@ -390,6 +391,7 @@ function DeviceList() {
                             </div>
                             <SwitchSave
                               checked={i.isSaveData}
+                              id={i.id + "-switch-save"}
                               onClick={() =>
                                 onToggleSwitchSave({
                                   id: i.id,
@@ -417,6 +419,7 @@ function DeviceList() {
                                   setEditDialogOpen(true);
                                 }}
                                 className="mr-6 text-[#2E7D32]"
+                                id={i.id + "-edit-device-btn"}
                               >
                                 Edit
                               </button>
@@ -426,6 +429,7 @@ function DeviceList() {
                                   setIsDeleteConfirmOpen(!isDeleteConfirmOpen);
                                 }}
                                 className="text-[#dc3546]"
+                                id={i.id + "-delete-device-btn"}
                               >
                                 Delete
                               </button>

@@ -15,10 +15,11 @@ interface IProp {
   payload:string;
   fetchAllWidgets:()=>void
   publishMQTT: (payload: any) => void;
+  selectWidget:(widget_id:any)=>void
 }
 
 
-function ButtonControl({ label, button_label, widgetId , payload ,fetchAllWidgets , publishMQTT}: IProp) {
+function ButtonControl({ label, button_label, widgetId , payload ,fetchAllWidgets , publishMQTT,selectWidget}: IProp) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
@@ -38,7 +39,9 @@ function ButtonControl({ label, button_label, widgetId , payload ,fetchAllWidget
       </div>
       {isOptionOpen && (
         <div className="bg-white flex flex-col absolute top-6 right-2 border-[1px] rounded-md shadow-sm">
-          <button className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]">
+          <button onClick={()=>{
+            selectWidget(widgetId)
+          }}className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]">
             Edit
           </button>
           <button

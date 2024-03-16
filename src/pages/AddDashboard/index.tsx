@@ -73,7 +73,7 @@ function AddDashboard() {
           </div>
 
           <div className="flex w-[100%] justify-between sm:hidden">
-            <div className="text-[23px] text-[#1d4469] font-bold mb-10">
+            <div id="title-outlet" className="text-[23px] text-[#1d4469] font-bold mb-10">
               Add Dashboard
             </div>
           </div>

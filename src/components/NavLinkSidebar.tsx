@@ -14,6 +14,7 @@ const NavLinks = (props:IProp) => {
       <div className="flex flex-col">
         <NavLink
           to="/"
+          id="overview-navlink-sidebar"
           key={1}
           onClick={() => {}}
           className={({ isActive }) =>
@@ -27,6 +28,7 @@ const NavLinks = (props:IProp) => {
         </NavLink>
         <NavLink
           to="/dashboard-list"
+          id="dashboard-navlink-sidebar"
           key={2}
           onClick={() => {}}
           className={({ isActive }) =>
@@ -42,6 +44,7 @@ const NavLinks = (props:IProp) => {
         <NavLink
           to="/device-list"
           key={3}
+          id="device-navlink-sidebar"
           onClick={() => {}}
           className={({ isActive }) =>
             `flex pl-10 p-5 items-center text-[14px] ${
