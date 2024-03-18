@@ -118,8 +118,19 @@ function DashboardList() {
                 <IoSearchOutline className="absolute text-[#1d4469] end-0 text-[20px]" />
               </div>
               <div className="flex justify-start sm:w-[100%]">
-                <div className="w-[140px]">
-                  <FormControl title="Sort by date" options={["Date"]} />
+              <div className="pb-2 sm:w-[100%]">
+                  <select
+                    id="countries"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full px-5 py-2"
+                    defaultValue={""}
+                    onChange={(e) => {
+                      
+                    }}
+                  >
+                    <option value="-createdAt">Sort by Date</option>
+                    <option value="%2BcreatedAt">Oldest</option>
+                    <option value="-createdAt">Latest</option>
+                  </select>
                 </div>
               </div>
             </div>

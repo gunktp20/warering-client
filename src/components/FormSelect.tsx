@@ -33,7 +33,7 @@ const FormSelect: FunctionComponent<IFormRow> = ({
         onChange={(event: any) => {
           setValue(event.target.value);
         }}
-        className={`block py-2.5 px-0 w-full text-[13.5px] text-gray-900 bg-transparent border-0 border-b-[1.6px] border-gray-200 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-second focus:outline-none focus:ring-0 focus:border-second peer`}
+        className={`block py-2.5 px-0 w-full text-[13.5px] text-gray-900 bg-transparent border-0 border-b-[1.6px] border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-second peer`}
       >
         {options.map((option, index) => {
           return (
