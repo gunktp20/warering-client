@@ -47,6 +47,7 @@ export const register = createAsyncThunk(
     }
   }
 );
+
 export const login = createAsyncThunk(
   "auth/login",
   async (userInfo: ILogin, thunkApi) => {
@@ -110,6 +111,24 @@ export const refreshToken = createAsyncThunk(
     try {
       const response = await api.get(`/auth/refresh`);
       return response.data;
+    } catch (err: any) {
+      const msg =
+        typeof err?.response?.data?.message === "object"
+          ? err?.response?.data?.message[0]
+          : err?.response?.data?.message;
+      return thunkApi.rejectWithValue(msg);
+    }
+  }
+);
+
+export const requestVerifyEmail = createAsyncThunk(
+  "auth/requestVerifyEmail",
+  async (token: string, thunkApi) => {
+    try {
+      const { data } = await api.get(`/auth/email/${token}`);
+      return {
+        ...data,
+      };
     } catch (err: any) {
       const msg =
         typeof err?.response?.data?.message === "object"
@@ -252,6 +271,22 @@ const AuthSlice = createSlice({
         state.token = action.payload.access_token;
       }),
       builder.addCase(refreshToken.rejected, (state, action) => {
+        state.isLoading = false;
+        state.showAlert = true;
+        state.alertText = action.payload as string;
+        state.alertType = "error";
+      });
+      builder.addCase(requestVerifyEmail.pending, (state) => {
+        state.isLoading = true;
+      }),
+      builder.addCase(requestVerifyEmail.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.showAlert = true;
+        state.alertText = "Verified Successfully";
+        state.alertType = "success";
+        state.token = action.payload.token;
+      }),
+      builder.addCase(requestVerifyEmail.rejected, (state, action) => {
         state.isLoading = false;
         state.showAlert = true;
         state.alertText = action.payload as string;
