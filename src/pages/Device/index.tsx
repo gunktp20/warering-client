@@ -123,10 +123,6 @@ function Device() {
   useEffect(() => {
     fetchDeviceById();
     fetchAllWidgets();
-    
-    return ()=>{
-      mqttDisconnect()
-    }
   }, []);
   useEffect(() => {
     if (client) {
@@ -422,6 +418,7 @@ function Device() {
               }}
               variant="outlined"
               id="add-widget-btn"
+              disabled={isLoading}
             >
               Add widget
             </Button>
