@@ -329,7 +329,7 @@ function Device() {
             <div className="flex flex-col">
               <label
                 htmlFor="retain-checkbox"
-                className="ms-2 text-sm mr-2 font-medium text-[#1D4469] dark:text-gray-300"
+                className="ms-2 text-sm mr-2 font-medium text-[#1D4469]"
               >
                 Retain
               </label>

@@ -271,7 +271,7 @@ function AddDevice() {
             <div className="flex items-center">
               <label
                 htmlFor="link-checkbox"
-                className="ms-2 text-sm mr-2 font-medium text-[#1D4469] dark:text-gray-300"
+                className="ms-2 text-sm mr-2 font-medium text-[#1D4469]"
               >
                 Retain
               </label>
@@ -281,7 +281,7 @@ function AddDevice() {
                 name="retain"
                 onChange={() => setRetain((prev) => !prev)}
                 checked={retain}
-                className=" w-[15px] h-[15px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#ffffff00] dark:focus:ring-[#2CB1BC] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                className=" w-[15px] h-[15px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#ffffff00] focus:ring-2"
               />
             </div>
             <div className="w-[360px] sm:w-[100%]">
