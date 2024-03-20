@@ -231,8 +231,9 @@ export default function EditWidgetDialog(props: IProps) {
       setSnackBarType("success");
       setSnackBarText("Edited your widget successfully");
       clearAlert();
-      props.setIsEditDisplayShow(false);
       props.fetchAllWidgets();
+      props.setIsEditDisplayShow(false);
+      props.setSelectedWidget(null);
       setIsLoading(false);
     } catch (err: any) {
       const msg =

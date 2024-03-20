@@ -15,7 +15,7 @@ interface IProp {
   off_payload: string | number;
   fetchAllWidgets: () => void;
   publishMQTT: (payload: any) => void;
-  selectWidget:(widget_id:any)=>void
+  selectWidget: (widget_id: any) => void
 }
 
 function ToggleSwitch({
@@ -26,7 +26,7 @@ function ToggleSwitch({
   off_payload,
   fetchAllWidgets,
   publishMQTT,
-  selectWidget
+  selectWidget,
 }: IProp) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [isActive, setIsActive] = useState<boolean>(true);
@@ -35,7 +35,7 @@ function ToggleSwitch({
 
   return (
     <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center ">
-      <div className="absolute left-2 top-2 text-[#1d4469] text-sm">
+      <div className="absolute left-2 top-2 text-[#1d4469] text-[12px]">
         {label}
       </div>
       <div
@@ -48,10 +48,11 @@ function ToggleSwitch({
       </div>
       {isOptionOpen && (
         <div className="bg-white flex flex-col absolute top-6 right-2 border-[1px] rounded-md shadow-sm">
-          <button onClick={()=>{
+          <button onClick={() => {
             selectWidget(widgetId)
+            setIsOptionOpen(false)
           }}
-          className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]">
+            className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]">
             Edit
           </button>
           <button
