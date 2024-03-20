@@ -158,7 +158,7 @@ export default function EditDeviceDialog(props: IDrawer) {
       setSnackBarText("Your device information has been edited successfully");
       clearAlert();
       setIsLoading(false);
-      console.log(data)
+      props.hookEditSuccess()
     } catch (err: any) {
       setValues(currentDeviceInfo)
       const msg =
