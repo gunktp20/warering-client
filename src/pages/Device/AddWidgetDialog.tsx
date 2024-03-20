@@ -278,7 +278,7 @@ export default function AddWidgetDialog(props: IProps) {
               <label className="text-[12px] text-[#000]">Occupation</label>
               <select
                 id="select_widget"
-                className="bg-gray-50 w-[250px] sm:w-[100%] border border-gray-300 mt-1 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-5 py-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="bg-gray-50 w-[250px] sm:w-[100%] border border-gray-300 mt-1 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-5 py-2"
                 value={occupation}
                 onChange={(e) => {
                   setOccupation(e?.target.value);

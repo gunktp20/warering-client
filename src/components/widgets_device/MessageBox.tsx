@@ -49,11 +49,12 @@ function MessageBox({ label, value, unit, widgetId ,fetchAllWidgets,selectWidget
           </button>
         </div>
       )}
-      <div className="text-[#1966fb] text-[19px] font-bold">
+      <div className="text-[#1966fb] text-[19px] font-bold flex">
+        
+        {value}
         <div className="text-[11px] font-medium text-[#5353538a] text-right">
           {unit}
         </div>
-        {value}
       </div>
       <ConfirmDelete
         widgetId={widgetId}
