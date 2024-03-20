@@ -299,7 +299,7 @@ export default function AlertDialogSlide(props: IDrawer) {
                       value=""
                       onClick={() => setIsAcceptTerm(!isAcceptTerm)}
                       checked={isAcceptTerm}
-                      className="w-[13px] h-[13px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#fff] dark:focus:ring-[#2CB1BC] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                      className="w-[13px] h-[13px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#fff]"
                     />
                     <label
                       htmlFor="link-checkbox"
@@ -308,7 +308,7 @@ export default function AlertDialogSlide(props: IDrawer) {
                       I agree with the{" "}
                       <Link
                         to="/term-condition"
-                        className="text-[#3173B1] dark:text-[#3173B1] hover:underline"
+                        className="text-[#3173B1] hover:underline"
                       >
                         terms and conditions
                       </Link>
@@ -327,7 +327,7 @@ export default function AlertDialogSlide(props: IDrawer) {
                       />
                       <label
                         htmlFor="link-checkbox"
-                        className="ms-2 text-[11.5px] font-medium text-gray-900 "
+                        className="ms-2 text-[11.5px] font-medium text-gray-900"
                       >
                         Remember me
                       </label>
