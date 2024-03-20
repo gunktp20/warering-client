@@ -52,7 +52,7 @@ function MessageBox({ label, value, unit, widgetId ,fetchAllWidgets,selectWidget
       <div className="text-[#1966fb] text-[19px] font-bold flex">
         
         {value}
-        <div className="text-[11px] font-medium text-[#5353538a] text-right">
+        <div className="text-[11px] font-medium text-[#5353538a] text-right ml-2">
           {unit}
         </div>
       </div>

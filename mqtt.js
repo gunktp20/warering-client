@@ -32,7 +32,7 @@ client.on("connect", function () {
   setInterval(() => {
     console.log("publish");
     client.publish(
-      "65e2e2e1946718f317756f47/TestMQTT1/publish",
+      "65fa7d160a66331e55eb483c/TestMQTT1/publish",
       JSON.stringify({
         tem_val: (Math.random() * 100).toFixed(2),
         speed_val: (Math.random() * 100).toFixed(2),

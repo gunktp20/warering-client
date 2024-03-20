@@ -93,7 +93,6 @@ function Device() {
         payload,
         {
           qos: 0,
-          retain: true,
         },
         (error) => {
           if (error) {
