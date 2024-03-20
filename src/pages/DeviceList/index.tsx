@@ -147,6 +147,9 @@ function DeviceList() {
   const hookDeleteSuccess = () => {
     fetchAllDevice();
   };
+  const hookEditSuccess = () => {
+    fetchAllDevice();
+  };
 
   return (
     <Wrapper>
@@ -164,6 +167,7 @@ function DeviceList() {
         selectedDevice={selectedDevice}
         isEditDialogOpen={isEditDialogOpen}
         setEditDialogOpen={setEditDialogOpen}
+        hookEditSuccess={hookEditSuccess}
       />
       <BigNavbar
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}

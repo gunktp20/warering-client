@@ -22,6 +22,7 @@ interface IDrawer {
   isEditDialogOpen: boolean;
   setEditDialogOpen: (active: boolean) => void;
   selectedDevice: string;
+  hookEditSuccess: () => void
 }
 
 interface IValue {
@@ -57,15 +58,15 @@ export default function EditDeviceDialog(props: IDrawer) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const options = [0, 1, 2];
   const [qos, setQos] = useState<number>(options[0]);
-  const [retain,setRetain] = useState<boolean>(true)
-  
-  const [currentDeviceInfo,setCurrentDeviceInfo] = useState<any>()
+  const [retain, setRetain] = useState<boolean>(true)
+
+  const [currentDeviceInfo, setCurrentDeviceInfo] = useState<any>()
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
   const handleClose = () => {
-    if(isLoading){
+    if (isLoading) {
       return;
     }
     setEditDialogOpen(false);
@@ -94,7 +95,7 @@ export default function EditDeviceDialog(props: IDrawer) {
         usernameDevice,
         description,
         password,
-        topics:topics[0].split('/')[1],
+        topics: topics[0].split('/')[1],
         isSaveData,
       });
       setCurrentDeviceInfo({
@@ -102,7 +103,7 @@ export default function EditDeviceDialog(props: IDrawer) {
         usernameDevice,
         description,
         password,
-        topics:topics[0].split('/')[1],
+        topics: topics[0].split('/')[1],
         qos,
         retain,
         isSaveData,
@@ -114,7 +115,7 @@ export default function EditDeviceDialog(props: IDrawer) {
       setIsLoading(false);
     }
   };
-  const onSubmit = async() =>{
+  const onSubmit = async () => {
     const {
       nameDevice,
       usernameDevice,
@@ -127,7 +128,7 @@ export default function EditDeviceDialog(props: IDrawer) {
       !usernameDevice ||
       !description ||
       !password ||
-      !topics 
+      !topics
     ) {
       setShowSnackBar(true);
       setSnackBarType("error");
@@ -137,13 +138,13 @@ export default function EditDeviceDialog(props: IDrawer) {
     }
     const deviceInfo = {
       ...values,
-      nameDevice:nameDevice === currentDeviceInfo.nameDevice ? undefined : nameDevice ,
-      usernameDevice:usernameDevice === currentDeviceInfo.usernameDevice ? undefined : usernameDevice ,
-      password:password === "" ? undefined : password ,
-      description:description === currentDeviceInfo.description ? undefined : description ,
-      topics:topics === currentDeviceInfo.topics ? undefined : topics ,
-      retain:retain === currentDeviceInfo.retain ? undefined:retain,
-      qos:Number(qos)
+      nameDevice: nameDevice === currentDeviceInfo.nameDevice ? undefined : nameDevice,
+      usernameDevice: usernameDevice === currentDeviceInfo.usernameDevice ? undefined : usernameDevice,
+      password: password === "" ? undefined : password,
+      description: description === currentDeviceInfo.description ? undefined : description,
+      topics: topics === currentDeviceInfo.topics ? undefined : topics,
+      retain: retain === currentDeviceInfo.retain ? undefined : retain,
+      qos: Number(qos)
     }
     await editDevice(deviceInfo)
   }
@@ -204,7 +205,7 @@ export default function EditDeviceDialog(props: IDrawer) {
             variant={"body2"}
           >
             <div className=" w-[100%] flex flex-col">
-              <div 
+              <div
                 id="edit-device-title"
                 className="text-[17px] font-bold text-[#1D4469]">
                 Edit Device
@@ -373,16 +374,16 @@ export default function EditDeviceDialog(props: IDrawer) {
                 </Button>
               </div>
               {showSnackBar && (
-              <div className="block sm:hidden">
-                <SnackBar
-                  id="edit-widget-snackbar"
-                  severity={snackBarType}
-                  showSnackBar={showSnackBar}
-                  snackBarText={snackBarText}
-                  setShowSnackBar={setShowSnackBar}
-                />
-              </div>
-            )}
+                <div className="block sm:hidden">
+                  <SnackBar
+                    id="edit-widget-snackbar"
+                    severity={snackBarType}
+                    showSnackBar={showSnackBar}
+                    snackBarText={snackBarText}
+                    setShowSnackBar={setShowSnackBar}
+                  />
+                </div>
+              )}
             </div>
           </DialogContentText>
         </DialogContent>
