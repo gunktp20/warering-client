@@ -113,21 +113,20 @@ function Device() {
     });
     setClient(_mqtt);
   };
-  // const mqttDisconnect = () => {
-  //   if (client) {
-  //     try {
-  //       client.end(false, () => {
-  //         setConnectStatus("Connect");
-  //         // console.log("disconnected successfully");
-  //       });
-  //     } catch (error) {
-  //       // console.log("disconnect error:", error);
-  //     }
-  //   }
-  // };
+  const mqttDisconnect = () => {
+    if (client) {
+      client.end(() => {
+        setConnectStatus('Disconnected');
+      });
+    }
+  };
   useEffect(() => {
     fetchDeviceById();
     fetchAllWidgets();
+    
+    return ()=>{
+      mqttDisconnect()
+    }
   }, []);
   useEffect(() => {
     if (client) {
@@ -147,9 +146,9 @@ function Device() {
           );
         }
       });
-      // client.end(() => {
-      //   setConnectStatus('Disconnected');
-      // });
+      client.end(() => {
+        setConnectStatus('Disconnected');
+      });
       // client.on("error", (err) => {
       //   console.error("Connection error: ", err);
       //   client.end();
@@ -223,7 +222,6 @@ function Device() {
           setIsDrawerOpen={setIsDrawerOpen}
         />
         {/* content container */}
-        {isLoading && <div className="loader"></div>}
         <div className="m-[3rem] top-[5rem] min-h-vh w-[100%] flex flex-col rounded-md sm:m-[1rem] sm:mt-[2.5rem]">
           <div className="flex justify-between">
             <button
@@ -342,9 +340,8 @@ function Device() {
                   <div className="w-[15px] h-[15px] border-[#adadad7c] border-[1px] bg-[#f3f3f34d] rounded-sm"></div>
                 )}
                 <div
-                  className={`ml-2 bottom-[0px] relative ${
-                    deviceInfo?.retain ? "text-[#0075ff]" : "text-[#7a7a7a]"
-                  } text-[13.4px]`}
+                  className={`ml-2 bottom-[0px] relative ${deviceInfo?.retain ? "text-[#0075ff]" : "text-[#7a7a7a]"
+                    } text-[13.4px]`}
                 >
                   {deviceInfo?.retain.toString()}
                 </div>
