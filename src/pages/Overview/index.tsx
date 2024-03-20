@@ -14,7 +14,7 @@ import { IoBan } from "react-icons/io5";
 function Overview() {
   const dispatch = useAppDispatch();
   const axiosPrivate = useAxiosPrivate();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  // const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
   const { deviceOffline, deviceOnline, totalDevice, totalDeviceDeny } =
     useAppSelector((state) => state.device);
@@ -23,13 +23,13 @@ function Overview() {
     useState<boolean>(false);
 
   const fetchDeviceOverview = async () => {
-    setIsLoading(true);
+    // setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(`/api/overview`);
       dispatch(setDeviceOverview(data));
-      setIsLoading(false);
+      // setIsLoading(false);
     } catch (err: any) {
-      setIsLoading(false);
+      // setIsLoading(false);
     }
   };
 
