@@ -231,7 +231,7 @@ function DeviceList() {
               <div className="w-[330px] sm:w-[100%] relative items-center flex ">
                 <FormRow
                   type="text"
-                  name="search_device"
+                  name=""
                   labelText="search device"
                   value={values.search_device}
                   handleChange={handleChange}
