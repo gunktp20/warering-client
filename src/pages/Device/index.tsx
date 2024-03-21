@@ -93,6 +93,7 @@ function Device() {
         payload,
         {
           qos: 0,
+          retain:true
         },
         (error) => {
           if (error) {
@@ -104,10 +105,10 @@ function Device() {
   };
   const connectEMQX = async (data: any) => {
     const _mqtt = await mqtt.connect(import.meta.env.VITE_EMQX_DOMAIN, {
-      protocol: "ws",
+      // protocol: "ws",
       host: "localhost",
       clientId: "emqx_react_" + Math.random().toString(16).substring(2, 8),
-      port: 8083,
+      // port: 8083,
       username: data?.usernameDevice,
       password: data?.password,
     });
@@ -142,9 +143,9 @@ function Device() {
           );
         }
       });
-      client.end(() => {
-        setConnectStatus('Disconnected');
-      });
+      // client.end(() => {
+      //   setConnectStatus('Disconnected');
+      // });
       // client.on("error", (err) => {
       //   console.error("Connection error: ", err);
       //   client.end();

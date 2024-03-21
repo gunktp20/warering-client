@@ -34,8 +34,8 @@ client.on("connect", function () {
     client.publish(
       "65fa7d160a66331e55eb483c/TestMQTT1/publish",
       JSON.stringify({
-        tem_val: (Math.random() * 100).toFixed(2),
-        speed_val: (Math.random() * 100).toFixed(2),
+        tem_val: Number((Math.random() * 100).toFixed(2)),
+        speed_val: Number((Math.random() * 100).toFixed(2)),
       }),
       {
         qos: 0,
