@@ -8,14 +8,23 @@ import { TransitionProps } from "@mui/material/transitions";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 interface IProp {
   label: string;
-  value: number;
+  value: string;
   unit: string;
   widgetId: string;
-  fetchAllWidgets:()=>void
-  selectWidget:(widget_id:any)=>void
+  fetchAllWidgets: () => void
+  selectWidget: (widget_id: any) => void
 }
-function MessageBox({ label, value, unit, widgetId ,fetchAllWidgets,selectWidget}: IProp) {
+function MessageBox({ label, value, unit, widgetId, fetchAllWidgets, selectWidget }: IProp) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
+  function checkThaiLanguage(text: string) {
+    // ใช้ Regular Expression เพื่อตรวจสอบว่า text มีตัวอักษรภาษาไทยหรือไม่
+    var thaiRegex = new RegExp(/[\u0E00-\u0E7F]+/);
+    return thaiRegex.test(text);
+  }
+
+  // ตัวอย่างการใช้งาน
+  console.log(checkThaiLanguage("Hello, สวัสดี")); // true
+  console.log(checkThaiLanguage("Hello, World!")); // false
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
   return (
@@ -34,7 +43,7 @@ function MessageBox({ label, value, unit, widgetId ,fetchAllWidgets,selectWidget
       </div>
       {isOptionOpen && (
         <div className="z-30 bg-white flex flex-col absolute top-6 right-2 border-[1px] rounded-md shadow-sm">
-          <button onClick={()=>{
+          <button onClick={() => {
             selectWidget(widgetId)
             setIsOptionOpen(false)
           }} className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]">
@@ -50,8 +59,8 @@ function MessageBox({ label, value, unit, widgetId ,fetchAllWidgets,selectWidget
           </button>
         </div>
       )}
-      <div className="text-[#1966fb] text-[19px] font-bold flex">
-        
+      <div className={`text-[#1966fb] font-bold flex ${checkThaiLanguage(value) ? "text-[12.8px] font-thin" : "text-[19px]"}`}>
+
         {value}
         <div className="text-[11px] font-medium text-[#5353538a] text-right ml-2">
           {unit}
@@ -78,7 +87,7 @@ interface IProps {
   widgetId: string;
   isDeleteConfirmOpen: boolean;
   setIsDeleteConfirmOpen: (active: boolean) => void;
-  fetchAllWidgets:() => void;
+  fetchAllWidgets: () => void;
 }
 
 function ConfirmDelete({

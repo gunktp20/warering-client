@@ -114,13 +114,13 @@ function Device() {
     });
     setClient(_mqtt);
   };
-  const mqttDisconnect = () => {
-    if (client) {
-      client.end(() => {
-        setConnectStatus('Disconnected');
-      });
-    }
-  };
+  // const mqttDisconnect = () => {
+  //   if (client) {
+  //     client.end(() => {
+  //       setConnectStatus('Disconnected');
+  //     });
+  //   }
+  // };
   useEffect(() => {
     fetchDeviceById();
     fetchAllWidgets();
