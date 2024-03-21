@@ -28,7 +28,7 @@ function MessageBox({ label, value, unit, widgetId, fetchAllWidgets, selectWidge
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
   return (
-    <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2">
+    <div className="h-[130px] w-[100%] bg-white relative shadow-md flex justify-center items-center rounded-md hover:ring-2 overflow-hidden">
       {!value && <div className="w-[100%] h-[100%] bg-white z-10 flex absolute justify-center items-center font-bold text-[#0075ff]">IDLE</div>}
       <div className="z-30 absolute left-2 top-2 text-[#1d4469] text-[12px]">
         {label}
