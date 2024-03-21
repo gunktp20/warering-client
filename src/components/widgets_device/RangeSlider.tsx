@@ -52,7 +52,7 @@ export default function RangeSlider({label,min,max,widgetId,value,fetchAllWidget
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
   React.useState<boolean>(false);
   return (
-    <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center ">
+    <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2">
       <div className="absolute left-2 top-2 text-[#1d4469] text-[12px]">
         {label}
       </div>
