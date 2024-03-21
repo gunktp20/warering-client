@@ -7,6 +7,8 @@ interface IFormRow {
   value?: string;
   handleChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   labelText?: string;
+  width?: string;
+  marginTop?: string;
 }
 
 const FormRow: FunctionComponent<IFormRow> = ({
@@ -15,17 +17,29 @@ const FormRow: FunctionComponent<IFormRow> = ({
   value,
   handleChange,
   labelText,
+  width,
+  marginTop,
 }: IFormRow): JSX.Element => {
   const [hide, setHide] = useState<boolean>(true);
 
   return (
-    <div className="relative z-0 w-full mb-5 group mt-7">
+    <div
+      className={`relative z-0 w-[${width ? width : "100%"}] mb-5 group ${
+        marginTop ? marginTop : " mt-7"
+      }`}
+    >
       <input
         onChange={handleChange}
-        type={type === "password" && hide ? "password" : "value"}
+        type={
+          type === "password" && hide
+            ? "password"
+            : type === "number"
+            ? "number"
+            : "value"
+        }
         name={name}
         id={name}
-        className="block py-2.5 px-0 w-full text-[13.5px] text-gray-900 bg-transparent border-0 border-b-[1.6px] border-gray-200 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-second focus:outline-none focus:ring-0 focus:border-second peer"
+        className={`block py-2.5 px-0 w-full text-[13.5px] text-gray-900 bg-transparent border-0 border-b-[1.6px] border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-second peer`}
         placeholder=" "
         required
         value={value}

@@ -1,9 +1,12 @@
+type role = "user" | "admin";
+
 export interface IAuthState {
   user: {
     username: string;
     firstname: string;
     lastname: string;
     email: string;
+    roles: role[];
   } | null;
   token: string | null;
   isLoading: boolean;
@@ -38,3 +41,13 @@ export interface IResetPass {
   token: string | undefined;
   newPassword: string | undefined;
 }
+
+export interface AccessTokenPayload {
+  sub: string;
+  username: string;
+  roles: [];
+  iat: number;
+  exp: number;
+}
+
+export type AddUserFunc = (user: { username: string }, token: string) => void;

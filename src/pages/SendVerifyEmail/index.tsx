@@ -1,0 +1,62 @@
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { requestVerifyEmail } from "../../features/auth/authSlice";
+import { Link } from "react-router-dom";
+import Wrapper from "../../assets/wrappers/VerifiedSuccess";
+import verified_success from "../../assets/images/Verified-amico.svg";
+import verify_error from "../../assets/images/401 Error Unauthorized-amico.svg";
+
+function SendVerifyEmail() {
+  let { token } = useParams();
+  const { isLoading, alertText, alertType } = useAppSelector(
+    (state) => state.auth
+  );
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(requestVerifyEmail(token as string));
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="h-[100vh] w-[100%] flex ">
+        <div className="flex justify-center items-center gap-6 w-[100%] h-[100%] flex-col">
+          <div className="loader"></div>
+          <div className="text-[#303030] text-[20px]">
+            Verifying your e-mail
+          </div>
+          <div className="text-[#838383]">Please waiting for a second...</div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Wrapper>
+      <div>
+        <img
+          src={alertType === "success" ? verified_success : verify_error}
+          alt="not found"
+          className="w-[400px] h-[400px]"
+        />
+        <div className="text-[#303030] mb-3 text-[20px]">{alertText}</div>
+        <div className="text-[#838383]">
+          {alertType === "success"
+            ? "Thank you for trusting and choosing to use our Platform"
+            : "Have an error , Please try again"}
+        </div>
+        <div className="mt-8">
+          <Link
+            to="/home"
+            className="px-9 py-2 text-[#45a2f9] capitalize rounded-md border-[#45a2f9] border-[2px] hover:bg-[#45a2f9] hover:text-white"
+          >
+            back home
+          </Link>
+        </div>
+      </div>
+    </Wrapper>
+  );
+}
+
+export default SendVerifyEmail;
