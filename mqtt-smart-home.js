@@ -35,7 +35,7 @@ client.on("connect", function () {
       }),
       {
         qos: 0,
-        retain: false,
+        retain: true,
       }
     );
   }, 2500);

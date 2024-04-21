@@ -11,15 +11,15 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 interface IProp {
   label: string;
   widgetId: string;
-  button_label:string;
-  payload:string;
-  fetchAllWidgets:()=>void
-  publishMQTT: (payload: any) => void;
-  selectWidget:(widget_id:any)=>void
+  button_label: string;
+  payload: string;
+  fetchAllWidgets: () => void
+  publishMQTT: (payload: string) => void;
+  selectWidget: (widget_id: string) => void
 }
 
 
-function ButtonControl({ label, button_label, widgetId , payload ,fetchAllWidgets , publishMQTT,selectWidget}: IProp) {
+function ButtonControl({ label, button_label, widgetId, payload, fetchAllWidgets, publishMQTT, selectWidget }: IProp) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
@@ -39,10 +39,10 @@ function ButtonControl({ label, button_label, widgetId , payload ,fetchAllWidget
       </div>
       {isOptionOpen && (
         <div className="bg-white flex flex-col absolute top-6 right-2 border-[1px] rounded-md shadow-sm">
-          <button onClick={()=>{
+          <button onClick={() => {
             selectWidget(widgetId)
             setIsOptionOpen(false)
-          }}className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]">
+          }} className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]">
             Edit
           </button>
           <button
@@ -90,7 +90,7 @@ function ButtonControl({ label, button_label, widgetId , payload ,fetchAllWidget
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
-    children: React.ReactElement<any, any>;
+    children: React.ReactElement;
   },
   ref: React.Ref<unknown>
 ) {
@@ -101,7 +101,7 @@ interface IProps {
   widgetId: string;
   isDeleteConfirmOpen: boolean;
   setIsDeleteConfirmOpen: (active: boolean) => void;
-  fetchAllWidgets:()=>void
+  fetchAllWidgets: () => void
 }
 
 function ConfirmDelete({

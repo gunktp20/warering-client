@@ -93,7 +93,7 @@ function Device() {
         payload,
         {
           qos: 0,
-          retain:true
+          retain: true
         },
         (error) => {
           if (error) {
@@ -114,13 +114,13 @@ function Device() {
     });
     setClient(_mqtt);
   };
-  // const mqttDisconnect = () => {
-  //   if (client) {
-  //     client.end(() => {
-  //       setConnectStatus('Disconnected');
-  //     });
-  //   }
-  // };
+  const mqttDisconnect = () => {
+    if (client) {
+      client.end(() => {
+        setConnectStatus('Disconnected');
+      });
+    }
+  };
   useEffect(() => {
     fetchDeviceById();
     fetchAllWidgets();
@@ -165,6 +165,9 @@ function Device() {
         }
       });
     }
+    return () => {
+      mqttDisconnect();
+    };
   }, [client]);
 
   const selectWidget = async (widgetID: any) => {

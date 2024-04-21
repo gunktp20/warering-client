@@ -32,7 +32,7 @@ const defaultCols: Column[] = [
   },
 ];
 
-// const tasksStorage = localStorage.getItem("tasks")
+const tasksStorage = localStorage.getItem("tasks")
 
 const defaultTasks: Task[] = [
   {
@@ -72,7 +72,7 @@ function KanbanBoard() {
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
 
   // tasksStorage ? JSON.parse(tasksStorage) : vvv
-  const [tasks, setTasks] = useState<Task[]>(defaultTasks);
+  const [tasks, setTasks] = useState<Task[]>(tasksStorage ? JSON.parse(tasksStorage) : defaultTasks);
 
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);
 
@@ -314,8 +314,10 @@ function KanbanBoard() {
           tasks[activeIndex].columnId = tasks[overIndex].columnId;
           return arrayMove(tasks, activeIndex, overIndex - 1);
         }
-        // localStorage.setItem("tasks", JSON.stringify(arrayMove(tasks, activeIndex, overIndex)))
+        localStorage.setItem("tasks", JSON.stringify(arrayMove(tasks, activeIndex, overIndex)))
+        console.log(arrayMove(tasks, activeIndex, overIndex));
         return arrayMove(tasks, activeIndex, overIndex);
+        
       });
     }
 
@@ -327,6 +329,7 @@ function KanbanBoard() {
 
         tasks[activeIndex].columnId = overId;
         console.log("DROPPING TASK OVER COLUMN", { activeIndex });
+        localStorage.setItem("tasks", JSON.stringify(arrayMove(tasks, activeIndex, activeIndex)))
         return arrayMove(tasks, activeIndex, activeIndex);
       });
     }
