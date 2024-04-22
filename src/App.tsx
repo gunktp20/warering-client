@@ -35,8 +35,8 @@ function App() {
           <Route path="/account" element={<Account />} />
           <Route path="/edit-profile" element={<EditProfile />} />
         </Route>
-        <Route element={<RequireAdmin />}>
-          <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/admin" element={<RequireAdmin />}>
+          <Route index element={<AdminDashboard />} />
         </Route>
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route

@@ -3,10 +3,13 @@ import Dialog from "@mui/material/Dialog";
 import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { logout } from "../../features/auth/authSlice";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
-    children: React.ReactElement<any, any>;
+    children: React.ReactElement;
   },
   ref: React.Ref<unknown>
 ) {
@@ -19,9 +22,33 @@ interface IProps {
 }
 
 export default function ConfirmDeleteAccount(props: IProps) {
-
+  const axiosPrivate = useAxiosPrivate();
+  const dispatch = useAppDispatch()
+  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const { token } = useAppSelector((state) => state.auth)
   const handleClose = () => {
     props.setIsDeleteConfirmOpen(false);
+  };
+
+  const deleteUser = async () => {
+    setIsLoading(true)
+    try {
+      const { data } = await axiosPrivate.delete("/users")
+      console.log(data)
+      setIsLoading(false)
+      return signOut()
+    } catch (err) {
+      setIsLoading(false)
+      console.log(err)
+    }
+  }
+
+  const signOut = async () => {
+    dispatch(logout());
+    await axiosPrivate.post(
+      `/auth/logout`,
+      {},
+    );
   };
 
   return (
@@ -56,8 +83,8 @@ export default function ConfirmDeleteAccount(props: IProps) {
             >
               Cancel
             </button>
-            <button className="bg-[#f1aeb5] text-[12.5px] text-white px-10 py-[0.5rem] rounded-sm">
-              Delete Account
+            <button onClick={deleteUser} className="bg-[#f1aeb5] hover:bg-[#DC3546] text-[12.5px] text-white px-10 py-[0.5rem] rounded-sm">
+              {isLoading ? "Loading..." : "Delete Account"}
             </button>
           </div>
         </DialogContentText>
