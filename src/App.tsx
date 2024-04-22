@@ -17,6 +17,7 @@ import AddDevice from "./pages/AddDevice";
 import Account from "./pages/Account";
 import EditProfile from "./pages/EditProfile";
 import SendVerifyEmail from "./pages/SendVerifyEmail";
+import UserManagement from "./pages/UserManagement"
 function App() {
   return (
     <BrowserRouter>
@@ -36,7 +37,7 @@ function App() {
           <Route path="/edit-profile" element={<EditProfile />} />
         </Route>
         <Route path="/admin" element={<RequireAdmin />}>
-          <Route index element={<AdminDashboard />} />
+          <Route index element={<UserManagement />} />
         </Route>
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route

@@ -17,7 +17,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { MdSearchOff } from "react-icons/md";
 import moment from "moment";
 
-function DeviceList() {
+function UserManagement() {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { devices } = useAppSelector((state) => state.device);
@@ -477,4 +477,4 @@ function DeviceList() {
     );
 }
 
-export default DeviceList;
+export default UserManagement;
