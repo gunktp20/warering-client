@@ -1,112 +1,282 @@
-import { IoArrowBackSharp } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
+import userAvatar from "../../assets/images/user-avatar.png";
+import Wrapper from "../../assets/wrappers/EditProfile";
+import { useEffect, useState } from "react";
+import { FormRow, SnackBar } from "../../components";
+import { useAppSelector } from "../../app/hooks";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { AxiosError } from "axios";
+import { AccessTokenPayload } from "../../features/auth/types";
+import { jwtDecode } from "jwt-decode";
 
 const EditProfile = () => {
-  const userData = {
-    img: "https://img.freepik.com/free-psd/3d-illustration-person-with-long-hair_23-2149436197.jpg?w=740&t=st=1708260597~exp=1708261197~hmac=6e04022c7ee16156ca21397efa80e383f0a513a6abc241afc626e3c6774b120d",
-    firstName: "Kruluz Utsman",
-    lastName: "KruluzUtsman",
-    password: "KruluzUtsman21wqq",
+  const { token } = useAppSelector((state) => state.auth);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isChanged, setIsChanged] = useState<boolean>(false);
+  const [showSnackBar, setShowSnackBar] = useState<boolean>(false);
+  const [snackBarText, setSnackBarText] = useState<string>("");
+  const [snackBarType, setSnackBarType] = useState<
+    "error" | "success" | "info" | "warning"
+  >("error");
+  const [currentProfileImage, setCurrentProfileImage] = useState<string>("");
+  const [currentUserInfo, setCurrentUserInfo] = useState<{
+    firstName: string;
+    lastName: string;
+    profileUrl?: string;
+  }>({
+    firstName: "",
+    lastName: "",
+    profileUrl: "",
+  });
+  const [values, setValues] = useState<{
+    firstName: string;
+    lastName: string;
+    profileUrl?: string;
+  }>({
+    firstName: "",
+    lastName: "",
+    profileUrl: "",
+  });
+  const onProfileImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.files && event.target.files[0]) {
+      const selectedFile = event.target.files[0];
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+      try {
+        await axiosPrivate.put("/users/", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        setIsLoading(false);
+        setShowSnackBar(true);
+        setSnackBarType("success");
+        setSnackBarText("Updated your information");
+        clearAlert();
+        getUserInfo();
+        return;
+      } catch (err: unknown) {
+        if (err instanceof AxiosError) {
+          setIsChanged(false);
+          const msg =
+            typeof err?.response?.data?.message === "object"
+              ? err?.response?.data?.message[0]
+              : err?.response?.data?.message;
+          setShowSnackBar(true);
+          setSnackBarType("error");
+          setSnackBarText(msg);
+          clearAlert();
+          return setIsLoading(false);
+        }
+      }
+    }
+  };
+  const [timeoutIds, setTimeoutIds] = useState<NodeJS.Timeout[]>([]);
+  const clearAllTimeouts = () => {
+    timeoutIds.forEach((timeoutId: NodeJS.Timeout) => clearTimeout(timeoutId));
+    setTimeoutIds([]);
   };
 
-  const navigate = useNavigate()
+  const clearAlert = () => {
+    setIsLoading(true);
+    clearAllTimeouts();
+    const newTimeoutId = setTimeout(() => {
+      setShowSnackBar(false);
+    }, 3000);
+    setTimeoutIds([newTimeoutId]);
+  };
+  const axiosPrivate = useAxiosPrivate();
+  const decoded: AccessTokenPayload | undefined = token
+    ? jwtDecode(token)
+    : undefined;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValues({ ...values, [e.target.name]: e.target.value });
+  };
+
+  const getUserInfo = async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await axiosPrivate.get(`/users/${decoded?.sub}`);
+      setIsLoading(false);
+      setCurrentUserInfo({ firstName: data?.fname, lastName: data?.lname });
+      setValues({
+        firstName: data?.fname,
+        lastName: data?.lname,
+        profileUrl: data?.profileUrl,
+      });
+      if (data.profileUrl) {
+        return getProfileImage(data.profileUrl);
+      }
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        const msg =
+          typeof err?.response?.data?.msg === "object"
+            ? err?.response?.data?.msg[0]
+            : err?.response?.data?.msg;
+        console.log(msg);
+      }
+      setIsLoading(false);
+    }
+  };
+
+  const onUpdate = async () => {
+    setIsLoading(true);
+    const formData = new FormData();
+    formData.append("firstName", values?.firstName);
+    formData.append("lastName", values?.lastName);
+    try {
+      await axiosPrivate.put("/users/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setIsLoading(false);
+      setShowSnackBar(true);
+      setSnackBarType("success");
+      setSnackBarText("Updated your information");
+      clearAlert();
+      getUserInfo();
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        setIsChanged(false);
+        const msg =
+          typeof err?.response?.data?.message === "object"
+            ? err?.response?.data?.message[0]
+            : err?.response?.data?.message;
+        setShowSnackBar(true);
+        setSnackBarType("error");
+        setSnackBarText(msg);
+        clearAlert();
+        return setIsLoading(false);
+      }
+    }
+  };
+
+  const getProfileImage = async (profileUrl: string) => {
+    const fileName = profileUrl.split("/").pop();
+    try {
+      const { data } = await axiosPrivate.get("/users/profile/" + fileName);
+      console.log(data);
+
+      const buffer = await data.arrayBuffer(); // รับข้อมูลเป็น ArrayBuffer
+
+      // สร้าง Blob จาก buffer และกำหนดประเภทข้อมูลของภาพ (เช่น 'image/png')
+      const imageBlob = new Blob([buffer], { type: "image/png" });
+
+      // สร้าง URL จาก Blob
+      const imageUrl = URL.createObjectURL(imageBlob);
+
+      // เก็บ URL ใน state
+      setCurrentProfileImage(imageUrl);
+      // setCurrentProfileImage()
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    getUserInfo();
+  }, []);
+
+  useEffect(() => {
+    if (
+      currentUserInfo?.firstName !== values?.firstName ||
+      currentUserInfo?.lastName !== values?.lastName
+    ) {
+      setIsChanged(true);
+    } else {
+      setIsChanged(false);
+    }
+  }, [values]);
+
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="w-[597px] h-[614px] relative bg-white rounded-lg border">
-        <button
-          onClick={() => {
-            navigate("/");
-          }}
-          className="absolute top-[-2.5rem] flex cursor-pointer text-sm text-[#1D4469] font-bold items-center left-0 "
-        >
-          <IoArrowBackSharp className="text-sm" />
-          Back
-        </button>
-        <div className="left-[50px] top-[30px] absolute prompt-medium text-[24px]">
+    <Wrapper>
+      {showSnackBar && (
+        <div id="add-device-snackbar" className="block sm:hidden">
+          <SnackBar
+            id="add-device-snackbar"
+            severity={snackBarType}
+            showSnackBar={showSnackBar}
+            snackBarText={snackBarText}
+            setShowSnackBar={setShowSnackBar}
+          />
+        </div>
+      )}
+      <div className="bg-white py-[2rem] px-[3.1rem] h-fit w-[510px] border-[#f3f3f3] rounded-lg border-[1px] shadow-sm top-[10rem] absolute">
+        <div className="flex justify-start w-[100%] text-[22px] border-b-[1px] border-[#dfdfdf] text-[#1c1c1c] pb-5 font-semibold">
           Profile Information
         </div>
-        <div className="left-[51px] top-[95px] absolute prompt-regular text-gray-500">
-          Photo
+        <div className="text-[14px] mt-5 text-[#7a7a7a]">
+          <p>Photo</p>
         </div>
-        <img
-          className="w-[89px] h-[87px] left-[69px] top-[134px] absolute rounded-xl"
-          src={userData.img}
-          alt="User Photo"
-        />
-        <input type="file" id="fileInput" style={{ display: "none" }} />
-
-        <a
-          href="#"
-          className="left-[200px] top-[134px] absolute text-green-700 prompt-regular"
-          onClick={() => {
-
-          }}
-        >
-          Update
-        </a>
-
-        <a
-          href=""
-          className="left-[284px] top-[134px] absolute prompt-regular text-red-800"
-        >
-          Remove
-        </a>
-        <div className="w-[354px] left-[201px] top-[175px] absolute prompt-regular text-gray-500">
-          Recommended: Square JPG, PNG, or GIF, at least 1,000 pixels per side.
-        </div>
-        <div className="w-[487px] h-[68px] left-[55px] top-[275px] absolute">
-          <label htmlFor="firstName" className="left-0 top-0 absolute">
-            <span className="text-cyan-900 prompt-regular">First Name </span>
-            <span className="text-red-500 prompt-regular">*</span>
-          </label>
-        </div>
-        <div className="w-[487px] h-[68px] left-[55px] top-[315px] absolute">
-          <div className="">
-            <label id="firstName" className="text-black prompt-regular">
-              {userData.firstName}
-            </label>
-            <div className="self-stretch h-px relative box-border border-t-[1px] border-solid border-primary-gray" />
+        <div className="flex mt-4 justify-between">
+          <div className="flex ml-2 w-[80px] h-[80px] bg-[#f8f8f8] rounded-lg border-[1px] border-[#fdfdfd] shadow-sm">
+            <img
+              src={values?.profileUrl ? values?.profileUrl : userAvatar}
+              className="w-[100%x] h-[100%px] opacity-60 text-[#dbdbdb]"
+            ></img>
           </div>
-          <div className="h-6 w-0 relative inline-block ml-[-487px]" />
-        </div>
-
-        <div className="w-[487px] h-[68px] left-[55px] top-[375px] absolute">
-          <label htmlFor="lastname" className="left-0 top-0 absolute">
-            <span className="text-cyan-900 prompt-regular">Last Name </span>
-            <span className="text-red-500 prompt-regular">*</span>
-          </label>
-        </div>
-        <div className="w-[487px] h-[68px] left-[55px] top-[415px] absolute">
-          <div className="">
-            <label id="lastName" className="text-black prompt-regular">
-              {userData.lastName}
-            </label>
-            <div className="self-stretch h-px relative box-border border-t-[1px] border-solid border-primary-gray" />
-          </div>
-          <div className="h-6 w-0 relative inline-block ml-[-487px]" />
-        </div>
-        <div className="w-[487px] h-[68px] left-[55px] top-[465px] absolute">
-          <label htmlFor="password" className="left-0 top-0 absolute">
-            <span className="text-cyan-900 prompt-regular">Password </span>
-            <span className="text-red-500 prompt-regular">*</span>
-          </label>
-        </div>
-        <div className="w-[487px] h-[68px] left-[55px] top-[500px] absolute">
-          <div className="">
-            <label id="password" className="text-black prompt-regular">
-              {userData.password}
-            </label>
-            <div className="self-stretch h-px relative box-border border-t-[1px] border-solid border-primary-gray" />
+          <div className="flex flex-col">
+            <div className="flex gap-8 mb-3">
+              <label
+                htmlFor="file-upload"
+                className="text-[#2e7d32] text-sm cursor-pointer"
+              >
+                Update
+              </label>
+              <input
+                id="file-upload"
+                onChange={onProfileImageChange}
+                className="hidden"
+                type="file"
+              />
+              <button className="text-[#dc3546] text-sm cursor-pointer">
+                Remove
+              </button>
+            </div>
+            <div className="text-[#7a7a7a] text-sm w-[270px]">
+              Recommended: Square JPG, PNG, or GIF, at least 1,000 pixels per
+              side.
+            </div>
           </div>
         </div>
-        <div className="w-[141px] h-11 p-2.5 left-[261px] top-[540px] absolute rounded border border-green-700 justify-center items-center gap-2.5 inline-flex">
-          <button className="text-green-800 prompt-regular">Cancel</button>
+
+        <div className="w-[100%] mt-11">
+          <FormRow
+            type="text"
+            name="firstName"
+            labelText="First name"
+            value={values.firstName}
+            handleChange={handleChange}
+            marginTop="mt-[0.2rem]"
+          />
         </div>
-        <div className="w-[141px] h-11 p-2.5 right-[30px] top-[540px] absolute bg-green-700 rounded justify-center items-center gap-2.5 inline-flex">
-          <button className="text-white prompt-regular">Save</button>
+        <div className="w-[100%]">
+          <FormRow
+            type="text"
+            name="lastName"
+            labelText="Last name"
+            value={values.lastName}
+            handleChange={handleChange}
+            marginTop="mt-[0.2rem] mb-0"
+          />
+        </div>
+        <div className="w-[100%] flex text-primary-300 mt-4 text-[12px] cursor-pointer hover:text-primary-400 transition-all">
+          <div>Change Password</div>
+        </div>
+        <div className="flex mt-5">
+          <button
+            onClick={onUpdate}
+            disabled={!isChanged || !values?.firstName || !values?.lastName}
+            className="flex justify-center items-center transition-all bg-primary-500 disabled:bg-primary-100 text-white rounded-md w-[220px] h-[36px]"
+          >
+            {isLoading ? (
+              <div className="loader w-[20px] h-[20px]"></div>
+            ) : (
+              "Save"
+            )}
+          </button>
         </div>
       </div>
-    </div>
+    </Wrapper>
   );
 };
 

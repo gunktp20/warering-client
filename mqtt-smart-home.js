@@ -6,8 +6,8 @@ const url = "ws://localhost:8083/mqtt";
 const options = {
   connectTimeout: 4000,
   clientId: "TestMQTT1",
-  username: "Smart-home-1",
-  password: "1234",
+  username: "TestMQTT1",
+  password: "TestMQTT1",
   protocol: "ws",
   clean: true,
   reconnectPeriod: 5000,
@@ -27,7 +27,7 @@ client.on("connect", function () {
      brightness_val = map(brightness_val, 0, 10000, 500, 1200).toFixed(0);
 
     client.publish(
-      "65f82cdd1cc452b51386c307/home-1/publish",
+      "65e2e2e1946718f317756f47/TestMQTT1/publish",
       JSON.stringify({
         tem_val,
         speed_val,
@@ -38,11 +38,11 @@ client.on("connect", function () {
         retain: true,
       }
     );
-  }, 2500);
+  }, 500);
 
   setInterval(() => {
     client.subscribe(
-      "65f82cdd1cc452b51386c307/home-1/subscribe",
+      "65e2e2e1946718f317756f47/TestMQTT1/subscribe",
       {
         qos: 0,
         retain: true,
@@ -58,23 +58,34 @@ client.on("connect", function () {
   }, 1000);
 });
 
+const test = {
+  led : 0
+}
+
 // Receive messages
 client.on("message", function (topic, message) {
   const payload = JSON.parse(message.toString());
+  console.log(payload)
   if (payload.led === 1) {
     console.log("ไฟกลางห้องถูกเปิด ✔️");
+    
   }
   if (payload.led === 0) {
     console.log("ไฟกลางห้องถูกปิด ❌");
+    
   }
   if (payload["brightness-bedroom"] > 0) {
     console.log("ความสว่างไฟหัวเตียง ", payload["brightness-bedroom"], "%");
+    
   }
   if (payload["brightness-bedroom"] < 1) {
     console.log("ความสว่างในห้อง 0 %");
+    
   }
   console.log("--------------------------------");
 });
+
+
 
 client.on("disconnect", function (topic, message) {
   console.log("อุปกรณ์ Disconnect");
@@ -83,6 +94,7 @@ client.on("disconnect", function (topic, message) {
 client.on("reconnect", function (topic, message) {
   console.log("อุปกรณ์ reconnect");
 });
+
 const map = (x, in_min, in_max, out_min, out_max) => {
   return ((x - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min;
 };

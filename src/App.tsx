@@ -17,7 +17,7 @@ import AddDevice from "./pages/AddDevice";
 import Account from "./pages/Account";
 import EditProfile from "./pages/EditProfile";
 import SendVerifyEmail from "./pages/SendVerifyEmail";
-import UserManagement from "./pages/UserManagement"
+import UserManagement from "./pages/UserManagement";
 function App() {
   return (
     <BrowserRouter>
@@ -43,6 +43,12 @@ function App() {
         <Route
           path="/request-verify-email/:token"
           element={<SendVerifyEmail />}
+        />
+        <Route
+          path="/test"
+          element={<div className="bg-blue-50 w-[100%] h-[100vh] relative flex justify-center items-center">
+            <div className="bg-red-500 w-[200px] h-[200px] absolute left-[30%] top-[50%]"></div>
+          </div>}
         />
         <Route path="*" element={<NotFound />} />
       </Routes>
