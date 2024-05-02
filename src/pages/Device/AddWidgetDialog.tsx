@@ -15,10 +15,30 @@ import {
 import { Button } from "@mui/material";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Alert } from "@mui/material";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import LineChartPreview from "../../components/widgets_preview/LineChart";
+
+interface IWidget {
+  id: string;
+  type?: string;
+  label?: string;
+  configWidget: IConfigWidget;
+}
+
+interface IConfigWidget {
+  value?: string;
+  min?: number;
+  max?: number;
+  unit?: string;
+  button_label?: string;
+  payload?: string;
+  on_payload?: string | undefined;
+  off_payload?: string | undefined;
+}
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
-    children: React.ReactElement<any, any>;
+    children: React.ReactElement;
   },
   ref: React.Ref<unknown>
 ) {
@@ -26,14 +46,24 @@ const Transition = React.forwardRef(function Transition(
 });
 
 interface IProps {
-  device_id:string | undefined
+  device_id: string | undefined;
   isAddWidgetShow: boolean;
   setIsAddWidgetShow: (active: boolean) => void;
   nameDevice: string;
   fetchAllWidgets: () => void;
 }
 
-const initialState = {
+const initialState: {
+  label: string;
+  value: string;
+  min: 0;
+  max: 100;
+  unit: string;
+  payload: '{ "key":value , "key":value }';
+  button_label: string;
+  on_payload: string | number;
+  off_payload: string | number;
+} = {
   label: "",
   value: "",
   min: 0,
@@ -48,7 +78,6 @@ const initialState = {
 export default function AddWidgetDialog(props: IProps) {
   const [occupation, setOccupation] = useState<string>("");
   const axiosPrivate = useAxiosPrivate();
-  const [timeoutIds, setTimeoutIds] = useState<any>([]);
   const [showSnackBar, setShowSnackBar] = useState<boolean>(false);
   const [snackBarText, setSnackBarText] = useState<string>("");
   const [snackBarType, setSnackBarType] = useState<
@@ -60,16 +89,18 @@ export default function AddWidgetDialog(props: IProps) {
     setValues(initialState);
     props.setIsAddWidgetShow(false);
   };
-  const [values, setValues] = useState<any>(initialState);
+  const [values, setValues] = useState<typeof initialState>(initialState);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
+  const [timeoutIds, setTimeoutIds] = useState<NodeJS.Timeout[]>([]);
   const clearAllTimeouts = () => {
-    timeoutIds.forEach((timeoutId: any) => clearTimeout(timeoutId));
+    timeoutIds.forEach((timeoutId: NodeJS.Timeout) => clearTimeout(timeoutId));
     setTimeoutIds([]);
   };
   const clearAlert = () => {
+    setIsLoading(true);
     clearAllTimeouts();
     const newTimeoutId = setTimeout(() => {
       setShowSnackBar(false);
@@ -79,15 +110,18 @@ export default function AddWidgetDialog(props: IProps) {
   const onSubmit = () => {
     const { label, value, min, max, unit, payload, on_payload, off_payload } =
       values;
-    const widgetInfo: any = {};
-    if (occupation === "Gauge" && (!label || !value || min === null || !max || !unit)) {
+    const widgetInfo: IWidget = {};
+    if (
+      occupation === "Gauge" &&
+      (!label || !value || min === null || !max || !unit)
+    ) {
       setShowSnackBar(true);
       setSnackBarType("error");
       setSnackBarText("Please provide all value!");
       clearAlert();
       return;
     }
-    if(occupation === "Gauge" && min > max){
+    if (occupation === "Gauge" && min > max) {
       setShowSnackBar(true);
       setSnackBarType("error");
       setSnackBarText("min value must be < max value");
@@ -121,7 +155,7 @@ export default function AddWidgetDialog(props: IProps) {
       clearAlert();
       return;
     }
-    if(occupation === "RangeSlider" && min > max){
+    if (occupation === "RangeSlider" && min > max) {
       setShowSnackBar(true);
       setSnackBarType("error");
       setSnackBarText("min value must be < max value");
@@ -162,7 +196,7 @@ export default function AddWidgetDialog(props: IProps) {
           };
           createWidget(widgetInfo);
           return;
-        } catch (err: any) {
+        } catch (err: unknown) {
           setShowSnackBar(true);
           setSnackBarType("error");
           setSnackBarText("Payload must be JSON format");
@@ -184,7 +218,7 @@ export default function AddWidgetDialog(props: IProps) {
           };
           createWidget(widgetInfo);
           return;
-        } catch (err: any) {
+        } catch (err: unknown) {
           setShowSnackBar(true);
           setSnackBarType("error");
           setSnackBarText("Payload must be JSON format");
@@ -202,7 +236,7 @@ export default function AddWidgetDialog(props: IProps) {
           };
           createWidget(widgetInfo);
           return;
-        } catch (err: any) {
+        } catch (err: unknown) {
           setShowSnackBar(true);
           setSnackBarType("error");
           setSnackBarText("Payload must be JSON format");
@@ -211,7 +245,7 @@ export default function AddWidgetDialog(props: IProps) {
         }
     }
   };
-  const createWidget = async (widgetInfo: any) => {
+  const createWidget = async (widgetInfo: IWidget) => {
     setIsLoading(true);
     try {
       await axiosPrivate.post(`/widgets/${props.device_id}`, widgetInfo);
@@ -223,11 +257,8 @@ export default function AddWidgetDialog(props: IProps) {
       props.setIsAddWidgetShow(false);
       props.fetchAllWidgets();
       setValues(initialState);
-    } catch (err: any) {
-      const msg =
-        typeof err?.response?.data?.message === "object"
-          ? err?.response?.data?.message[0]
-          : err?.response?.data?.message;
+    } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err);
       setShowSnackBar(true);
       setSnackBarType("error");
       setSnackBarText(msg);
@@ -290,6 +321,7 @@ export default function AddWidgetDialog(props: IProps) {
                 <option value="ButtonControl">Button Control</option>
                 <option value="ToggleSwitch">Toggle Switch</option>
                 <option value="RangeSlider">Range Slider</option>
+                <option value="LineChart">Line Chart</option>
               </select>
             </div>
             {occupation && (
@@ -325,6 +357,7 @@ export default function AddWidgetDialog(props: IProps) {
                 {(occupation === "Gauge" ||
                   occupation === "MessageBox" ||
                   occupation === "ToggleSwitch" ||
+                  occupation === "LineChart" ||
                   occupation === "RangeSlider") && (
                   <div className="w-[350px] sm:w-[100%] relative">
                     <FormRow
@@ -342,7 +375,9 @@ export default function AddWidgetDialog(props: IProps) {
 
             {occupation && (
               <div className="flex gap-10 mt-3 sm:flex-col sm:gap-0">
-                {(occupation === "Gauge" || occupation === "RangeSlider") && (
+                {(occupation === "Gauge" ||
+                  occupation === "RangeSlider" ||
+                  occupation === "LineChart") && (
                   <div className="w-[350px] sm:w-[100%]">
                     <FormRow
                       type="number"
@@ -354,7 +389,9 @@ export default function AddWidgetDialog(props: IProps) {
                     />
                   </div>
                 )}
-                {(occupation === "Gauge" || occupation === "RangeSlider") && (
+                {(occupation === "Gauge" ||
+                  occupation === "RangeSlider" ||
+                  occupation === "LineChart") && (
                   <div className="w-[350px] sm:w-[100%]">
                     <FormRow
                       type="number"
@@ -462,9 +499,19 @@ export default function AddWidgetDialog(props: IProps) {
                 <ToggleSwitchPreview label={values.label} />
               </div>
             )}
+
             {occupation === "RangeSlider" && (
               <div className="flex gap-10 mt-5 sm:flex-col sm:gap-0 w-[100%]">
                 <RangeSliderPreview label={values.label} />
+              </div>
+            )}
+            {occupation === "LineChart" && (
+              <div className="flex gap-10 mt-5 sm:flex-col sm:gap-0 w-[100%]">
+                 <LineChartPreview
+                    label={values.label}
+                    min={values.min}
+                    max={values.max}
+                  />
               </div>
             )}
 

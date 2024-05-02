@@ -34,7 +34,7 @@ function DeviceList() {
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
   // const [limitQuery, setLimitQuery] = useState<number>(5);
-  const limitQuery: number = 5
+  const limitQuery: number = 5;
   const [numOfPage, setNumOfPage] = useState<number>(1);
   const [pageCount, setPageCount] = useState<number>(0);
   const [selectedDevice, setSelectedDevice] = useState<any>();
@@ -80,13 +80,20 @@ function DeviceList() {
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(
-        `/devices?limit=${limitQuery}&page=${numOfPage}&query=${values.search_device}&createdAt=${sortCreatedAt}${filterByPermission && "&permission=" + filterByPermission}${filterByisSaveData && "&isSaveData=" + filterByisSaveData}`
+        `/devices?limit=${limitQuery}&page=${numOfPage}&query=${
+          values.search_device
+        }&createdAt=${sortCreatedAt}${
+          filterByPermission && "&permission=" + filterByPermission
+        }${filterByisSaveData && "&isSaveData=" + filterByisSaveData}`
       );
       dispatch(setDevices(data.data));
-      setIsLoading(false);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 5000);
       setPageCount(data.metadata.pageCount);
-      if(data.metadata.pageCount === 1 && numOfPage !== 1){
-          setNumOfPage(1)
+  
+      if (data.metadata.pageCount === 1 && numOfPage !== 1) {
+        setNumOfPage(1);
       }
     } catch (err: any) {
       setIsLoading(false);
@@ -96,12 +103,9 @@ function DeviceList() {
   const setDevicePermission = async (deviceId: string, permission: string) => {
     setIsLoading(true);
     try {
-      await axiosPrivate.put(
-        `/devices/permission/${deviceId}`,
-        {
-          permission: permission,
-        }
-      );
+      await axiosPrivate.put(`/devices/permission/${deviceId}`, {
+        permission: permission,
+      });
       fetchAllDevice();
       setIsLoading(false);
     } catch (err: any) {
@@ -124,10 +128,11 @@ function DeviceList() {
           setNumOfPage(i);
         }}
         key={i}
-        className={`${numOfPage === i
-          ? "bg-[#1966fb] text-white"
-          : "bg-white text-[#7a7a7a]"
-          } cursor-pointer  border-[#cccccc] border-[1px] text-[13.5px] rounded-md w-[30px] h-[30px] flex items-center justify-center`}
+        className={`${
+          numOfPage === i
+            ? "bg-[#1966fb] text-white"
+            : "bg-white text-[#7a7a7a]"
+        } cursor-pointer  border-[#cccccc] border-[1px] text-[13.5px] rounded-md w-[30px] h-[30px] flex items-center justify-center`}
       >
         {i}
       </button>
@@ -193,7 +198,10 @@ function DeviceList() {
           </button>
 
           <div className="flex w-[100%] justify-between">
-            <div id="title-outlet" className="text-[23px] text-[#1d4469] font-bold mb-10">
+            <div
+              id="title-outlet"
+              className="text-[23px] text-[#1d4469] font-bold mb-10"
+            >
               Device List
             </div>
 
@@ -231,7 +239,7 @@ function DeviceList() {
               <div className="w-[330px] sm:w-[100%] relative items-center flex ">
                 <FormRow
                   type="text"
-                  name=""
+                  name="search_device"
                   labelText="search device"
                   value={values.search_device}
                   handleChange={handleChange}
@@ -285,26 +293,29 @@ function DeviceList() {
               </div>
             </div>
 
-            {(devices.length === 0 && !isLoading) && (
+            {devices.length === 0 && !isLoading && (
               <div className="text-[80px] flex justify-center w-[100%] my-5 text-[#c0c0c0]">
                 {" "}
                 <MdSearchOff />
               </div>
             )}
-            {(devices.length === 0 && !isLoading) && (
+            {devices.length === 0 && !isLoading && (
               <div className="text-md text-center w-[100%] my-5 text-[#c0c0c0]">
                 {" "}
                 Not found any device
               </div>
             )}
 
-            {isLoading && <div className="w-[100%] flex justify-center h-[165px] items-center">
-                <div className="loader"></div>
-              </div>}
+            {isLoading && devices.length <= 0 && (
+              <div className="w-[100%] flex justify-center  h-[165px] items-center">
+                <div className="loader w-[50px] h-[50px] border-blue-200 border-b-transparent"></div>
+              </div>
+            )}
 
             <div
-              className={`overflow-auto rounded-lg shadow block sm:shadow-none ${devices.length === 0 && "hidden"
-                }`}
+              className={`overflow-auto rounded-lg shadow block sm:shadow-none ${
+                devices.length === 0 && "hidden"
+              }`}
             >
               <table className="w-full">
                 <thead className="border-b-2 border-gray-200 sm:hidden">
@@ -336,10 +347,11 @@ function DeviceList() {
                           className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10"
                         >
                           <td
-                            className={`cursor-pointer flex sm:hidden items-center justify-center capitalize p-3 text-[13px] select-none ${i.permission === "allow"
-                              ? "text-green-500"
-                              : "text-red-500"
-                              } whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}
+                            className={`cursor-pointer flex sm:hidden items-center justify-center capitalize p-3 text-[13px] select-none ${
+                              i.permission === "allow"
+                                ? "text-green-500"
+                                : "text-red-500"
+                            } whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}
                             onClick={() => {
                               onTogglePermission(
                                 i.id,
@@ -349,10 +361,11 @@ function DeviceList() {
                             id="toggle-activity-desktop"
                           >
                             <button
-                              className={`w-[8px] h-[8px] ${i.permission === "allow"
-                                ? "bg-green-500"
-                                : "bg-red-500"
-                                } rounded-full mr-2`}
+                              className={`w-[8px] h-[8px] ${
+                                i.permission === "allow"
+                                  ? "bg-green-500"
+                                  : "bg-red-500"
+                              } rounded-full mr-2`}
                             ></button>
                             {i.permission}
                           </td>
@@ -367,10 +380,11 @@ function DeviceList() {
                           </td>
 
                           <td
-                            className={`hidden items-center sm:flex capitalize p-3 text-[13px] ${i.permission === "allow"
-                              ? "text-green-500"
-                              : "text-red-500"
-                              } whitespace-nowrap text-center sm:text-start`}
+                            className={`hidden items-center sm:flex capitalize p-3 text-[13px] ${
+                              i.permission === "allow"
+                                ? "text-green-500"
+                                : "text-red-500"
+                            } whitespace-nowrap text-center sm:text-start`}
                             onClick={() => {
                               onTogglePermission(
                                 i.id,
@@ -380,10 +394,11 @@ function DeviceList() {
                             id="toggle-activity-mobile"
                           >
                             <div
-                              className={`w-[8px] h-[8px] ${i.permission === "allow"
-                                ? "bg-green-500"
-                                : "bg-red-500"
-                                } rounded-full mr-2`}
+                              className={`w-[8px] h-[8px] ${
+                                i.permission === "allow"
+                                  ? "bg-green-500"
+                                  : "bg-red-500"
+                              } rounded-full mr-2`}
                             ></div>
                             {i.permission}
                           </td>
@@ -444,6 +459,7 @@ function DeviceList() {
                 </tbody>
               </table>
             </div>
+            
             {pageCount > 1 && (
               <div className="flex justify-end items-center w-[100%] mt-4 sm:flex-col">
                 <div className="mr-3 sm:mb-3 text-[12.4px]">1-5 of items</div>

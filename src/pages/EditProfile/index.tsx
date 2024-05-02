@@ -7,6 +7,7 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { AxiosError } from "axios";
 import { AccessTokenPayload } from "../../features/auth/types";
 import { jwtDecode } from "jwt-decode";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 
 const EditProfile = () => {
   const { token } = useAppSelector((state) => state.auth);
@@ -55,18 +56,13 @@ const EditProfile = () => {
         getUserInfo();
         return;
       } catch (err: unknown) {
-        if (err instanceof AxiosError) {
-          setIsChanged(false);
-          const msg =
-            typeof err?.response?.data?.message === "object"
-              ? err?.response?.data?.message[0]
-              : err?.response?.data?.message;
-          setShowSnackBar(true);
-          setSnackBarType("error");
-          setSnackBarText(msg);
-          clearAlert();
-          return setIsLoading(false);
-        }
+        const msg = await getAxiosErrorMessage(err);
+        setIsChanged(false);
+        setShowSnackBar(true);
+        setSnackBarType("error");
+        setSnackBarText(msg);
+        clearAlert();
+        return setIsLoading(false);
       }
     }
   };
@@ -75,6 +71,7 @@ const EditProfile = () => {
     timeoutIds.forEach((timeoutId: NodeJS.Timeout) => clearTimeout(timeoutId));
     setTimeoutIds([]);
   };
+  const [profileImage, setProfileImg] = useState<string>("");
 
   const clearAlert = () => {
     setIsLoading(true);
@@ -98,24 +95,50 @@ const EditProfile = () => {
     try {
       const { data } = await axiosPrivate.get(`/users/${decoded?.sub}`);
       setIsLoading(false);
-      setCurrentUserInfo({ firstName: data?.fname, lastName: data?.lname });
+      setCurrentUserInfo({
+        firstName: data?.fname,
+        lastName: data?.lname,
+        profileUrl: data?.profileUrl,
+      });
+      setProfileImg(data?.profileUrl);
       setValues({
         firstName: data?.fname,
         lastName: data?.lname,
         profileUrl: data?.profileUrl,
       });
-      if (data.profileUrl) {
-        return getProfileImage(data.profileUrl);
-      }
+      // if (data.profileUrl) {
+      //   return getProfileImage(data.profileUrl);
+      // }
     } catch (err: unknown) {
-      if (err instanceof AxiosError) {
-        const msg =
-          typeof err?.response?.data?.msg === "object"
-            ? err?.response?.data?.msg[0]
-            : err?.response?.data?.msg;
-        console.log(msg);
-      }
+      const msg = await getAxiosErrorMessage(err);
+      console.log(msg);
       setIsLoading(false);
+    }
+  };
+
+  const removeProfileImg = async () => {
+    setIsLoading(true);
+    const formData = new FormData();
+    formData.append("profileUrl", values?.lastName);
+    try {
+      await axiosPrivate.put("/users/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setIsLoading(false);
+      setShowSnackBar(true);
+      setSnackBarType("success");
+      setSnackBarText("Deleted your image profile");
+      clearAlert();
+      getUserInfo();
+    } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err);
+      setIsChanged(false);
+      console.log(msg);
+      setShowSnackBar(true);
+      setSnackBarType("error");
+      setSnackBarText(msg);
+      clearAlert();
+      return setIsLoading(false);
     }
   };
 
@@ -135,42 +158,26 @@ const EditProfile = () => {
       clearAlert();
       getUserInfo();
     } catch (err: unknown) {
-      if (err instanceof AxiosError) {
-        setIsChanged(false);
-        const msg =
-          typeof err?.response?.data?.message === "object"
-            ? err?.response?.data?.message[0]
-            : err?.response?.data?.message;
-        setShowSnackBar(true);
-        setSnackBarType("error");
-        setSnackBarText(msg);
-        clearAlert();
-        return setIsLoading(false);
-      }
+      const msg = await getAxiosErrorMessage(err);
+      setIsChanged(false);
+      console.log(msg);
+      setShowSnackBar(true);
+      setSnackBarType("error");
+      setSnackBarText(msg);
+      clearAlert();
+      return setIsLoading(false);
     }
   };
 
-  const getProfileImage = async (profileUrl: string) => {
-    const fileName = profileUrl.split("/").pop();
-    try {
-      const { data } = await axiosPrivate.get("/users/profile/" + fileName);
-      console.log(data);
-
-      const buffer = await data.arrayBuffer(); // รับข้อมูลเป็น ArrayBuffer
-
-      // สร้าง Blob จาก buffer และกำหนดประเภทข้อมูลของภาพ (เช่น 'image/png')
-      const imageBlob = new Blob([buffer], { type: "image/png" });
-
-      // สร้าง URL จาก Blob
-      const imageUrl = URL.createObjectURL(imageBlob);
-
-      // เก็บ URL ใน state
-      setCurrentProfileImage(imageUrl);
-      // setCurrentProfileImage()
-    } catch (err) {
-      console.log(err);
-    }
-  };
+  // const getProfileImage = async (profileUrl: string) => {
+  //   const fileName = profileUrl.split("/").pop();
+  //   try {
+  //     const { data } = await axiosPrivate.get("/users/profile/" + fileName);
+  //     console.log(data);
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // };
 
   useEffect(() => {
     getUserInfo();
@@ -208,10 +215,12 @@ const EditProfile = () => {
           <p>Photo</p>
         </div>
         <div className="flex mt-4 justify-between">
-          <div className="flex ml-2 w-[80px] h-[80px] bg-[#f8f8f8] rounded-lg border-[1px] border-[#fdfdfd] shadow-sm">
+          <div className="flex ml-2 w-[80px] justify-center items-center  bg-[#f8f8f8] rounded-lg border-[1px] border-[#fdfdfd] shadow-sm">
             <img
-              src={values?.profileUrl ? values?.profileUrl : userAvatar}
-              className="w-[100%x] h-[100%px] opacity-60 text-[#dbdbdb]"
+              src={profileImage ? profileImage : userAvatar}
+              className={`w-[80px] h-[80px] text-[#dbdbdb] ${
+                profileImage ? "opacity-100 object-cover object-top" : "opacity-60"
+              }`}
             ></img>
           </div>
           <div className="flex flex-col">
@@ -228,7 +237,10 @@ const EditProfile = () => {
                 className="hidden"
                 type="file"
               />
-              <button className="text-[#dc3546] text-sm cursor-pointer">
+              <button
+                onClick={removeProfileImg}
+                className="text-[#dc3546] text-sm cursor-pointer"
+              >
                 Remove
               </button>
             </div>

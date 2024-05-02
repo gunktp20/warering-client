@@ -4,7 +4,7 @@ import { TbEye, TbEyeOff } from "react-icons/tb";
 interface IFormRow {
   type: string;
   name: string;
-  value?: string;
+  value?: string | number;
   handleChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   labelText?: string;
   width?: string;

@@ -10,6 +10,8 @@ import {
   AddUserFunc,
   AccessTokenPayload,
 } from "./types";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import { AxiosError } from "axios";
 
 const user = localStorage.getItem("user");
 const token = localStorage.getItem("token");
@@ -39,10 +41,7 @@ export const register = createAsyncThunk(
       const response = await api.post("/auth/register", userInfo);
       return response.data;
     } catch (err: any) {
-      const msg =
-        typeof err?.response?.data?.message === "object"
-          ? err?.response?.data?.message[0]
-          : err?.response?.data?.message;
+      const msg = await getAxiosErrorMessage(err);
       return thunkApi.rejectWithValue(msg);
     }
   }
@@ -61,10 +60,7 @@ export const login = createAsyncThunk(
         },
       };
     } catch (err: any) {
-      const msg =
-        typeof err?.response?.data?.message === "object"
-          ? err?.response?.data?.message[0]
-          : err?.response?.data?.message;
+      const msg = await getAxiosErrorMessage(err);
       return thunkApi.rejectWithValue(msg);
     }
   }
@@ -77,10 +73,7 @@ export const forgetPassword = createAsyncThunk(
       const response = await api.get(`/auth/forget-password/${email}`);
       return response.data;
     } catch (err: any) {
-      const msg =
-        typeof err?.response?.data?.msg === "object"
-          ? err?.response?.data?.msg[0]
-          : err?.response?.data?.msg;
+      const msg = await getAxiosErrorMessage(err);
       return thunkApi.rejectWithValue(msg);
     }
   }
@@ -96,10 +89,7 @@ export const resetPassword = createAsyncThunk(
       });
       return response.data;
     } catch (err: any) {
-      const msg =
-        typeof err?.response?.data?.message === "object"
-          ? err?.response?.data?.message[0]
-          : err?.response?.data?.message;
+      const msg = await getAxiosErrorMessage(err);
       return thunkApi.rejectWithValue(msg);
     }
   }
@@ -112,10 +102,7 @@ export const refreshToken = createAsyncThunk(
       const response = await api.get(`/auth/refresh`);
       return response.data;
     } catch (err: any) {
-      const msg =
-        typeof err?.response?.data?.message === "object"
-          ? err?.response?.data?.message[0]
-          : err?.response?.data?.message;
+      const msg = await getAxiosErrorMessage(err);
       return thunkApi.rejectWithValue(msg);
     }
   }
@@ -130,10 +117,7 @@ export const requestVerifyEmail = createAsyncThunk(
         ...data,
       };
     } catch (err: any) {
-      const msg =
-        typeof err?.response?.data?.message === "object"
-          ? err?.response?.data?.message[0]
-          : err?.response?.data?.message;
+      const msg = await getAxiosErrorMessage(err);
       return thunkApi.rejectWithValue(msg);
     }
   }
@@ -276,9 +260,9 @@ const AuthSlice = createSlice({
         state.alertText = action.payload as string;
         state.alertType = "error";
       });
-      builder.addCase(requestVerifyEmail.pending, (state) => {
-        state.isLoading = true;
-      }),
+    builder.addCase(requestVerifyEmail.pending, (state) => {
+      state.isLoading = true;
+    }),
       builder.addCase(requestVerifyEmail.fulfilled, (state, action) => {
         state.isLoading = false;
         state.showAlert = true;

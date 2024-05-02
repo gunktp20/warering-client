@@ -18,8 +18,8 @@ const NavLinkSidebar = (props:IProp) => {
           key={1}
           onClick={() => {}}
           className={({ isActive }) =>
-            `flex pl-10 p-5 items-center text-[14px] ${
-              isActive ? "text-[#1966fb] font-semibold" : "text-[#1d4469]"
+            `flex pl-10 p-5 items-center text-[14px] font-semibold ${
+              isActive ? "text-[#1966fb]" : "text-[#1d4469]"
             }`
           }
         >

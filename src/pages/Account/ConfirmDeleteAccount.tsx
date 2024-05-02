@@ -3,7 +3,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { useAppDispatch } from "../../app/hooks";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { logout } from "../../features/auth/authSlice";
 
@@ -25,7 +25,6 @@ export default function ConfirmDeleteAccount(props: IProps) {
   const axiosPrivate = useAxiosPrivate();
   const dispatch = useAppDispatch()
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
-  const { token } = useAppSelector((state) => state.auth)
   const handleClose = () => {
     props.setIsDeleteConfirmOpen(false);
   };
@@ -33,8 +32,7 @@ export default function ConfirmDeleteAccount(props: IProps) {
   const deleteUser = async () => {
     setIsLoading(true)
     try {
-      const { data } = await axiosPrivate.delete("/users")
-      console.log(data)
+      await axiosPrivate.delete("/users")
       setIsLoading(false)
       return signOut()
     } catch (err) {

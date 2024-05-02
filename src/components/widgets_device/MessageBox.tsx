@@ -9,16 +9,18 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 interface IProp {
   label: string;
   value: string;
-  unit: string;
+  unit?: string;
   widgetId: string;
   fetchAllWidgets: () => void
-  selectWidget: (widget_id: any) => void
+  selectWidget: (widget_id: string) => void
 }
 function MessageBox({ label, value, unit, widgetId, fetchAllWidgets, selectWidget }: IProp) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   function checkThaiLanguage(text: string) {
     // ใช้ Regular Expression เพื่อตรวจสอบว่า text มีตัวอักษรภาษาไทยหรือไม่
-    var thaiRegex = new RegExp(/[\u0E00-\u0E7F]+/);
+    
+    // eslint-disable-next-line prefer-const
+    let thaiRegex = new RegExp(/[\u0E00-\u0E7F]+/);
     return thaiRegex.test(text);
   }
 
@@ -77,7 +79,7 @@ function MessageBox({ label, value, unit, widgetId, fetchAllWidgets, selectWidge
 }
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
-    children: React.ReactElement<any, any>;
+    children: React.ReactElement;
   },
   ref: React.Ref<unknown>
 ) {

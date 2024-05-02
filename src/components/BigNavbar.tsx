@@ -1,7 +1,12 @@
 import { RiMenu2Fill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../app/hooks";
-import userAvatar from "../assets/images/user-avatar.png"
+import userAvatar from "../assets/images/user-avatar.png";
+import { useEffect, useState } from "react";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import { jwtDecode } from "jwt-decode";
+import { AccessTokenPayload } from "../features/auth/types";
+import getAxiosErrorMessage from "../utils/getAxiosErrorMessage";
 
 interface IProps {
   setIsAccountUserDrawerOpen: (active: boolean) => void;
@@ -12,7 +17,31 @@ interface IProps {
 
 function BigNavbar(props: IProps) {
   const navigate = useNavigate();
-  const { user } = useAppSelector((state) => state.auth);
+  const { user, token } = useAppSelector((state) => state.auth);
+  const [profileImage, setProfileImg] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const axiosPrivate = useAxiosPrivate();
+  const decoded: AccessTokenPayload | undefined = token
+    ? jwtDecode(token)
+    : undefined;
+
+  const getUserInfo = async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await axiosPrivate.get(`/users/${decoded?.sub}`);
+      setIsLoading(false);
+      setProfileImg(data?.profileUrl);
+    } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err);
+      console.log(msg);
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getUserInfo();
+  }, []);
+
   return (
     <div className="bg-[#fff] w-[100%] p-3 flex justify-between shadow-sm items-center">
       <div className="flex item-center transition-all">
@@ -37,15 +66,17 @@ function BigNavbar(props: IProps) {
         </button>
       </div>
       <div className=" flex items-center pr-[3rem] sm:pr-2">
-        <div className="text-[13.5px] sm:hidden text-[#1d4469]">
+        <div className="text-[13.5px] sm:hidden text-[#1d4469] font-semibold">
           {user?.username}
         </div>
         <img
-          src={userAvatar}
+          src={profileImage ? profileImage : userAvatar}
           onClick={() => {
             props.setIsAccountUserDrawerOpen(!props.isAccountUserDrawerOpen);
           }}
-          className="ml-5 w-[42px] opacity-60 h-[42px] text-[#dbdbdb]"
+          className={`ml-4 w-[42px] h-[42px]text-[#dbdbdb] ${
+            profileImage ? "opacity-100 object-cover object-top" : "opacity-60"
+          }`}
         ></img>
         {/* <img
           id="account-user-drawer-toggle"

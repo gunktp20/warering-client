@@ -13,7 +13,7 @@ import { SiMicrosoftexcel } from "react-icons/si";
 import { BsFiletypeJson } from "react-icons/bs";
 // import { FaClipboardList } from "react-icons/fa";
 import Wrapper from "../../assets/wrappers/Device";
-import mqtt, { MqttClient } from "mqtt";
+import { MqttClient } from "mqtt";
 import { LuEye } from "react-icons/lu";
 import { LuEyeOff } from "react-icons/lu";
 import {
@@ -32,16 +32,46 @@ import moment from "moment";
 import TopicsDialog from "./TopicsDialog";
 import AddWidgetDialog from "./AddWidgetDialog";
 import EditWidgetDialog from "./EditWidgetDialog";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+// Line Chart Module
+import {
+  Chart as ChartJS,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+} from "chart.js";
+import { Line } from "react-chartjs-2";
+import ConnectMQTT from "../../services/mqtt";
+ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
 interface IDevice {
   nameDevice: string;
-  qos: 0 | 1 | 2 | any;
-  topics: any[];
+  qos: 0 | 1 | 2;
+  topics: string[];
   description: string;
   createdAt: string;
   usernameDevice: string;
   password: string;
   retain: boolean;
+}
+
+interface IWidget {
+  id: string;
+  type: string;
+  label: string;
+  configWidget: IConfigWidget;
+}
+
+interface IConfigWidget {
+  value: string;
+  min: number;
+  max: number;
+  unit: string;
+  button_label: string;
+  payload: string;
+  on_payload: string;
+  off_payload: string;
 }
 
 function Device() {
@@ -52,7 +82,12 @@ function Device() {
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  let { device_id } = useParams();
+  const { device_id } = useParams();
+  // device information for connect mqtt server
+  const [publishTopic, setPublishTopic] = useState<string>("");
+  const [subScribeTopic, setSubScribeTopic] = useState<string>("");
+  const [qos, setQos] = useState<0 | 1 | 2>(0);
+  //
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
   const [deviceInfo, setDeviceInfo] = useState<IDevice>();
   const [client, setClient] = useState<MqttClient | null>(null);
@@ -61,18 +96,25 @@ function Device() {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
   const [isTopicsShow, setIsTopicsShow] = useState<boolean>(false);
   const [isAddWidgetShow, setIsAddWidgetShow] = useState<boolean>(false);
-  const [selectedWidget, setSelectedWidget] = useState<any>(null);
-  const [widgets, setWidgets] = useState<any>(null);
-  const [configWidgetsDevice, setConfigWidgetsDevice] = useState<any>(null);
+  const [selectedWidget, setSelectedWidget] = useState<string>("");
+  const [widgets, setWidgets] = useState<IWidget[]>([]);
+
+  const [configWidgetsDevice, setConfigWidgetsDevice] =
+    useState<IConfigWidget>();
 
   const fetchDeviceById = async () => {
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(`/devices/${device_id}`);
       setDeviceInfo(data);
+      setPublishTopic(data?.topics[1]);
+      setSubScribeTopic(data?.topics[0]);
+      setQos(data?.qos);
       connectEMQX(data);
       setIsLoading(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err);
+      console.log(msg);
       setIsLoading(false);
     }
   };
@@ -82,18 +124,21 @@ function Device() {
       const { data } = await axiosPrivate.get(`/widgets/${device_id}`);
       setWidgets(data);
       setIsLoading(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err);
+      console.log(msg);
       setIsLoading(false);
     }
   };
-  const mqttPublish = (payload: any) => {
+
+  const mqttPublish = (payload: string) => {
     if (client) {
       client.publish(
-        deviceInfo?.topics[1],
+        publishTopic,
         payload,
         {
           qos: 0,
-          retain: true
+          retain: true,
         },
         (error) => {
           if (error) {
@@ -103,28 +148,28 @@ function Device() {
       );
     }
   };
-  const connectEMQX = async (data: any) => {
-    const _mqtt = await mqtt.connect(import.meta.env.VITE_EMQX_DOMAIN, {
-      // protocol: "ws",
-      host: "localhost",
-      clientId: "emqx_react_" + Math.random().toString(16).substring(2, 8),
-      // port: 8083,
-      username: data?.usernameDevice,
-      password: data?.password,
-    });
-    setClient(_mqtt);
+
+  const connectEMQX = async (data: {
+    usernameDevice: string;
+    password: string;
+  }) => {
+    const Mqtt = awaitConnectMQTT.getInstance(data?.usernameDevice, data?.password);
+    setClient(Mqtt._mqtt);
   };
+
   const mqttDisconnect = () => {
     if (client) {
       client.end(() => {
-        setConnectStatus('Disconnected');
+        setConnectStatus("Disconnected");
       });
     }
   };
+
   useEffect(() => {
     fetchDeviceById();
     fetchAllWidgets();
   }, []);
+
   useEffect(() => {
     if (client) {
       client.on("connect", () => {
@@ -133,9 +178,9 @@ function Device() {
         console.log(connectStatus);
         if (client) {
           client.subscribe(
-            deviceInfo?.topics[0],
+            subScribeTopic,
             {
-              qos: deviceInfo?.qos,
+              qos: qos,
             },
             (err) => {
               console.log("not sub", err);
@@ -143,13 +188,6 @@ function Device() {
           );
         }
       });
-      // client.end(() => {
-      //   setConnectStatus('Disconnected');
-      // });
-      // client.on("error", (err) => {
-      //   console.error("Connection error: ", err);
-      //   client.end();
-      // });
       client.on("reconnect", () => {
         setConnectStatus("Reconnecting");
       });
@@ -165,15 +203,43 @@ function Device() {
         }
       });
     }
+    
     return () => {
       mqttDisconnect();
     };
   }, [client]);
 
-  const selectWidget = async (widgetID: any) => {
+  const selectWidget = async (widgetID: string) => {
     setSelectedWidget(widgetID);
     console.log(widgetID);
     setIsEditDisplayShow(true);
+  };
+  const data = {
+    labels: ["2", "4", "6", "8", "10", "12", "14", "16", "18", "20"],
+    datasets: [
+      {
+        label: "Sales of the Week",
+        data: [10, 21, 22, 23, 24, 25, 10, 15, 11, 10],
+        //  Data Y
+        backgroundColor: "#1966fb",
+        borderColor: "#00000013",
+        border: "1px",
+        pointBorderColor: "#1966fb",
+        fill: true,
+        tension: 0.4,
+        borderWidth: 1.8,
+      },
+    ],
+  };
+
+  const options = {
+    legend: true,
+    scales: {
+      y: {
+        min: 10,
+        max: 25,
+      },
+    },
   };
 
   return (
@@ -245,7 +311,10 @@ function Device() {
             </button>
           </div>
           <div className="flex w-[100%] justify-between sm:hidden">
-            <div id="title-outlet" className="text-[22px] text-[#1d4469] font-bold mb-10">
+            <div
+              id="title-outlet"
+              className="text-[22px] text-[#1d4469] font-bold mb-10"
+            >
               {deviceInfo?.nameDevice}
             </div>
           </div>
@@ -340,8 +409,9 @@ function Device() {
                   <div className="w-[15px] h-[15px] border-[#adadad7c] border-[1px] bg-[#f3f3f34d] rounded-sm"></div>
                 )}
                 <div
-                  className={`ml-2 bottom-[0px] relative ${deviceInfo?.retain ? "text-[#0075ff]" : "text-[#7a7a7a]"
-                    } text-[13.4px]`}
+                  className={`ml-2 bottom-[0px] relative ${
+                    deviceInfo?.retain ? "text-[#0075ff]" : "text-[#7a7a7a]"
+                  } text-[13.4px]`}
                 >
                   {deviceInfo?.retain.toString()}
                 </div>
@@ -432,7 +502,7 @@ function Device() {
 
           <div className="grid grid-cols-3 gap-10 mt-8 md:grid-cols-2 sm:grid-cols-1">
             {widgets &&
-              widgets.map((widget: any, index: number) => {
+              widgets.map((widget: IWidget, index: number) => {
                 // console.log(`${[widget.nameDevice]}`, widget);
                 // console.log(`unit`, widget?.configWidget?.unit);
                 // console.log(widget)
@@ -509,6 +579,7 @@ function Device() {
                     />
                   );
                 }
+                
               })}
             {/* <Gauge
               isDeleteConfirmOpen={isDeleteConfirmOpen}
@@ -530,6 +601,13 @@ function Device() {
               isDeleteConfirmOpen={isDeleteConfirmOpen}
               setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
             /> */}
+            {/* <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 overflow-hidden">
+              <Line
+                data={data}
+                options={options}
+                className="flex flex-grow mx-14"
+              ></Line>
+            </div> */}
           </div>
           {/* end widget container */}
         </div>

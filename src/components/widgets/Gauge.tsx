@@ -77,7 +77,7 @@ function Gauge({ task, setIsDeleteConfirmOpen,isDeleteConfirmOpen }: Props) {
       style={style}
       {...attributes}
       {...listeners}
-      className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 hover:ring-inset hover:ring-[#1966fb] cursor-grab"
+      className="h-[140px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 hover:ring-inset hover:ring-[#1966fb] cursor-grab"
     >
       <div className="absolute left-2 top-2 text-[#1d4469] text-sm">
         Temperature

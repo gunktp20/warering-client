@@ -8,15 +8,12 @@ import Wrapper from "../../assets/wrappers/Dashboard";
 import { useEffect, useState } from "react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { IoSearchOutline } from "react-icons/io5";
-import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import EditDashboardDialog from "./EditDashboardDialog";
 import ConfirmDelete from "./ConfirmDelete";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { AxiosError } from "axios";
 import NavLinkSidebar from "../../components/Admin/NavDialogAdmin";
-import { IoPersonCircleSharp } from "react-icons/io5";
-import { useAppSelector } from "../../app/hooks";
 import userAvatar from "../../assets/images/user-avatar.png"
 
 function UserManagement() {

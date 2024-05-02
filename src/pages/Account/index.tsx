@@ -6,9 +6,9 @@ import { IoArrowBackSharp } from "react-icons/io5";
 import { useAppSelector } from "../../app/hooks";
 import { AccessTokenPayload } from "../../features/auth/types";
 import { jwtDecode } from "jwt-decode";
-import { AxiosError } from "axios";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import userAvatar from "../../assets/images/user-avatar.png";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 
 const Account = () => {
   const navigate = useNavigate();
@@ -17,6 +17,7 @@ const Account = () => {
 
   const { token } = useAppSelector((state) => state.auth);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [profileImage, setProfileImg] = useState<string>("");
   const [user, setUser] = useState<{
     fname: string;
     lname: string;
@@ -38,16 +39,12 @@ const Account = () => {
     try {
       const { data } = await axiosPrivate.get(`/users/${decoded?.sub}`);
       setIsLoading(false);
+      setProfileImg(data?.profileUrl)
       console.log(data);
       setUser(data);
     } catch (err: unknown) {
-      if (err instanceof AxiosError) {
-        const msg =
-          typeof err?.response?.data?.msg === "object"
-            ? err?.response?.data?.msg[0]
-            : err?.response?.data?.msg;
-        console.log(msg);
-      }
+      const msg = await getAxiosErrorMessage(err);
+      console.log(msg);
       setIsLoading(false);
     }
   };
@@ -75,53 +72,73 @@ const Account = () => {
         <div className="flex justify-start w-[100%] text-[22px] border-b-[1px] border-[#dfdfdf] text-[#1c1c1c] pb-5 font-semibold">
           Account
         </div>
-        <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
-          <div className="text-[13.5px]">Email address</div>
-          <div className="text-[#8b8b8b] text-[14px] mr-10">{user?.email}</div>
-        </div>
-        <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
-          <div className="text-[13.5px]">
-            Profile Information
-            <div className="text-[11px] text-[#cccccc] mt-1">
-              Edit your photo, name , bio, etc
+        {isLoading && (
+          <div className="w-[100%] flex justify-center items-center h-[200px]">
+            <div className="loader w-[40px] h-[40px] border-primary-200 border-b-transparent"></div>
+          </div>
+        )}
+        {!isLoading && (
+          <>
+            <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
+              <div className="text-[13.5px]">Email address</div>
+              <div className="text-[#8b8b8b] text-[14px] mr-10">
+                {user?.email}
+              </div>
             </div>
-          </div>
-          <div className="text-[#8b8b8b] text-[14px] mr-10 flex items-center">
-          {user?.fname} {user?.lname}{" "}
-            <div className="flex ml-2 w-[39px] h-[39px] bg-[#f8f8f8] rounded-lg border-[1px] border-[#fdfdfd] shadow-sm">
-            <img
-              src={userAvatar}
-              className="w-[100%x] h-[100%px] opacity-60 text-[#dbdbdb]"
-            ></img>
-          </div>
-          </div>
-        </div>
-        <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
-          <div className="text-[13.5px]">Username</div>
-          <div className="text-[#8b8b8b] text-[14px] mr-10">{user?.username}</div>
-        </div>
-        <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
-          <div className="text-[13.5px]">Firstname</div>
-          <div className="text-[#8b8b8b] text-[14px] mr-10">{user?.fname}</div>
-        </div>
-        <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
-          <div className="text-[13.5px]">Lastname</div>
-          <div className="text-[#8b8b8b] text-[14px] mr-10">{user?.lname}</div>
-        </div>
-        <div className="border-b-[1px] border-[#dfdfdf] pb-5 mt-5"></div>
-        <div className="mt-3">
-          <div
-            className="text-[#dc3546] text-[16.3px] cursor-pointer"
-            onClick={() => {
-              setIsDeleteConfirmOpen(!isDeleteConfirmOpen);
-            }}
-          >
-            Delete account
-          </div>
-          <div className="text-[#b3b3b3] text-[12.3px] mt-1">
-            Permanently delete your account and all of your content.
-          </div>
-        </div>
+            
+            <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
+              <div className="text-[13.5px]">
+                Profile Information
+                <div className="text-[11px] text-[#cccccc] mt-1">
+                  Edit your photo, name , bio, etc
+                </div>
+              </div>
+              <div className="text-[#8b8b8b] text-[14px] mr-10 flex items-center">
+                {user?.fname} {user?.lname}{" "}
+                <div className="flex ml-2 w-[39px] h-[39px] bg-[#fff] rounded-lg border-[0px] border-[#fdfdfd]">
+                  <img
+                    src={profileImage ? profileImage : userAvatar}
+                    className={`w-[100%] h-[100%]  text-[#dbdbdb] ${
+                      profileImage ? "opacity-100 object-cover object-top" : "opacity-60"
+                    }`}
+                  ></img>
+                </div>
+              </div>
+            </div>
+            <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
+              <div className="text-[13.5px]">Username</div>
+              <div className="text-[#8b8b8b] text-[14px] mr-10">
+                {user?.username}
+              </div>
+            </div>
+            <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
+              <div className="text-[13.5px]">Firstname</div>
+              <div className="text-[#8b8b8b] text-[14px] mr-10">
+                {user?.fname}
+              </div>
+            </div>
+            <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
+              <div className="text-[13.5px]">Lastname</div>
+              <div className="text-[#8b8b8b] text-[14px] mr-10">
+                {user?.lname}
+              </div>
+            </div>
+            <div className="border-b-[1px] border-[#dfdfdf] pb-5 mt-5"></div>
+            <div className="mt-3">
+              <div
+                className="text-[#dc3546] text-[16.3px] cursor-pointer"
+                onClick={() => {
+                  setIsDeleteConfirmOpen(!isDeleteConfirmOpen);
+                }}
+              >
+                Delete account
+              </div>
+              <div className="text-[#b3b3b3] text-[12.3px] mt-1">
+                Permanently delete your account and all of your content.
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </Wrapper>
   );

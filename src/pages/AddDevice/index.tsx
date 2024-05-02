@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { SnackBar } from "../../components";
 import { Alert } from "@mui/material";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 
 interface IDeviceInfo {
   nameDevice: string;
@@ -41,8 +42,6 @@ function AddDevice() {
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
 
-  const [timeoutIds, setTimeoutIds] = useState<any>([]);
-
   const AddDevice = async (deviceInfo: IDeviceInfo) => {
     setIsLoading(true);
     try {
@@ -53,12 +52,9 @@ function AddDevice() {
       setSnackBarText("Your device has been added");
       clearAlert();
       setIsLoading(false);
-      navigate('/device-list')
-    } catch (err: any) {
-      const msg =
-        typeof err?.response?.data?.message === "object"
-          ? err?.response?.data?.message[0]
-          : err?.response?.data?.message;
+      navigate("/device-list");
+    } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err);
       setShowSnackBar(true);
       setSnackBarType("error");
       setSnackBarText(msg);
@@ -67,20 +63,20 @@ function AddDevice() {
     }
   };
 
-  // Function to clear all running timeouts
+  const [timeoutIds, setTimeoutIds] = useState<NodeJS.Timeout[]>([]);
   const clearAllTimeouts = () => {
-    timeoutIds.forEach((timeoutId: any) => clearTimeout(timeoutId));
-    setTimeoutIds([]); // Clear the timeout IDs from state
+    timeoutIds.forEach((timeoutId: NodeJS.Timeout) => clearTimeout(timeoutId));
+    setTimeoutIds([]);
   };
-  // Function to set a new timeout
   const clearAlert = () => {
-    clearAllTimeouts(); // Clear existing timeouts before setting a new one
+    setIsLoading(true);
+    clearAllTimeouts();
     const newTimeoutId = setTimeout(() => {
-      // Your timeout function logic here
       setShowSnackBar(false);
     }, 3000);
-    setTimeoutIds([newTimeoutId]); // Store the new timeout ID in state
+    setTimeoutIds([newTimeoutId]);
   };
+
   const [values, setValues] = useState({
     nameDevice: "",
     usernameDevice: "",
@@ -138,7 +134,7 @@ function AddDevice() {
         isSidebarShow={isSidebarShow}
       />
       <div className="flex h-[100vh]">
-        <NavLinkSidebar isSidebarShow={isSidebarShow}/>
+        <NavLinkSidebar isSidebarShow={isSidebarShow} />
         <NavDialog
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
@@ -168,7 +164,10 @@ function AddDevice() {
           </div>
 
           <div className="flex w-[100%] justify-between sm:hidden">
-            <div id="title-outlet" className="text-[23px] text-[#1d4469] font-bold mb-10">
+            <div
+              id="title-outlet"
+              className="text-[23px] text-[#1d4469] font-bold mb-10"
+            >
               Add Device
             </div>
           </div>
@@ -308,7 +307,7 @@ function AddDevice() {
                 id="add-device-submit-btn"
                 disabled={isLoading}
               >
-                { isLoading ? <div className="loader"></div>: "Add Device"}
+                {isLoading ? <div className="loader"></div> : "Add Device"}
               </Button>
             </div>
             {showSnackBar && (
