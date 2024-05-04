@@ -243,6 +243,24 @@ export default function AddWidgetDialog(props: IProps) {
           clearAlert();
           return;
         }
+      case "LineChart":
+        try {
+          widgetInfo.label = values?.label;
+          widgetInfo.type = occupation;
+          widgetInfo.configWidget = {
+            value: values.value,
+            min: Number(values.min),
+            max: Number(values.max),
+          };
+          createWidget(widgetInfo);
+          return;
+        } catch (err: unknown) {
+          setShowSnackBar(true);
+          setSnackBarType("error");
+          setSnackBarText("Payload must be JSON format");
+          clearAlert();
+          return;
+        }
     }
   };
   const createWidget = async (widgetInfo: IWidget) => {

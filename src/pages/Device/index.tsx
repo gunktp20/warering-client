@@ -43,6 +43,7 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import ConnectMQTT from "../../services/mqtt";
+import LineChart from "../../components/widgets_device/LineChart";
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
 interface IDevice {
@@ -567,6 +568,21 @@ function Device() {
                 if (widget.type === "RangeSlider") {
                   return (
                     <RangeSlider
+                      key={index}
+                      widgetId={widget?.id}
+                      label={widget?.label}
+                      min={widget?.configWidget?.min}
+                      max={widget?.configWidget?.max}
+                      value={widget?.configWidget?.value}
+                      fetchAllWidgets={fetchAllWidgets}
+                      publishMQTT={mqttPublish}
+                      selectWidget={selectWidget}
+                    />
+                  );
+                }
+                if (widget.type === "LineChart") {
+                  return (
+                    <LineChart
                       key={index}
                       widgetId={widget?.id}
                       label={widget?.label}
