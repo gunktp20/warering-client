@@ -9,6 +9,7 @@ interface IFormRow {
   labelText?: string;
   width?: string;
   marginTop?: string;
+  placeHolderSize?: string
 }
 
 const FormRow: FunctionComponent<IFormRow> = ({
@@ -19,14 +20,14 @@ const FormRow: FunctionComponent<IFormRow> = ({
   labelText,
   width,
   marginTop,
+  placeHolderSize,
 }: IFormRow): JSX.Element => {
   const [hide, setHide] = useState<boolean>(true);
 
   return (
     <div
-      className={`relative z-0 w-[${width ? width : "100%"}] mb-5 group ${
-        marginTop ? marginTop : " mt-7"
-      }`}
+      className={`relative z-0 w-[${width ? width : "100%"}] mb-5 group ${marginTop ? marginTop : " mt-7"
+        }`}
     >
       <input
         onChange={handleChange}
@@ -34,8 +35,8 @@ const FormRow: FunctionComponent<IFormRow> = ({
           type === "password" && hide
             ? "password"
             : type === "number"
-            ? "number"
-            : "value"
+              ? "number"
+              : "value"
         }
         name={name}
         id={name}
@@ -46,7 +47,7 @@ const FormRow: FunctionComponent<IFormRow> = ({
       />
       <label
         htmlFor={name}
-        className="peer-focus:font-medium left-0 absolute text-[12.8px] text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-second peer-focus:dark:text-second peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 capitalize"
+        className={`${placeHolderSize ? `text-[${placeHolderSize}] ` : "text-[12.8px] "} left-0 absolute  text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-second peer-focus:dark:text-second peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 capitalize`}
       >
         {labelText ? labelText : name}
       </label>

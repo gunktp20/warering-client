@@ -55,9 +55,7 @@ function DashboardList() {
         `/dashboards?limit=${limitQuery}&page=${numOfPage}&query=${values.search_dashboard}&createdAt=${sortCreatedAt}`
       );
       setDashboard(data?.data);
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 5000);
+      setIsLoading(false);
       console.log("data.metadata.pageCount", data.metadata.pageCount);
       setPageCount(data.metadata.pageCount);
 
@@ -88,11 +86,10 @@ function DashboardList() {
           setNumOfPage(i);
         }}
         key={i}
-        className={`${
-          numOfPage === i
+        className={`${numOfPage === i
             ? "bg-[#1966fb] text-white"
             : "bg-white text-[#7a7a7a]"
-        } cursor-pointer  border-[#cccccc] border-[1px] text-[13.5px] rounded-md w-[30px] h-[30px] flex items-center justify-center`}
+          } cursor-pointer  border-[#cccccc] border-[1px] text-[13.5px] rounded-md w-[30px] h-[30px] flex items-center justify-center`}
       >
         {i}
       </button>
@@ -231,9 +228,8 @@ function DashboardList() {
             )}
 
             <div
-              className={`overflow-auto rounded-lg shadow block sm:shadow-none ${
-                dashboards.length === 0 && "hidden"
-              }`}
+              className={`overflow-auto rounded-lg shadow block sm:shadow-none ${dashboards.length === 0 && "hidden"
+                }`}
             >
               <table className="w-full">
                 <thead className="border-b-2 border-gray-200 sm:hidden">

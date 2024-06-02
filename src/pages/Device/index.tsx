@@ -219,6 +219,16 @@ function Device() {
     setIsEditDisplayShow(true);
   };
 
+  const exportData = async () => {
+    try {
+      const { data } = await axiosPrivate.get(`export/${device_id}`)
+      console.log(data)
+    } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err)
+      console.log(msg)
+    }
+  }
+
   return (
     <Wrapper>
       {deviceInfo?.nameDevice && (
@@ -386,9 +396,8 @@ function Device() {
                   <div className="w-[15px] h-[15px] border-[#adadad7c] border-[1px] bg-[#f3f3f34d] rounded-sm"></div>
                 )}
                 <div
-                  className={`ml-2 bottom-[0px] relative ${
-                    deviceInfo?.retain ? "text-[#0075ff]" : "text-[#7a7a7a]"
-                  } text-[13.4px]`}
+                  className={`ml-2 bottom-[0px] relative ${deviceInfo?.retain ? "text-[#0075ff]" : "text-[#7a7a7a]"
+                    } text-[13.4px]`}
                 >
                   {deviceInfo?.retain.toString()}
                 </div>
@@ -432,9 +441,10 @@ function Device() {
                 Excel
               </div>
             </div>
-            <div className="flex flex-col justify-center items-center">
+            {/* Export JSON */}
+            <div className="flex flex-col justify-center items-center cursor-pointer text-nowrap" onClick={exportData}>
               <BsFiletypeJson className="text-[#1d4469] text-[25px]" />
-              <div className="text-[13px] mt-3 text-[#1d4469] font-bold">
+              <div className="text-[13px] mt-3 text-[#1d4469] font-bold text-nowrap">
                 JSON
               </div>
             </div>

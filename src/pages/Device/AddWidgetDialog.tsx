@@ -19,7 +19,6 @@ import { Alert } from "@mui/material";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 
 interface IWidget {
-  id: string;
   type?: string;
   label?: string;
   configWidget?: IConfigWidget;
@@ -108,9 +107,7 @@ export default function AddWidgetDialog(props: IProps) {
   const onSubmit = () => {
     const { label, value, min, max, unit, payload, on_payload, off_payload } =
       values;
-    const widgetInfo: IWidget = {
-      id: "",
-    };
+    const widgetInfo : IWidget = {}
     if (
       occupation === "Gauge" &&
       (!label || !value || min === null || !max || !unit)
@@ -263,7 +260,9 @@ export default function AddWidgetDialog(props: IProps) {
         }
     }
   };
+
   const createWidget = async (widgetInfo: IWidget) => {
+    console.log("widgetInfo",widgetInfo)
     setIsLoading(true);
     try {
       await axiosPrivate.post(`/widgets/${props.device_id}`, widgetInfo);

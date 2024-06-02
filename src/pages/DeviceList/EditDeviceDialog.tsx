@@ -366,7 +366,7 @@ export default function EditDeviceDialog(props: IDrawer) {
                     id="edit-widget-snackbar"
                     severity={alertType}
                     showSnackBar={showAlert}
-                    snackBarText={alertType}
+                    snackBarText={alertText}
                   />
                 </div>
               )}

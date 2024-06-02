@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { IDeviceState } from "./types";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 
 const initialState: IDeviceState = {
   deviceOffline: 0,
@@ -11,22 +9,6 @@ const initialState: IDeviceState = {
   totalDeviceDeny: 0,
   devices: [],
 };
-
-export const fetchAllDevices = createAsyncThunk(
-  "auth/requestVerifyEmail",
-  async (_, thunkApi) => {
-    const axiosPrivate = useAxiosPrivate();
-    try {
-      const { data } = await axiosPrivate.get(`/devices/`);
-      return {
-        ...data,
-      };
-    } catch (err: any) {
-      const msg = await getAxiosErrorMessage(err);
-      return thunkApi.rejectWithValue(msg);
-    }
-  }
-);
 
 const DeviceSlice = createSlice({
   name: "device",

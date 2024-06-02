@@ -5,9 +5,9 @@ const url = "ws://localhost:8083/mqtt";
 
 const options = {
   connectTimeout: 4000,
-  clientId: "TestMQTT1",
-  username: "TestMQTT1",
-  password: "TestMQTT1",
+  clientId: "TestMQTT-1",
+  username: "TestMQTT-1",
+  password: "TestMQTT-1",
   protocol: "ws",
   clean: true,
   reconnectPeriod: 5000,
@@ -27,7 +27,7 @@ client.on("connect", function () {
      brightness_val = map(brightness_val, 0, 10000, 500, 1200).toFixed(0);
 
     client.publish(
-      "65e2e2e1946718f317756f47/TestMQTT1/publish",
+      "665caac4b6cdb9c0ca9c999f/TestMQTT-1/publish",
       JSON.stringify({
         tem_val,
         speed_val,
@@ -42,7 +42,7 @@ client.on("connect", function () {
 
   setInterval(() => {
     client.subscribe(
-      "65e2e2e1946718f317756f47/TestMQTT1/subscribe",
+      "665caac4b6cdb9c0ca9c999f/TestMQTT-1/subscribe",
       {
         qos: 0,
         retain: true,

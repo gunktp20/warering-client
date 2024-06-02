@@ -2,7 +2,7 @@ import userAvatar from "../../assets/images/user-avatar.png";
 import Wrapper from "../../assets/wrappers/EditProfile";
 import { useEffect, useState } from "react";
 import { FormRow, SnackBar } from "../../components";
-import { useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { AccessTokenPayload } from "../../features/auth/types";
 import { jwtDecode } from "jwt-decode";
@@ -11,12 +11,15 @@ import CroperDialog from "./CroperDialog";
 import { useNavigate } from "react-router-dom";
 import { IoArrowBackSharp } from "react-icons/io5";
 import useAlert from "../../hooks/useAlert";
+import ChangePasswordDialog from "./ChangePasswordDialog";
+import { setProfileImg } from "../../features/auth/authSlice";
 
 const EditProfile = () => {
   const { token } = useAppSelector((state) => state.auth);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isChanged, setIsChanged] = useState<boolean>(false);
   const [showCropingProfile, setShowCropingProfile] = useState<boolean>(false);
+  const [showChangePassDialog, setShowChangePassDialog] = useState<boolean>(false);
   const { showAlert, alertText, alertType, displayAlert } = useAlert();
   const [currentUserInfo, setCurrentUserInfo] = useState<{
     firstName: string;
@@ -37,7 +40,8 @@ const EditProfile = () => {
     profileUrl: "",
   });
 
-  const [profileImage, setProfileImg] = useState<string>("");
+  const [profileImage, setProfileImage] = useState<string>("");
+  const dispatch = useAppDispatch()
   const navigate = useNavigate();
 
   const axiosPrivate = useAxiosPrivate();
@@ -59,7 +63,7 @@ const EditProfile = () => {
         lastName: data?.lname,
         profileUrl: data?.profileUrl,
       });
-      setProfileImg(data?.profileUrl);
+      setProfileImage(data?.profileUrl);
       setValues({
         firstName: data?.fname,
         lastName: data?.lname,
@@ -78,6 +82,7 @@ const EditProfile = () => {
       await axiosPrivate.delete("/users/profile");
       setIsLoading(false);
       getUserInfo();
+      dispatch(setProfileImg(""))
       return displayAlert({
         msg: "Removed your image profile",
         type: "error",
@@ -93,12 +98,19 @@ const EditProfile = () => {
     }
   };
 
-  const onUploadProfileImageSuccess = async () => {
+  const onUploadProfileImageSuccess = () => {
     displayAlert({
       msg: "Your profile picture was uploaded",
       type: "success",
     });
   };
+
+  const onUpdatedPasswordSuccess = () => {
+    displayAlert({
+      msg: "Updated your password",
+      type: "success"
+    })
+  }
 
   const onUpdate = async () => {
     setIsLoading(true);
@@ -149,6 +161,7 @@ const EditProfile = () => {
         getUserInfo={getUserInfo}
         onUploadProfileImageSuccess={onUploadProfileImageSuccess}
       />
+      <ChangePasswordDialog onUpdatedPasswordSuccess={onUpdatedPasswordSuccess} isShowChangePassDialog={showChangePassDialog} setIsShowChangePassDialog={setShowChangePassDialog} />
       {showAlert && (
         <div id="add-device-snackbar" className="block sm:hidden">
           <SnackBar
@@ -179,11 +192,10 @@ const EditProfile = () => {
           <div className="flex ml-2 w-[80px] justify-center items-center">
             <img
               src={profileImage ? profileImage : userAvatar}
-              className={`w-[80px] h-[80px] text-[#dbdbdb] ${
-                profileImage
-                  ? "opacity-100 object-cover object-top rounded-xl"
-                  : "opacity-60"
-              }`}
+              className={`w-[80px] h-[80px] text-[#dbdbdb] ${profileImage
+                ? "opacity-100 object-cover object-top rounded-xl"
+                : "opacity-60"
+                }`}
             ></img>
           </div>
           <div className="flex flex-col sm:ml-[10px]">
@@ -231,7 +243,11 @@ const EditProfile = () => {
           />
         </div>
         <div className="w-[100%] flex text-primary-300 mt-4 text-[12px] cursor-pointer hover:text-primary-400 transition-all">
-          <div>Change Password</div>
+          <button onClick={() => {
+            setShowChangePassDialog((prevStatus) => {
+              return !prevStatus
+            })
+          }}>Change Password</button>
         </div>
         <div className="flex mt-5">
           <button
