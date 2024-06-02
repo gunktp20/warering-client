@@ -3,6 +3,7 @@ import Wrapper from "../../assets/wrappers/Landing/BigNavbar";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { clearAlert } from "../../features/auth/authSlice";
 import { useNavigate } from "react-router-dom";
+import userAvatar from "../../assets/images/user-avatar.png"
 
 interface IBigNavbar {
   setIsDrawerOpen: (active: boolean) => void;
@@ -12,9 +13,10 @@ interface IBigNavbar {
 }
 
 const BigNavbar: FunctionComponent<IBigNavbar> = (props: IBigNavbar) => {
+  const isLoading = false
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { user } = useAppSelector((state) => state.auth);
+  const { user , profileImg } = useAppSelector((state) => state.auth);
 
   const onSelectEndpoint = (endPoint: "login" | "register") => {
     const isMember = endPoint === "login" ? true : false;
@@ -40,19 +42,33 @@ const BigNavbar: FunctionComponent<IBigNavbar> = (props: IBigNavbar) => {
             >
               Project
             </button>
-            <div className=" flex items-center sm:pr-2">
-              <div className="text-[13.5px] sm:hidden text-[#1d4469]">{user?.username}</div>
-              <img
-                id="account-user-drawer-toggle"
-                src={
-                  "https://www.wilsoncenter.org/sites/default/files/media/images/person/james-person-1.jpg"
+            {isLoading && <div className="loader w-[20px] h-[20px]"></div>}
+            <div
+              onClick={() => {
+                if (isLoading) {
+                  return;
                 }
-                className="ml-5 w-[42px] h-[42px] object-cover rounded-[100px]"
+                props.setIsAccountUserDrawerOpen(!props.isAccountUserDrawerOpen);
+              }}
+              className="text-[13.5px] sm:hidden text-[#1d4469] font-semibold text-nowrap cursor-pointer"
+            >
+              {isLoading ? "loading..." : user?.username}
+            </div>
+            {isLoading ? (
+              <div className="loader w-[23px] h-[23px]"></div>
+            ) : (
+              <img
+                src={profileImg ? profileImg : userAvatar}
                 onClick={() => {
+                  if (isLoading) {
+                    return;
+                  }
                   props.setIsAccountUserDrawerOpen(!props.isAccountUserDrawerOpen);
                 }}
+                className={`cursor-pointer ml-4 w-[42px] h-[42px]text-[#dbdbdb] rounded-[100%] ${profileImg ? "opacity-100 object-cover object-top" : "opacity-60"
+                  }`}
               ></img>
-            </div>
+            )}
           </div>
         )}
         {!user && (
