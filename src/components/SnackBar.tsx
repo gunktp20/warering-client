@@ -1,13 +1,19 @@
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import { ISnackBarProp } from "./types";
+
+interface IProp {
+  id: string;
+  severity: "error" | "success" | "warning" | "info";
+  showSnackBar: boolean;
+  snackBarText: string;
+}
 
 export default function SnackBar({
   id,
   severity,
   showSnackBar,
   snackBarText,
-}: ISnackBarProp) {
+}: IProp) {
   const vertical = "top";
   const horizontal = "right";
 

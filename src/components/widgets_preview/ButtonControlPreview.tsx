@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import { IButtonControlPreviewProp } from "./types";
+import { IButtonControlPreviewProp } from "../../types/widget_preview";
 
 function ButtonControlPreview({
   label,

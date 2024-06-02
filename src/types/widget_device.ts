@@ -48,14 +48,16 @@ export interface ILineChartDeviceProp extends IWidgetDisplayProp, IWidgetProp {
   max: number;
 }
 
-export interface IRangeSliderDeviceProp extends IWidgetControlProp, IWidgetProp {
+export interface IRangeSliderDeviceProp
+  extends IWidgetControlProp,
+    IWidgetProp {
   value: string;
   unit?: string;
   min: number;
   max: number;
 }
 
-export interface IMessageBoxDeviceProp extends IWidgetDisplayProp , IWidgetProp {
+export interface IMessageBoxDeviceProp extends IWidgetDisplayProp, IWidgetProp {
   value: string | number | null;
   unit?: string;
 }

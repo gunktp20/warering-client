@@ -7,7 +7,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
-import { IRangeSliderDeviceProp } from "./types";
+import { IRangeSliderDeviceProp } from "../../types/widget_device";
 
 // const MAX = 10;
 // const MIN = 0;

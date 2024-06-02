@@ -3,7 +3,7 @@ import { useState } from "react";
 interface IProp {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   executeAction: (...args: any) => any;
-  duration: number;
+  duration?: number;
 }
 
 function useTimeout({ executeAction, duration }: IProp) {
@@ -20,7 +20,7 @@ function useTimeout({ executeAction, duration }: IProp) {
     const newTimeoutId = setTimeout(
       () => {
         console.log("args", ...args);
-        executeAction(...args); 
+        executeAction(...args);
       },
       duration ? duration : 3000
     );

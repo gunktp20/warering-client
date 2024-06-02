@@ -1,4 +1,4 @@
-import { IMessageBoxPreviewProp } from "./types";
+import { IMessageBoxPreviewProp } from "../../types/widget_preview";
 
 function MessageBoxPreview({ label, value, unit }: IMessageBoxPreviewProp) {
   return (

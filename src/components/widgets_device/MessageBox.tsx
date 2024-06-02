@@ -6,7 +6,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { IMessageBoxDeviceProp } from "./types";
+import { IMessageBoxDeviceProp } from "../../types/widget_device";
 
 function MessageBox({
   label,
@@ -71,7 +71,11 @@ function MessageBox({
       )}
       <div
         className={`text-[#1966fb] font-bold flex ${
-          checkThaiLanguage(value) ? "text-[12.8px] font-thin" : "text-[19px]"
+          checkThaiLanguage(
+            value !== null && typeof value !== "number" ? value : ""
+          )
+            ? "text-[12.8px] font-thin"
+            : "text-[19px]"
         }`}
       >
         {value}

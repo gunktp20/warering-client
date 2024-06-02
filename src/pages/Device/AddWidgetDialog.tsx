@@ -11,12 +11,12 @@ import {
   ButtonControlPreview,
   ToggleSwitchPreview,
   RangeSliderPreview,
+  LineChartPreview,
 } from "../../components/widgets_preview";
 import { Button } from "@mui/material";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Alert } from "@mui/material";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
-import LineChartPreview from "../../components/widgets_preview/LineChartPreview";
 
 interface IWidget {
   id: string;

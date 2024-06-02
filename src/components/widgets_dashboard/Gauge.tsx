@@ -9,7 +9,7 @@ import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useSortable } from "@dnd-kit/sortable";
-import { IGaugeDashboardProp } from "./types";
+import { IGaugeDashboardProp } from "../../types/widget_dashboard";
 import { CSS } from "@dnd-kit/utilities";
 
 export type Id = string | number;

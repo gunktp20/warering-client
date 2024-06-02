@@ -1,7 +1,7 @@
 import { styled } from "@mui/material/styles";
 import Switch, { SwitchProps } from "@mui/material/Switch";
 import { useState } from "react";
-import { IToggleSwitchPreviewProp } from "./types";
+import { IToggleSwitchPreviewProp } from "../../types/widget_preview";
 
 function ToggleSwitchPreview({ label }: IToggleSwitchPreviewProp) {
   const [isActive, setIsActive] = useState<boolean>(true);

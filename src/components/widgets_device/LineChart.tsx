@@ -14,7 +14,7 @@ import {
   PointElement,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { ILineChartDeviceProp } from "./types";
+import { ILineChartDeviceProp } from "../../types/widget_device";
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
 function LineChart({
@@ -127,7 +127,7 @@ function LineChart({
   };
 
   React.useEffect(() => {
-    pushNumber(value);
+    pushNumber(typeof value === "number" ? value : 0);
   }, [value]);
 
   return (

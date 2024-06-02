@@ -1,6 +1,6 @@
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
-import { IGaugePreviewProp } from "./types";
+import { IGaugePreviewProp } from "../../types/widget_preview";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 

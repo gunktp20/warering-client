@@ -6,7 +6,7 @@ import {
   PointElement,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { ILineChartPreviewProp } from "./types";
+import { ILineChartPreviewProp } from "../../types/widget_preview";
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
 function calculatePercentage(percent: number, baseNumber: number) {

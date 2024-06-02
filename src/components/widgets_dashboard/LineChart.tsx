@@ -15,7 +15,7 @@ import {
 import { Line } from "react-chartjs-2";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { ILineChartDashboardProp } from "./types";
+import { ILineChartDashboardProp } from "../../types/widget_dashboard";
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
 function LineChart({

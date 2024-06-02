@@ -8,7 +8,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
 import { useSortable } from "@dnd-kit/sortable";
-import { IRangeSliderDashboardProp } from "./types";
+import { IRangeSliderDashboardProp } from "../../types/widget_dashboard";
 import { CSS } from "@dnd-kit/utilities";
 
 const CustomSliderStyles = {

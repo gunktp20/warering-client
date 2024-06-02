@@ -9,7 +9,7 @@ import { TransitionProps } from "@mui/material/transitions";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { IButtonControlDashboardProp } from "./types";
+import { IButtonControlDashboardProp } from "../../types/widget_dashboard";
 
 function ButtonControl({
   widget,

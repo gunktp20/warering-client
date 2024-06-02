@@ -8,7 +8,7 @@ import { TransitionProps } from "@mui/material/transitions";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { IMessageBoxDashboardProp } from "./types";
+import { IMessageBoxDashboardProp } from "../../types/widget_dashboard";
 
 function MessageBox({
   widget,

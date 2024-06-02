@@ -8,7 +8,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { IGaugeDeviceProp } from "./types";
+import { IGaugeDeviceProp } from "../../types/widget_device";
 
 export type Id = string | number;
 

@@ -7,7 +7,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { IButtonControlDeviceProp } from "./types";
+import { IButtonControlDeviceProp } from "../../types/widget_device";
 
 function ButtonControl({
   label,

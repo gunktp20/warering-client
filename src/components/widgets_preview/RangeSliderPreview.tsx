@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box";
 import Slider from "@mui/material/Slider";
 import React from "react";
-import { IRangeSliderPreviewProp } from "./types";
+import { IRangeSliderPreviewProp } from "../../types/widget_preview";
 
 const MAX = 10;
 const MIN = 0;
