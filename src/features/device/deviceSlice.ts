@@ -34,6 +34,6 @@ const DeviceSlice = createSlice({
   },
 });
 
-export const { setDeviceOverview , setDevices} = DeviceSlice.actions;
+export const { setDeviceOverview, setDevices } = DeviceSlice.actions;
 
 export default DeviceSlice.reducer;

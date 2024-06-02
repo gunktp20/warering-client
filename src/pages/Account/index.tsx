@@ -59,7 +59,7 @@ const Account = () => {
         isDeleteConfirmOpen={isDeleteConfirmOpen}
         setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
       />
-      <div className="bg-white py-[2rem] px-[3.1rem] h-fit w-[510px] border-[#f3f3f3] rounded-lg border-[1px] shadow-sm top-[10rem] absolute">
+      <div className="bg-white py-[2rem] px-[3.1rem] h-fit w-[510px] border-[#f3f3f3] rounded-lg border-[1px] shadow-sm top-[10rem] relative sm:w-[100%] sm:mx-[1rem] sm:px-[2.2rem]">
         <button
           onClick={() => {
             navigate("/");
@@ -98,7 +98,7 @@ const Account = () => {
                 <div className="flex ml-2 w-[39px] h-[39px] bg-[#fff] rounded-lg border-[0px] border-[#fdfdfd]">
                   <img
                     src={profileImage ? profileImage : userAvatar}
-                    className={`w-[100%] h-[100%]  text-[#dbdbdb] ${
+                    className={`w-[100%] h-[100%]  text-[#dbdbdb] rounded-lg ${
                       profileImage ? "opacity-100 object-cover object-top" : "opacity-60"
                     }`}
                   ></img>

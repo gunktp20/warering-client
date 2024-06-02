@@ -7,6 +7,7 @@ const Wrapper = styled.article`
   height: 100vh;
   position: relative;
   z-index: 0;
+  
 `;
 
 export default Wrapper;

@@ -4,21 +4,20 @@ import { useEffect, useState } from "react";
 import { FormRow, SnackBar } from "../../components";
 import { useAppSelector } from "../../app/hooks";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { AxiosError } from "axios";
 import { AccessTokenPayload } from "../../features/auth/types";
 import { jwtDecode } from "jwt-decode";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import CroperDialog from "./CroperDialog";
+import { useNavigate } from "react-router-dom";
+import { IoArrowBackSharp } from "react-icons/io5";
+import useAlert from "../../hooks/useAlert";
 
 const EditProfile = () => {
   const { token } = useAppSelector((state) => state.auth);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isChanged, setIsChanged] = useState<boolean>(false);
-  const [showSnackBar, setShowSnackBar] = useState<boolean>(false);
-  const [snackBarText, setSnackBarText] = useState<string>("");
-  const [snackBarType, setSnackBarType] = useState<
-    "error" | "success" | "info" | "warning"
-  >("error");
-  const [currentProfileImage, setCurrentProfileImage] = useState<string>("");
+  const [showCropingProfile, setShowCropingProfile] = useState<boolean>(false);
+  const { showAlert, alertText, alertType, displayAlert } = useAlert();
   const [currentUserInfo, setCurrentUserInfo] = useState<{
     firstName: string;
     lastName: string;
@@ -37,50 +36,10 @@ const EditProfile = () => {
     lastName: "",
     profileUrl: "",
   });
-  const onProfileImageChange = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    if (event.target.files && event.target.files[0]) {
-      const selectedFile = event.target.files[0];
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-      try {
-        await axiosPrivate.put("/users/", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        setIsLoading(false);
-        setShowSnackBar(true);
-        setSnackBarType("success");
-        setSnackBarText("Updated your information");
-        clearAlert();
-        getUserInfo();
-        return;
-      } catch (err: unknown) {
-        const msg = await getAxiosErrorMessage(err);
-        setIsChanged(false);
-        setShowSnackBar(true);
-        setSnackBarType("error");
-        setSnackBarText(msg);
-        clearAlert();
-        return setIsLoading(false);
-      }
-    }
-  };
-  const [timeoutIds, setTimeoutIds] = useState<NodeJS.Timeout[]>([]);
-  const clearAllTimeouts = () => {
-    timeoutIds.forEach((timeoutId: NodeJS.Timeout) => clearTimeout(timeoutId));
-    setTimeoutIds([]);
-  };
-  const [profileImage, setProfileImg] = useState<string>("");
 
-  const clearAlert = () => {
-    setIsLoading(true);
-    clearAllTimeouts();
-    const newTimeoutId = setTimeout(() => {
-      setShowSnackBar(false);
-    }, 3000);
-    setTimeoutIds([newTimeoutId]);
-  };
+  const [profileImage, setProfileImg] = useState<string>("");
+  const navigate = useNavigate();
+
   const axiosPrivate = useAxiosPrivate();
   const decoded: AccessTokenPayload | undefined = token
     ? jwtDecode(token)
@@ -106,9 +65,6 @@ const EditProfile = () => {
         lastName: data?.lname,
         profileUrl: data?.profileUrl,
       });
-      // if (data.profileUrl) {
-      //   return getProfileImage(data.profileUrl);
-      // }
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err);
       console.log(msg);
@@ -118,28 +74,30 @@ const EditProfile = () => {
 
   const removeProfileImg = async () => {
     setIsLoading(true);
-    const formData = new FormData();
-    formData.append("profileUrl", values?.lastName);
     try {
-      await axiosPrivate.put("/users/", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await axiosPrivate.delete("/users/profile");
       setIsLoading(false);
-      setShowSnackBar(true);
-      setSnackBarType("success");
-      setSnackBarText("Deleted your image profile");
-      clearAlert();
       getUserInfo();
+      return displayAlert({
+        msg: "Removed your image profile",
+        type: "error",
+      });
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err);
       setIsChanged(false);
-      console.log(msg);
-      setShowSnackBar(true);
-      setSnackBarType("error");
-      setSnackBarText(msg);
-      clearAlert();
-      return setIsLoading(false);
+      setIsLoading(false);
+      return displayAlert({
+        msg,
+        type: "error",
+      });
     }
+  };
+
+  const onUploadProfileImageSuccess = async () => {
+    displayAlert({
+      msg: "Your profile picture was uploaded",
+      type: "success",
+    });
   };
 
   const onUpdate = async () => {
@@ -152,32 +110,21 @@ const EditProfile = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setIsLoading(false);
-      setShowSnackBar(true);
-      setSnackBarType("success");
-      setSnackBarText("Updated your information");
-      clearAlert();
       getUserInfo();
+      return displayAlert({
+        msg: "Updated your information",
+        type: "success",
+      });
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err);
       setIsChanged(false);
-      console.log(msg);
-      setShowSnackBar(true);
-      setSnackBarType("error");
-      setSnackBarText(msg);
-      clearAlert();
-      return setIsLoading(false);
+      setIsLoading(false);
+      return displayAlert({
+        msg,
+        type: "error",
+      });
     }
   };
-
-  // const getProfileImage = async (profileUrl: string) => {
-  //   const fileName = profileUrl.split("/").pop();
-  //   try {
-  //     const { data } = await axiosPrivate.get("/users/profile/" + fileName);
-  //     console.log(data);
-  //   } catch (err) {
-  //     console.log(err);
-  //   }
-  // };
 
   useEffect(() => {
     getUserInfo();
@@ -196,18 +143,32 @@ const EditProfile = () => {
 
   return (
     <Wrapper>
-      {showSnackBar && (
+      <CroperDialog
+        isCroperDialogOpen={showCropingProfile}
+        setIsCroperDialogOpen={setShowCropingProfile}
+        getUserInfo={getUserInfo}
+        onUploadProfileImageSuccess={onUploadProfileImageSuccess}
+      />
+      {showAlert && (
         <div id="add-device-snackbar" className="block sm:hidden">
           <SnackBar
             id="add-device-snackbar"
-            severity={snackBarType}
-            showSnackBar={showSnackBar}
-            snackBarText={snackBarText}
-            setShowSnackBar={setShowSnackBar}
+            severity={alertType}
+            showSnackBar={showAlert}
+            snackBarText={alertText}
           />
         </div>
       )}
-      <div className="bg-white py-[2rem] px-[3.1rem] h-fit w-[510px] border-[#f3f3f3] rounded-lg border-[1px] shadow-sm top-[10rem] absolute">
+      <div className="bg-white py-[2rem] px-[3.1rem] h-fit w-[510px] border-[#f3f3f3] rounded-lg border-[1px] shadow-sm top-[10rem] relative sm:w-[100%] sm:mx-[1rem] sm:px-[2.7rem]">
+        <button
+          onClick={() => {
+            navigate("/");
+          }}
+          className="absolute top-[-2.5rem] flex cursor-pointer text-sm text-[#1D4469] font-bold items-center left-0 "
+        >
+          <IoArrowBackSharp className="text-sm" />
+          Back
+        </button>
         <div className="flex justify-start w-[100%] text-[22px] border-b-[1px] border-[#dfdfdf] text-[#1c1c1c] pb-5 font-semibold">
           Profile Information
         </div>
@@ -215,28 +176,26 @@ const EditProfile = () => {
           <p>Photo</p>
         </div>
         <div className="flex mt-4 justify-between">
-          <div className="flex ml-2 w-[80px] justify-center items-center  bg-[#f8f8f8] rounded-lg border-[1px] border-[#fdfdfd] shadow-sm">
+          <div className="flex ml-2 w-[80px] justify-center items-center">
             <img
               src={profileImage ? profileImage : userAvatar}
               className={`w-[80px] h-[80px] text-[#dbdbdb] ${
-                profileImage ? "opacity-100 object-cover object-top" : "opacity-60"
+                profileImage
+                  ? "opacity-100 object-cover object-top rounded-xl"
+                  : "opacity-60"
               }`}
             ></img>
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col sm:ml-[10px]">
             <div className="flex gap-8 mb-3">
-              <label
-                htmlFor="file-upload"
+              <button
+                onClick={() => {
+                  setShowCropingProfile(true);
+                }}
                 className="text-[#2e7d32] text-sm cursor-pointer"
               >
                 Update
-              </label>
-              <input
-                id="file-upload"
-                onChange={onProfileImageChange}
-                className="hidden"
-                type="file"
-              />
+              </button>
               <button
                 onClick={removeProfileImg}
                 className="text-[#dc3546] text-sm cursor-pointer"
@@ -245,7 +204,7 @@ const EditProfile = () => {
               </button>
             </div>
             <div className="text-[#7a7a7a] text-sm w-[270px]">
-              Recommended: Square JPG, PNG, or GIF, at least 1,000 pixels per
+              Recommended: Square JPG, PNG, or GIF, at least 250 pixels per
               side.
             </div>
           </div>

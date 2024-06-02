@@ -6,32 +6,102 @@ import {
   AccountUserDrawer,
 } from "../../components";
 import Wrapper from "../../assets/wrappers/Dashboard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { IoSearchOutline } from "react-icons/io5";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import EditDashboardDialog from "./EditDashboardDialog";
 import ConfirmDelete from "./ConfirmDelete";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import moment from "moment";
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdSearchOff } from "react-icons/md";
 
 function DashboardList() {
   const navigate = useNavigate();
+  const axiosPrivate = useAxiosPrivate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [dashboards, setDashboard] = useState<
+    {
+      id: string;
+      nameDashboard: string;
+      description: string;
+      createdAt: string;
+    }[]
+  >([]);
 
-  const dashboard_list = [1, 2, 3, 4, 5];
+  const limitQuery: number = 5;
+  const [numOfPage, setNumOfPage] = useState<number>(1);
+  const [pageCount, setPageCount] = useState<number>(0);
+  // const [limitQuery, setLimitQuery] = useState<number>(5);
+  const [selectedDashboard, setSelectedDashboard] = useState<string>("");
+  const [sortCreatedAt, setSortCreatedAt] = useState<string>("-createdAt");
+  const elements = [];
 
   const [values, setValues] = useState({
     search_dashboard: "",
   });
+
+  const fetchAllDashboards = async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await axiosPrivate.get(
+        `/dashboards?limit=${limitQuery}&page=${numOfPage}&query=${values.search_dashboard}&createdAt=${sortCreatedAt}`
+      );
+      setDashboard(data?.data);
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 5000);
+      console.log("data.metadata.pageCount", data.metadata.pageCount);
+      setPageCount(data.metadata.pageCount);
+
+      if (data.metadata.pageCount === 1 && numOfPage !== 1) {
+        setNumOfPage(1);
+      }
+    } catch (err: unknown) {
+      setIsLoading(false);
+    }
+  };
+
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
+
+  const hookDeleteSuccess = () => {
+    fetchAllDashboards();
+  };
+  const hookEditSuccess = () => {
+    fetchAllDashboards();
+  };
+
+  for (let i = 1; i < pageCount + 1; i++) {
+    elements.push(
+      <button
+        onClick={() => {
+          setNumOfPage(i);
+        }}
+        key={i}
+        className={`${
+          numOfPage === i
+            ? "bg-[#1966fb] text-white"
+            : "bg-white text-[#7a7a7a]"
+        } cursor-pointer  border-[#cccccc] border-[1px] text-[13.5px] rounded-md w-[30px] h-[30px] flex items-center justify-center`}
+      >
+        {i}
+      </button>
+    );
+  }
+
+  useEffect(() => {
+    fetchAllDashboards();
+  }, [values.search_dashboard, numOfPage, sortCreatedAt]);
 
   return (
     <Wrapper>
@@ -42,10 +112,14 @@ function DashboardList() {
       <ConfirmDelete
         isDeleteConfirmOpen={isDeleteConfirmOpen}
         setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
+        selectedDashboard={selectedDashboard}
+        hookDeleteSuccess={hookDeleteSuccess}
       />
       <EditDashboardDialog
         isEditDialogOpen={isEditDialogOpen}
         setEditDialogOpen={setEditDialogOpen}
+        selectedDashboard={selectedDashboard}
+        hookEditSuccess={hookEditSuccess}
       />
       <BigNavbar
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
@@ -54,12 +128,12 @@ function DashboardList() {
         setIsSidebarShow={setIsSidebarShow}
       />
       <div className="flex h-[100vh]">
-        <NavLinkSidebar isSidebarShow={isSidebarShow}/>
+        <NavLinkSidebar isSidebarShow={isSidebarShow} />
         <NavDialog
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
         />
-        <div className="m-[3rem] top-[4rem] w-[100%] flex h-fit flex-col sm:m-0 sm:my-[3rem]">
+        <div className="m-[3rem] top-[4rem] w-[100%] flex h-fit flex-col sm:m-0 sm:my-[3rem] sm:mx-[1rem]">
           <button
             onClick={() => {
               setIsDrawerOpen(true);
@@ -71,7 +145,10 @@ function DashboardList() {
           </button>
 
           <div className="flex w-[100%] justify-between">
-            <div id="title-outlet" className="text-[23px] text-[#1d4469] font-bold mb-10">
+            <div
+              id="title-outlet"
+              className="text-[23px] text-[#1d4469] font-bold mb-10"
+            >
               Dashboard List
             </div>
             <div>
@@ -117,13 +194,13 @@ function DashboardList() {
                 <IoSearchOutline className="absolute text-[#1d4469] end-0 text-[20px]" />
               </div>
               <div className="flex justify-start sm:w-[100%]">
-              <div className="pb-2 sm:w-[100%]">
+                <div className="pb-2 sm:w-[100%]">
                   <select
-                    id="countries"
-                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full px-5 py-2"
-                    defaultValue={""}
-                    onChange={() => {
-                      
+                    id="sort-by-createdAt"
+                    className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full px-5 py-2 "
+                    defaultValue={sortCreatedAt}
+                    onChange={(e) => {
+                      setSortCreatedAt(e.target.value);
                     }}
                   >
                     <option value="-createdAt">Sort by Date</option>
@@ -134,7 +211,30 @@ function DashboardList() {
               </div>
             </div>
 
-            <div className="overflow-auto rounded-lg shadow block sm:shadow-none">
+            {dashboards.length === 0 && !isLoading && (
+              <div className="text-[80px] flex justify-center w-[100%] my-5 text-[#c0c0c0]">
+                {" "}
+                <MdSearchOff />
+              </div>
+            )}
+            {dashboards.length === 0 && !isLoading && (
+              <div className="text-md text-center w-[100%] my-5 text-[#c0c0c0]">
+                {" "}
+                Not found any Dashboard
+              </div>
+            )}
+
+            {isLoading && dashboards.length <= 0 && (
+              <div className="w-[100%] flex justify-center  h-[165px] items-center">
+                <div className="loader w-[50px] h-[50px] border-blue-200 border-b-transparent"></div>
+              </div>
+            )}
+
+            <div
+              className={`overflow-auto rounded-lg shadow block sm:shadow-none ${
+                dashboards.length === 0 && "hidden"
+              }`}
+            >
               <table className="w-full">
                 <thead className="border-b-2 border-gray-200 sm:hidden">
                   <tr>
@@ -154,28 +254,33 @@ function DashboardList() {
                 </thead>
                 {/* <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600"> */}
                 <tbody className="divide-y divide-gray-100">
-                  {dashboard_list.map((i) => {
+                  {dashboards.map((dashboard, index) => {
                     return (
                       <tr
-                        key={i}
-                        className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10"
+                        key={index}
+                        className="sm:flex h-[49.5px] sm:h-max sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10"
                       >
-                        <td onClick={()=>{
-                          navigate("/dashboard/:dashboard_id")
-                        }} className="cursor-pointer p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white">
-                          Dashboard Name
+                        <td
+                          onClick={() => {
+                            navigate("/dashboard/" + dashboard.id);
+                          }}
+                          className="cursor-pointer p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white "
+                        >
+                          {dashboard?.nameDashboard}
                         </td>
                         <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
-                          <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
+                          <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600 ">
                             Description{" "}
                           </div>
-                          ภายในบ้าน
+                          {dashboard?.description}
                         </td>
                         <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
                           <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
                             CreatedAt
                           </div>
-                          00/00/0000 00:00
+                          {moment(dashboard?.createdAt)
+                            .add(543, "year")
+                            .format("DD/MM/YYYY h:mm")}
                         </td>
                         <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
                           <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
@@ -184,6 +289,7 @@ function DashboardList() {
                           <div className="flex justify-center sm:justify-start">
                             <button
                               onClick={() => {
+                                setSelectedDashboard(dashboard?.id);
                                 setEditDialogOpen(true);
                               }}
                               className="mr-6 text-[#2E7D32]"
@@ -193,6 +299,7 @@ function DashboardList() {
                             <button
                               className="text-[#dc3546]"
                               onClick={() => {
+                                setSelectedDashboard(dashboard?.id);
                                 setIsDeleteConfirmOpen(!isDeleteConfirmOpen);
                               }}
                             >
@@ -206,23 +313,35 @@ function DashboardList() {
                 </tbody>
               </table>
             </div>
-            <div className="flex justify-end items-center w-[100%] mt-4">
-              <div className="mr-3 text-[12.4px]">1-5 of items</div>
-              <div className="flex gap-2">
-                <div className="border-[1px] text-[#7a7a7a] border-[#cccccc] rounded-md w-[30px] h-[30px] flex items-center justify-center">
-                  {"<"}
-                </div>
-                <div className="bg-[#1966fb] text-[13.5px]  text-white border-[1px] rounded-md w-[30px] h-[30px] flex items-center justify-center">
-                  1
-                </div>
-                <div className="border-[1px] text-[13.5px] text-[#7a7a7a] border-[#cccccc] rounded-md w-[30px] h-[30px] flex items-center justify-center">
-                  2
-                </div>
-                <div className="border-[1px] text-[13.5px] text-[#7a7a7a] border-[#cccccc] rounded-md w-[30px] h-[30px] flex items-center justify-center">
-                  {">"}
+            {pageCount > 1 && (
+              <div className="flex justify-end items-center w-[100%] mt-4 sm:flex-col">
+                <div className="mr-3 sm:mb-3 text-[12.4px]">1-5 of items</div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      if (numOfPage > 1) {
+                        setNumOfPage(numOfPage - 1);
+                      }
+                    }}
+                    className="cursor-pointer text-[#5e5e5e] bg-gray-50 rounded-md w-[30px] h-[30px] flex items-center justify-center hover:bg-gray-100 hover:border-[1px]"
+                  >
+                    <MdKeyboardArrowLeft />
+                  </button>
+                  {elements}
+                  <button
+                    onClick={() => {
+                      if (numOfPage < pageCount) {
+                        setNumOfPage(numOfPage + 1);
+                      }
+                    }}
+                    className="cursor-pointer text-[#5e5e5e] bg-gray-50 rounded-md w-[30px] h-[30px] flex items-center justify-center hover:bg-gray-100 hover:border-[1px]"
+                  >
+                    <MdKeyboardArrowRight />
+                  </button>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

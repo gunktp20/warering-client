@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Column, Id, Task } from "./types";
+import { Column } from "./types";
 import ColumnContainer from "./ColumnContainer";
 import {
   DndContext,
@@ -14,70 +14,289 @@ import {
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
 import TaskCard from "./TaskCard";
-import { BigNavbar, NavDialog, NavLinkSidebar } from "../../components";
+import {
+  BigNavbar,
+  NavDialog,
+  NavLinkSidebar,
+  SnackBar,
+} from "../../components";
 import Wrapper from "../../assets/wrappers/Dashboard";
+import { useNavigate, useParams } from "react-router-dom";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { IoArrowBackSharp } from "react-icons/io5";
+import { RiMenu2Fill } from "react-icons/ri";
+import { Button } from "@mui/material";
+import AddDisplayDialog from "./AddDisplayDialog";
+import { toggleEditMode } from "../../features/dashboard/dashboardSlice";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { RiDragDropLine } from "react-icons/ri";
+import mqtt from "mqtt";
+import EditWidgetDialog from "./EditWidgetDialog";
+import useAlert from "../../hooks/useAlert";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+
+interface ConfigWidget {
+  value: string;
+  min: number;
+  max: number;
+  unit: string;
+}
+
+interface Widget {
+  configWidget: ConfigWidget;
+  createdAt: string;
+  deviceId: string;
+  id: string;
+  label: string;
+  type: string;
+  updatedAt: string;
+}
+
+interface WidgetObject {
+  column: string;
+  widget: Widget;
+  widgetPositionId: string;
+  __v: number;
+  _id: string;
+  id: string;
+}
 
 const defaultCols: Column[] = [
   {
-    id: "col1",
+    id: "column-1",
     title: "Column 1",
   },
   {
-    id: "col2",
+    id: "column-2",
     title: "Colum 2",
   },
   {
-    id: "col3",
+    id: "column-3",
     title: "Colum 3",
   },
 ];
 
-const tasksStorage = localStorage.getItem("tasks")
+interface IWidget {
+  id: string;
+  widget: {
+    _id: string;
+  };
+  widgetId: string;
+  _id: string;
+  type: string;
+  label: string;
+  configWidget: IConfigWidget;
+  column: "column-1" | "column-2" | "column-3" | string;
+  widgetPositionId: string;
+  dashboardId: string;
+  deviceId: string;
+}
 
-const defaultTasks: Task[] = [
-  {
-    id: "1",
-    columnId: "col1",
-    category: "Gauge",
-  },
-  {
-    id: "2",
-    columnId: "col1",
-    category: "ButtonControl",
-  },
-  {
-    id: "3",
-    columnId: "col2",
-    category: "MessageBox",
-  },
-  {
-    id: "4",
-    columnId: "col2",
-    category: "RangeSlider",
-  },
-  {
-    id: "5",
-    columnId: "col3",
-    category: "ToggleSwitch",
-  },
-  {
-    id: "6",
-    columnId: "col3",
-    content: "Dev meeting",
-  },
-];
+interface IConfigWidget {
+  value: string;
+  min: number;
+  max: number;
+  unit: string;
+  button_label: string;
+  payload: string;
+  on_payload: string;
+  off_payload: string;
+}
 
 function KanbanBoard() {
   const [columns, setColumns] = useState<Column[]>(defaultCols);
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
-
+  const { editMode } = useAppSelector((state) => state.dashboard);
+  const { displayAlert, showAlert, alertText, alertType } = useAlert();
+  const { dashboard_id } = useParams();
+  const [dashboardInfo, setDashboardInfo] = useState<{
+    id?: string;
+    nameDashboard: string;
+    description: string;
+  }>({ nameDashboard: "", description: "" });
   // tasksStorage ? JSON.parse(tasksStorage) : vvv
-  const [tasks, setTasks] = useState<Task[]>(tasksStorage ? JSON.parse(tasksStorage) : defaultTasks);
+  // const [tasks, setTasks] = useState<Task[]>(
+  //   tasksStorage ? JSON.parse(tasksStorage) : defaultTasks
+  // );
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [selectedWidget, setSelectedWidget] = useState<string>("");
+  const dispatch = useAppDispatch();
+
+  const axiosPrivate = useAxiosPrivate();
+  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const [isEditDialogOpen, setEditDialogOpen] = useState<boolean>(false);
+  const [currentWidgets, setCurrentWidgets] = useState<IWidget[] | []>([]);
+  const [widgets, setWidgets] = useState<IWidget[] | []>([]);
+  const [payloadDevices, setPayloadDevices] = useState<
+    { deviceId: string; mqttPublish: (payload: string) => void }[]
+  >([]);
+
+  const onDeleteSuccess = () => {
+    displayAlert({
+      msg: "Deleted 1 widget",
+      type: "error",
+    });
+  };
+
+  const onAddWidgetSuccess = async () => {
+    await fetchDashboardById();
+    displayAlert({
+      msg: "Added your widget in dashboard",
+      type: "success",
+    });
+  };
+
+  const fetchWidgetsInDashboard = async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await axiosPrivate.get(`/dashboards/${dashboard_id}`);
+
+      const formattedWidgets = await data?.widgets.map(
+        (element: {
+          _id: string;
+          widget: { _id: string; label: string; type: string };
+        }) => {
+          const mergedWidget = {
+            ...element.widget,
+            ...element,
+            id: element.widget?._id,
+            widgetPositionId: element?._id,
+          };
+          return mergedWidget;
+        }
+      );
+      setWidgets(formattedWidgets);
+      return setIsLoading(false);
+    } catch (err: unknown) {
+      console.log(err);
+      return setIsLoading(false);
+    }
+  };
+
+  const fetchDashboardById = async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await axiosPrivate.get(`/dashboards/${dashboard_id}`);
+      setIsLoading(false);
+      setDashboardInfo(data);
+
+      const formattedWidgets = await data?.widgets.map(
+        (element: {
+          _id: string;
+          widget: { _id: string; label: string; type: string };
+        }) => {
+          const mergedWidget = {
+            ...element.widget,
+            ...element,
+            id: element.widget?._id,
+            widgetPositionId: element?._id,
+          };
+          return mergedWidget;
+        }
+      );
+      setCurrentWidgets(formattedWidgets);
+      setWidgets(formattedWidgets);
+
+      const initialPayloadDevices = data?.devices.map(
+        (device: { _id: string }) => {
+          return { deviceId: device._id };
+        }
+      );
+
+      setPayloadDevices(initialPayloadDevices);
+
+      await data?.devices.map(
+        async (device: {
+          _id: string;
+          usernameDevice: string;
+          password_law: string;
+          topics: string[];
+        }) => {
+          const { usernameDevice, password_law } = device;
+
+          const client = await mqtt.connect(import.meta.env.VITE_EMQX_DOMAIN, {
+            protocol: "ws",
+            host: "localhost",
+            clientId:
+              "emqx_react_" + Math.random().toString(16).substring(2, 8),
+            username: usernameDevice,
+            password: password_law,
+          });
+
+          const mqttPublish = (payload: string): void => {
+            if (client) {
+              client.publish(
+                device?.topics[1],
+                payload,
+                {
+                  qos: 0,
+                  retain: true,
+                },
+                (error) => {
+                  if (error) {
+                    console.log("Publish error: ", error);
+                  }
+                }
+              );
+            }
+          };
+
+          setPayloadDevices((prevPayloadDevices) => {
+            const mergedMqttPublisherDevices = prevPayloadDevices.map(
+              (payload) => {
+                if (payload.deviceId === device._id) {
+                  return { ...payload, mqttPublish };
+                }
+                return payload;
+              }
+            );
+            return mergedMqttPublisherDevices;
+          });
+
+          client.on("connect", () => {
+            if (client) {
+              client.subscribe(
+                device?.topics[0],
+                {
+                  qos: 0,
+                },
+                (err) => {
+                  console.log("not sub", err);
+                }
+              );
+            }
+          });
+          client.on("reconnect", () => {});
+
+          client.on("message", async (topic, message) => {
+            const payload = { topic, message: message.toString() };
+            const payloadObject = JSON.parse(
+              payload.message.replace(/'/g, '"')
+            );
+            setPayloadDevices((prevPayloadDevices) => {
+              const mergedPayloadDevices = prevPayloadDevices.map((payload) => {
+                if (payload.deviceId === device._id) {
+                  return { ...payload, ...payloadObject };
+                }
+                return payload;
+              });
+              return mergedPayloadDevices;
+            });
+          });
+        }
+      );
+    } catch (err: unknown) {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardById();
+  }, []);
 
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);
 
-  const [activeTask, setActiveTask] = useState<Task | null>(null);
-  const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const [activeTask, setActiveTask] = useState<WidgetObject | null>(null);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
@@ -90,75 +309,194 @@ function KanbanBoard() {
     })
   );
 
-  useEffect(() => {
-    console.log("useEffect tasks : ", tasks);
-  }, [tasks]);
+  const pushWidgetsPosition = async () => {
+    if (currentWidgets === widgets) {
+      return dispatch(toggleEditMode());
+    }
+    setIsLoading(true);
+    const mergedWidgetsPosition = await widgets?.map((widget) => {
+      const mergedWidget = {
+        widget: widget?.widget?._id,
+        column: widget?.column,
+        _id: widget?.widgetPositionId,
+      };
+      return mergedWidget;
+    });
+    try {
+      await axiosPrivate.put(`/dashboards/${dashboard_id}/position`, {
+        widgets: mergedWidgetsPosition,
+      });
+      displayAlert({
+        msg: "Updated widgets position",
+        type: "success",
+      });
+      setIsLoading(false);
+      dispatch(toggleEditMode());
+    } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err);
+      setIsLoading(false);
+      displayAlert({
+        msg,
+        type: "success",
+      });
+      dispatch(toggleEditMode());
+    }
+  };
+
+  const navigate = useNavigate();
+  const [isEditDisplayShow, setIsEditDisplayShow] = useState<boolean>(false);
+  useState<boolean>(false);
+
+  const selectWidget = async (widgetID: string) => {
+    setSelectedWidget(widgetID);
+    console.log(widgetID);
+    setIsEditDisplayShow(true);
+  };
 
   return (
     <Wrapper>
+      <AddDisplayDialog
+        isEditDialogOpen={isEditDialogOpen}
+        setEditDialogOpen={setEditDialogOpen}
+        selectedDashboard={dashboardInfo?.id}
+        dashboard_id={dashboard_id}
+        hookAddSuccess={onAddWidgetSuccess}
+      />
       <BigNavbar
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
         setIsSidebarShow={setIsSidebarShow}
         isSidebarShow={isSidebarShow}
       />
+      {selectedWidget && (
+        <EditWidgetDialog
+          widget_id={selectedWidget}
+          isEditDisplayShow={isEditDisplayShow}
+          setIsEditDisplayShow={setIsEditDisplayShow}
+          fetchAllWidgets={fetchWidgetsInDashboard}
+          setSelectedWidget={setSelectedWidget}
+        />
+      )}
       <div className="flex h-[100%]">
         <NavLinkSidebar isSidebarShow={isSidebarShow} />
         <NavDialog
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
         />
-        {/* content container */}
-        <div className="m-[3rem] w-[100%]  mt-0">
+        <div className="m-[3rem] top-[5rem] min-h-vh w-[100%] flex flex-col rounded-md sm:m-[1rem] sm:mt-[2.5rem]">
+          <div className="flex justify-between">
+            <button
+              onClick={() => {
+                setIsDrawerOpen(true);
+              }}
+              className="hidden p-1 w-fit h-fit relative sm:block text-[#8f8f8f] mb-6"
+              id="small-open-sidebar-btn"
+            >
+              <RiMenu2Fill className="text-[23px]" />
+            </button>
+
+            <button
+              onClick={() => {
+                navigate("/dashboard-list");
+              }}
+              className="flex cursor-pointer text-sm text-[#1D4469] font-bold items-center left-0 mb-10"
+            >
+              <IoArrowBackSharp className="text-sm mr-2" />
+              Back
+            </button>
+          </div>
+          <div className="flex w-[100%] justify-between">
+            <div
+              id="title-outlet"
+              className="text-[22px] text-[#1d4469] font-bold w-[100%] truncate sm:w-[150px]"
+            >
+              {dashboardInfo?.nameDashboard}
+            </div>
+            <div className="flex gap-6">
+              {!editMode && (
+                <button
+                  onClick={() => {
+                    dispatch(toggleEditMode());
+                  }}
+                  className="text-[14px] flex items-center gap-2 text-[#1D4469] h-[39px] bg-[#ebebeb] w-[39px] justify-center rounded-md border-[1px]"
+                >
+                  <RiDragDropLine className="text-[23px]" />
+                </button>
+              )}
+              {editMode && (
+                <button
+                  onClick={pushWidgetsPosition}
+                  className="text-[14px] flex items-center gap-2 h-[39px] bg-[#1D4469] w-[130px] justify-center rounded-md text-white font-semibold"
+                >
+                  {isLoading ? (
+                    <div className="loader w-[20px] h-[20px]"></div>
+                  ) : (
+                    "Save"
+                  )}
+                </button>
+              )}
+
+              <Button
+                onClick={() => {
+                  setEditDialogOpen(true);
+                }}
+                style={{
+                  textTransform: "none",
+                  width: "185px",
+                  height: "39px",
+                }}
+                sx={{
+                  border: 2,
+                  fontWeight: "bold",
+                  alignItems: "center",
+                  fontSize: "12px",
+                  color: "#1D4469",
+                  ":hover": {},
+                  ":disabled": {
+                    color: "#fff",
+                  },
+                }}
+                variant="outlined"
+                id="setup-user-submit"
+              >
+                Add Widget
+              </Button>
+            </div>
+          </div>
+
+          <div className="absolute left-0 top-[-4rem] text-[21px] text-[#1d4469] font-bold">
+            {dashboardInfo?.nameDashboard}
+          </div>
+
           <DndContext
             sensors={sensors}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             onDragOver={onDragOver}
           >
-            <div className="m-auto flex gap-4 ">
+            <div className=" flex gap-4 ">
               <div className="flex gap-4 w-[100%] h-[100vh]">
                 <SortableContext items={columnsId}>
-                {/* bg-yellow-500 */}
                   <div className="grid grid-cols-3 w-[100%] gap-2 md:grid-cols-2 sm:grid-cols-1 h-fit mt-9">
                     {columns.map((col) => (
                       <ColumnContainer
                         key={col.id}
                         column={col}
-                        deleteColumn={deleteColumn}
-                        updateColumn={updateColumn}
-                        createTask={createTask}
-                        deleteTask={deleteTask}
-                        updateTask={updateTask}
-                        tasks={tasks.filter((task) => task.columnId === col.id)}
+                        payloadDevices={payloadDevices}
+                        onDeleteSuccess={onDeleteSuccess}
+                        dashboard_id={
+                          dashboard_id !== undefined ? dashboard_id : ""
+                        }
+                        selectWidget={selectWidget}
+                        fetchAllWidgets={fetchWidgetsInDashboard}
+                        widgets={widgets.filter(
+                          (widget) => widget.column === col.id
+                        )}
                       />
                     ))}
                   </div>
                 </SortableContext>
               </div>
-              {/* <button
-            onClick={() => {
-              createNewColumn();
-            }}
-            className="
-      h-[60px]
-      w-[350px]
-      min-w-[350px]
-      cursor-pointer
-      rounded-lg
-      bg-mainBackgroundColor
-      border-2
-      border-columnBackgroundColor
-      p-4
-      ring-rose-500
-      hover:ring-2
-      flex
-      gap-2
-      "
-          >
-            <PlusIcon />
-            Add Column
-          </button> */}
             </div>
 
             {createPortal(
@@ -166,130 +504,73 @@ function KanbanBoard() {
                 {activeColumn && (
                   <ColumnContainer
                     column={activeColumn}
-                    deleteColumn={deleteColumn}
-                    updateColumn={updateColumn}
-                    createTask={createTask}
-                    deleteTask={deleteTask}
-                    updateTask={updateTask}
-                    tasks={tasks.filter(
-                      (task) => task.columnId === activeColumn.id
+                    payloadDevices={payloadDevices}
+                    onDeleteSuccess={onDeleteSuccess}
+                    dashboard_id={
+                      dashboard_id !== undefined ? dashboard_id : ""
+                    }
+                    selectWidget={selectWidget}
+                    fetchAllWidgets={fetchWidgetsInDashboard}
+                    widgets={widgets.filter(
+                      (widget) => widget.column === activeColumn.id
                     )}
                   />
                 )}
-                {activeTask && (
-                  <TaskCard
-                    task={activeTask}
-                    deleteTask={deleteTask}
-                    updateTask={updateTask}
-                  />
-                )}
+                {activeTask && <TaskCard task={activeTask} />}
               </DragOverlay>,
               document.body
             )}
           </DndContext>
         </div>
       </div>
+      {showAlert && (
+        <div id="add-device-snackbar" className="block sm:hidden">
+          <SnackBar
+            id="add-widget-dashboard-snackbar"
+            severity={alertType}
+            showSnackBar={showAlert}
+            snackBarText={alertText}
+          />
+        </div>
+      )}
     </Wrapper>
   );
 
-  function createTask(columnId: Id) {
-    const newTask: Task = {
-      id: generateId(),
-      columnId,
-      content: `Task ${tasks.length + 1}`,
-    };
-
-    setTasks([...tasks, newTask]);
-  }
-
-  function deleteTask(id: Id) {
-    const newTasks = tasks.filter((task) => task.id !== id);
-    setTasks(newTasks);
-  }
-
-  function updateTask(id: Id, content: string) {
-    const newTasks = tasks.map((task) => {
-      if (task.id !== id) return task;
-      return { ...task, content };
-    });
-
-    setTasks(newTasks);
-  }
-
-  // function createNewColumn() {
-  //   const columnToAdd: Column = {
-  //     id: generateId(),
-  //     title: `Column ${columns.length + 1}`,
-  //   };
-
-  //   setColumns([...columns, columnToAdd]);
-  // }
-
-  function deleteColumn(id: Id) {
-    const filteredColumns = columns.filter((col) => col.id !== id);
-    setColumns(filteredColumns);
-
-    const newTasks = tasks.filter((t) => t.columnId !== id);
-    setTasks(newTasks);
-  }
-
-  function updateColumn(id: Id, title: string) {
-    const newColumns = columns.map((col) => {
-      if (col.id !== id) return col;
-      return { ...col, title };
-    });
-
-    setColumns(newColumns);
-  }
-
   function onDragStart(event: DragStartEvent) {
-    console.log("onDragStart ", event);
-    console.log("Column and Task", event.active.data.current?.type);
     if (event.active.data.current?.type === "Column") {
       setActiveColumn(event.active.data.current.column);
       return;
     }
 
     if (event.active.data.current?.type === "Task") {
-      setActiveTask(event.active.data.current.task);
+      setActiveTask(event.active.data.current.widget);
       return;
     }
   }
 
   function onDragEnd(event: DragEndEvent) {
-    console.log("DragEndEvent", event.active.data.current?.sortable.items);
     setActiveColumn(null);
     setActiveTask(null);
 
     const { active, over } = event;
-    console.log("Over", active);
-    console.log("Active", active);
     if (!over) return;
 
     const activeId = active.id;
     const overId = over.id;
-    console.log("activeId", activeId);
-    console.log("overId", overId);
 
     if (activeId === overId) return;
 
     const isActiveAColumn = active.data.current?.type === "Column";
-    console.log("isActiveAColumn", isActiveAColumn);
     if (!isActiveAColumn) return;
-
-    console.log("DRAG END");
 
     setColumns((columns) => {
       const activeColumnIndex = columns.findIndex((col) => col.id === activeId);
-
       const overColumnIndex = columns.findIndex((col) => col.id === overId);
-
       return arrayMove(columns, activeColumnIndex, overColumnIndex);
     });
   }
 
   async function onDragOver(event: DragOverEvent) {
-    console.log("onDragOver", event);
     const { active, over } = event;
     if (!over) return;
 
@@ -303,42 +584,34 @@ function KanbanBoard() {
 
     if (!isActiveATask) return;
 
-    // Im dropping a Task over another Task
     if (isActiveATask && isOverATask) {
-      setTasks((tasks) => {
-        const activeIndex = tasks.findIndex((t) => t.id === activeId);
-        const overIndex = tasks.findIndex((t) => t.id === overId);
+      setWidgets((widgets) => {
+        const activeIndex = widgets.findIndex((t) => t.id === activeId);
+        const overIndex = widgets.findIndex((t) => t.id === overId);
 
-        if (tasks[activeIndex].columnId != tasks[overIndex].columnId) {
-          // Fix introduced after video recording
-          tasks[activeIndex].columnId = tasks[overIndex].columnId;
-          return arrayMove(tasks, activeIndex, overIndex - 1);
+        if (widgets[activeIndex].column != widgets[overIndex].column) {
+          widgets[activeIndex].column = widgets[overIndex].column;
+          return arrayMove(widgets, activeIndex, overIndex - 1);
         }
-        localStorage.setItem("tasks", JSON.stringify(arrayMove(tasks, activeIndex, overIndex)))
-        console.log(arrayMove(tasks, activeIndex, overIndex));
-        return arrayMove(tasks, activeIndex, overIndex);
-        
+        localStorage.setItem(
+          "widgets",
+          JSON.stringify(arrayMove(widgets, activeIndex, overIndex))
+        );
+        return arrayMove(widgets, activeIndex, overIndex);
       });
     }
 
     const isOverAColumn = over.data.current?.type === "Column";
 
     if (isActiveATask && isOverAColumn) {
-      setTasks((tasks) => {
-        const activeIndex = tasks.findIndex((t) => t.id === activeId);
+      setWidgets((widgets) => {
+        const activeIndex = widgets.findIndex((t) => t.id === activeId);
 
-        tasks[activeIndex].columnId = overId;
-        console.log("DROPPING TASK OVER COLUMN", { activeIndex });
-        localStorage.setItem("tasks", JSON.stringify(arrayMove(tasks, activeIndex, activeIndex)))
-        return arrayMove(tasks, activeIndex, activeIndex);
+        widgets[activeIndex].column = overId as string;
+        return arrayMove(widgets, activeIndex, activeIndex);
       });
     }
   }
-}
-
-function generateId() {
-  /* Generate a random number between 0 and 10000 */
-  return Math.floor(Math.random() * 10001);
 }
 
 export default KanbanBoard;

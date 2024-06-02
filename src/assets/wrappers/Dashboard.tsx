@@ -7,7 +7,6 @@ const Wrapper = styled.article`
   position: relative;
   display: flex;
   flex-direction: column;
-  
 `;
 
 export default Wrapper;

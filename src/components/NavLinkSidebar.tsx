@@ -4,13 +4,16 @@ import { VscGraph } from "react-icons/vsc";
 import { NavLink } from "react-router-dom";
 
 interface IProp {
-  isSidebarShow:boolean,
+  isSidebarShow: boolean;
 }
 
-const NavLinkSidebar = (props:IProp) => {
-  
+const NavLinkSidebar = (props: IProp) => {
   return (
-    <div className={`bg-[#fff] h-[100v%] w-[300px] shadow-md pt-5 w-sm flex flex-col sm:hidden transition-all ${!props.isSidebarShow && "ml-[-17.8rem]"}`}>
+    <div
+      className={`bg-[#fff] w-[300px] shadow-md pt-5 w-sm flex flex-col sm:hidden transition-all ${
+        !props.isSidebarShow && "ml-[-17.8rem]"
+      }`}
+    >
       <div className="flex flex-col">
         <NavLink
           to="/"

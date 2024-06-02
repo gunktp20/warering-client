@@ -17,8 +17,11 @@ import { IoSearchOutline } from "react-icons/io5";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { setDevices } from "../../features/device/deviceSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { MdSearchOff } from "react-icons/md";
+import { MdKeyboardArrowRight, MdSearchOff } from "react-icons/md";
+import { GoDotFill } from "react-icons/go";
 import moment from "moment";
+import useTimeout from "../../hooks/useTimeout";
+import { MdKeyboardArrowLeft } from "react-icons/md";
 
 function DeviceList() {
   const navigate = useNavigate();
@@ -33,35 +36,38 @@ function DeviceList() {
     useState<boolean>(false);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
-  // const [limitQuery, setLimitQuery] = useState<number>(5);
   const limitQuery: number = 5;
   const [numOfPage, setNumOfPage] = useState<number>(1);
   const [pageCount, setPageCount] = useState<number>(0);
-  const [selectedDevice, setSelectedDevice] = useState<any>();
+  const [selectedDevice, setSelectedDevice] = useState<string>("");
   const [sortCreatedAt, setSortCreatedAt] = useState<string>("-createdAt");
   const [filterByPermission, setFilterByPermission] = useState<string>("");
   const [filterByisSaveData, setFilterByIsSaveData] = useState<string>("");
   const elements = [];
 
-  const [timeoutIds, setTimeoutIds] = useState<any>([]);
-  const clearAllTimeouts = () => {
-    timeoutIds.forEach((timeoutId: any) => clearTimeout(timeoutId));
-    setTimeoutIds([]);
+  const onToggleSwitchSave = ({
+    id,
+    save,
+  }: {
+    id: string;
+    save: boolean;
+  }): void => {
+    setIsSaveDevice(id, save);
   };
-  const onToggleSwitchSave = ({ id, save }: { id: string; save: boolean }) => {
-    clearAllTimeouts();
-    const newTimeoutId = setTimeout(() => {
-      setIsSaveDevice(id, save);
-    }, 300);
-    setTimeoutIds([newTimeoutId]);
-  };
+
   const onTogglePermission = (id: string, permission: string) => {
-    clearAllTimeouts();
-    const newTimeoutId = setTimeout(() => {
-      setDevicePermission(id, permission);
-    }, 1000);
-    setTimeoutIds([newTimeoutId]);
+    setDevicePermission(id, permission);
   };
+
+  const { callHandler: callToggleSwitchSave } = useTimeout({
+    executeAction: onToggleSwitchSave,
+    duration: 1000,
+  });
+
+  const { callHandler: callTogglePermission } = useTimeout({
+    executeAction: onTogglePermission,
+    duration: 1000,
+  });
 
   const setIsSaveDevice = async (deviceId: string, save: boolean) => {
     try {
@@ -71,7 +77,7 @@ function DeviceList() {
       setIsLoading(false);
       fetchAllDevice();
       setPageCount(data.metadata.pageCount);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setIsLoading(false);
     }
   };
@@ -87,15 +93,13 @@ function DeviceList() {
         }${filterByisSaveData && "&isSaveData=" + filterByisSaveData}`
       );
       dispatch(setDevices(data.data));
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 5000);
+      setIsLoading(false);
       setPageCount(data.metadata.pageCount);
-  
+
       if (data.metadata.pageCount === 1 && numOfPage !== 1) {
         setNumOfPage(1);
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       setIsLoading(false);
     }
   };
@@ -108,7 +112,7 @@ function DeviceList() {
       });
       fetchAllDevice();
       setIsLoading(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setIsLoading(false);
     }
   };
@@ -186,7 +190,7 @@ function DeviceList() {
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
         />
-        <div className="m-[3rem] top-[4rem] w-[100%] flex h-fit flex-col sm:m-0 sm:my-[3rem]">
+        <div className="m-[3rem] top-[4rem] w-[100%] flex h-fit flex-col sm:m-0 sm:my-[3rem] sm:mx-[1rem]">
           <button
             onClick={() => {
               setIsDrawerOpen(true);
@@ -352,22 +356,27 @@ function DeviceList() {
                                 ? "text-green-500"
                                 : "text-red-500"
                             } whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}
-                            onClick={() => {
-                              onTogglePermission(
-                                i.id,
-                                i.permission === "allow" ? "deny" : "allow"
-                              );
-                            }}
                             id="toggle-activity-desktop"
                           >
                             <button
-                              className={`w-[8px] h-[8px] ${
+                              onClick={() => {
+                                callTogglePermission(
+                                  i.id,
+                                  i.permission === "allow" ? "deny" : "allow"
+                                );
+                              }}
+                              className={`flex items-center justify-center gap-1 transition-all capitalize cursor-pointer border-[1px] ${
+                                isLoading ? "cursor-wait" : "cursor-pointer"
+                              } ${
                                 i.permission === "allow"
-                                  ? "bg-green-500"
-                                  : "bg-red-500"
-                              } rounded-full mr-2`}
-                            ></button>
-                            {i.permission}
+                                  ? "hover:bg-green-500 hover:text-white border-green-500"
+                                  : "hover:bg-red-500 hover:text-white border-red-500"
+                              } px-2 rounded-lg`}
+                              disabled={isLoading}
+                            >
+                              <GoDotFill />
+                              {i.permission}
+                            </button>
                           </td>
 
                           <td
@@ -380,27 +389,35 @@ function DeviceList() {
                           </td>
 
                           <td
-                            className={`hidden items-center sm:flex capitalize p-3 text-[13px] ${
+                            className={`hidden items-center sm:flex cursor-pointer capitalize p-3 text-[13px] ${
                               i.permission === "allow"
                                 ? "text-green-500"
                                 : "text-red-500"
                             } whitespace-nowrap text-center sm:text-start`}
                             onClick={() => {
-                              onTogglePermission(
+                              callTogglePermission(
                                 i.id,
                                 i.permission === "allow" ? "deny" : "allow"
                               );
                             }}
                             id="toggle-activity-mobile"
                           >
-                            <div
-                              className={`w-[8px] h-[8px] ${
+                            <button
+                              onClick={() => {
+                                callTogglePermission(
+                                  i.id,
+                                  i.permission === "allow" ? "deny" : "allow"
+                                );
+                              }}
+                              className={`flex items-center justify-center gap-1 transition-all capitalize cursor-pointer border-[1px] ${
                                 i.permission === "allow"
-                                  ? "bg-green-500"
-                                  : "bg-red-500"
-                              } rounded-full mr-2`}
-                            ></div>
-                            {i.permission}
+                                  ? "hover:bg-green-500 hover:text-white border-green-500"
+                                  : "hover:bg-red-500 hover:text-white border-red-500"
+                              } px-2 rounded-lg`}
+                            >
+                              <GoDotFill />
+                              {i.permission}
+                            </button>
                           </td>
 
                           <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
@@ -411,7 +428,7 @@ function DeviceList() {
                               checked={i.isSaveData}
                               id={i.id + "-switch-save"}
                               onClick={() =>
-                                onToggleSwitchSave({
+                                callToggleSwitchSave({
                                   id: i.id,
                                   save: !i.isSaveData,
                                 })
@@ -459,7 +476,7 @@ function DeviceList() {
                 </tbody>
               </table>
             </div>
-            
+
             {pageCount > 1 && (
               <div className="flex justify-end items-center w-[100%] mt-4 sm:flex-col">
                 <div className="mr-3 sm:mb-3 text-[12.4px]">1-5 of items</div>
@@ -471,9 +488,9 @@ function DeviceList() {
                         setNumOfPage(numOfPage - 1);
                       }
                     }}
-                    className="cursor-pointer border-[1px] text-[#7a7a7a] border-[#cccccc] rounded-md w-[30px] h-[30px] flex items-center justify-center"
+                    className="cursor-pointer text-[#5e5e5e] bg-gray-50 rounded-md w-[30px] h-[30px] flex items-center justify-center hover:bg-gray-100 hover:border-[1px]"
                   >
-                    {"<"}
+                    <MdKeyboardArrowLeft />
                   </button>
                   {elements}
                   <button
@@ -482,9 +499,9 @@ function DeviceList() {
                         setNumOfPage(numOfPage + 1);
                       }
                     }}
-                    className="cursor-pointer border-[1px] text-[13.5px] text-[#7a7a7a] border-[#cccccc] rounded-md w-[30px] h-[30px] flex items-center justify-center"
+                    className="cursor-pointer text-[#5e5e5e] bg-gray-50 rounded-md w-[30px] h-[30px] flex items-center justify-center hover:bg-gray-100 hover:border-[1px]"
                   >
-                    {">"}
+                    <MdKeyboardArrowRight />
                   </button>
                 </div>
               </div>

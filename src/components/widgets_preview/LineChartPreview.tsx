@@ -6,13 +6,8 @@ import {
   PointElement,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { ILineChartPreviewProp } from "./types";
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
-
-interface IProp {
-  label: string;
-  min: number;
-  max: number;
-}
 
 function calculatePercentage(percent: number, baseNumber: number) {
   const result = (percent / 100) * baseNumber;
@@ -20,7 +15,7 @@ function calculatePercentage(percent: number, baseNumber: number) {
   return result;
 }
 
-function LineChartPreview({ label, min, max }: IProp) {
+function LineChartPreview({ label, min, max }: ILineChartPreviewProp) {
   const data = {
     labels: ["5", "15", "20", "21", "22", "25", "26"],
     datasets: [
@@ -30,12 +25,11 @@ function LineChartPreview({ label, min, max }: IProp) {
           calculatePercentage(5, max),
           calculatePercentage(21, max),
           calculatePercentage(42, max),
-          calculatePercentage(23,max),
-          calculatePercentage(24,max),
-          calculatePercentage(25,max),
-          calculatePercentage(40,max),
+          calculatePercentage(23, max),
+          calculatePercentage(24, max),
+          calculatePercentage(25, max),
+          calculatePercentage(40, max),
         ],
-        //  Data Y
         backgroundColor: "#1966fb",
         borderColor: "#00000013",
         border: "1px",

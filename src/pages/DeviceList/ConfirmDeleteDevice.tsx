@@ -7,7 +7,7 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
-    children: React.ReactElement<any, any>;
+    children: React.ReactElement;
   },
   ref: React.Ref<unknown>
 ) {
@@ -32,7 +32,7 @@ export default function ConfirmDelete(props: IProps) {
       setIsLoading(false);
       props.setIsDeleteConfirmOpen(false);
       props.hookDeleteSuccess();
-    } catch (err: any) {
+    } catch (err: unknown) {
       setIsLoading(false);
       props.setIsDeleteConfirmOpen(false);
     }

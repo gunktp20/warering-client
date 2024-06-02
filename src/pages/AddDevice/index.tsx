@@ -86,7 +86,7 @@ function AddDevice() {
   });
   const [retain, setRetain] = useState<boolean>(false);
   const options = [0, 1, 2];
-  const [qos, setQos] = useState<number>(options[0]);
+  const [qos, setQos] = useState<number | string>(options[0]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
@@ -317,7 +317,6 @@ function AddDevice() {
                   severity={snackBarType}
                   showSnackBar={showSnackBar}
                   snackBarText={snackBarText}
-                  setShowSnackBar={setShowSnackBar}
                 />
               </div>
             )}

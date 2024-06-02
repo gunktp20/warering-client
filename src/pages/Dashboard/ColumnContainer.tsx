@@ -1,32 +1,254 @@
 import { SortableContext, useSortable } from "@dnd-kit/sortable";
-import { Column, Id, Task } from "./types";
+import { Column } from "./types";
 import { CSS } from "@dnd-kit/utilities";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+interface IWidget {
+  id: string;
+  widget: {
+    _id: string;
+  };
+  widgetId: string;
+  _id: string;
+  type: string;
+  label: string;
+  configWidget: IConfigWidget;
+  column: "column-1" | "column-2" | "column-3" | string;
+  widgetPositionId: string;
+  dashboardId: string;
+  deviceId: string;
+}
+
+interface IConfigWidget {
+  value: string;
+  min: number;
+  max: number;
+  unit: string;
+  button_label: string;
+  payload: string;
+  on_payload: string;
+  off_payload: string;
+}
+
+type MqttPublish = (payload: string) => void;
+
 interface Props {
   column: Column;
-  deleteColumn: (id: Id) => void;
-  updateColumn: (id: Id, title: string) => void;
-
-  createTask: (columnId: Id) => void;
-  updateTask: (id: Id, content: string) => void;
-  deleteTask: (id: Id) => void;
-  tasks: Task[];
+  dashboard_id: string;
+  widgets: IWidget[];
+  onDeleteSuccess: () => void;
+  payloadDevices: {
+    deviceId: string;
+    [key: string]: string | number | MqttPublish;
+  }[];
+  selectWidget: (widget_id: string) => void;
+  fetchAllWidgets: () => void;
 }
-import { ButtonControl, Gauge, MessageBox, ToggleSwitch } from "../../components/widgets";
-import RangeSlider from "../../components/widgets/RangeSlider";
+
+import {
+  ButtonControl,
+  Gauge,
+  MessageBox,
+  RangeSlider,
+  ToggleSwitch,
+} from "../../components/widgets_dashboard";
+import LineChart from "../../components/widgets_dashboard/LineChart";
+import { useAppSelector } from "../../app/hooks";
 
 function ColumnContainer({
   column,
-  updateColumn,
-  tasks,
+  dashboard_id,
+  widgets,
+  payloadDevices,
+  selectWidget,
+  fetchAllWidgets,
+  onDeleteSuccess,
 }: Props) {
-  const [editMode, setEditMode] = useState(false);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
-    useState<boolean>(false);
+  const { editMode } = useAppSelector((state) => state.dashboard);
+  const [renderedWidgets, setRenderedWidgets] = useState<JSX.Element[]>([]);
+
+  const urgentMqttPublisher = (payload: string): void => {
+    console.log(payload);
+  };
+
+  const processWidgets = async (widgets: IWidget[]): Promise<JSX.Element[]> => {
+    const widgetPromises = widgets.map(async (widget, index: number) => {
+      if (widget.type === "Gauge") {
+        const matchedPayload = payloadDevices?.find(
+          (payload) => payload?.deviceId === widget?.deviceId
+        );
+
+        return (
+          <Gauge
+            key={index}
+            widget={widget}
+            onDeleteSuccess={onDeleteSuccess}
+            widgetId={widget?.id}
+            label={widget?.label}
+            value={
+              matchedPayload !== undefined
+                ? matchedPayload?.[widget?.configWidget?.value]
+                : null
+            }
+            min={widget?.configWidget?.min}
+            max={widget?.configWidget?.max}
+            unit={widget?.configWidget?.unit}
+            fetchAllWidgets={fetchAllWidgets}
+            selectWidget={selectWidget}
+            dashboardId={dashboard_id}
+            editMode={editMode}
+            id={""}
+          />
+        );
+      }
+      if (widget.type === "MessageBox") {
+        const matchedPayload = payloadDevices?.find(
+          (payload) => payload?.deviceId === widget?.deviceId
+        );
+
+        return (
+          <MessageBox
+            key={index}
+            widget={widget}
+            onDeleteSuccess={onDeleteSuccess}
+            widgetId={widget?.id}
+            label={widget?.label}
+            value={
+              matchedPayload !== undefined
+                ? matchedPayload?.[widget?.configWidget?.value]
+                : null
+            }
+            unit={widget?.configWidget?.unit}
+            fetchAllWidgets={fetchAllWidgets}
+            selectWidget={selectWidget}
+            dashboardId={dashboard_id}
+            editMode={editMode}
+            id={""}
+          />
+        );
+      }
+      if (widget.type === "ButtonControl") {
+        const matchedPayload = payloadDevices?.find(
+          (payload) => payload?.deviceId === widget?.deviceId
+        );
+
+        return (
+          <ButtonControl
+            key={index}
+            widget={widget}
+            onDeleteSuccess={onDeleteSuccess}
+            widgetId={widget?.id}
+            label={widget?.label}
+            button_label={widget?.configWidget?.button_label}
+            payload={widget?.configWidget?.payload}
+            fetchAllWidgets={fetchAllWidgets}
+            publishMQTT={
+              typeof matchedPayload?.mqttPublish === "function"
+                ? matchedPayload?.mqttPublish
+                : urgentMqttPublisher
+            }
+            selectWidget={selectWidget}
+            dashboardId={dashboard_id}
+            editMode={editMode}
+            id={""}
+          />
+        );
+      }
+      if (widget.type === "ToggleSwitch") {
+        const matchedPayload = payloadDevices?.find(
+          (payload) => payload?.deviceId === widget?.deviceId
+        );
+
+        console.log(typeof matchedPayload?.mqttPublish);
+
+        return (
+          <ToggleSwitch
+            widget={widget}
+            onDeleteSuccess={onDeleteSuccess}
+            key={index}
+            widgetId={widget?.id}
+            label={widget?.label}
+            on_payload={widget?.configWidget?.on_payload}
+            off_payload={widget?.configWidget?.off_payload}
+            value={widget?.configWidget?.value}
+            fetchAllWidgets={fetchAllWidgets}
+            publishMQTT={
+              typeof matchedPayload?.mqttPublish === "function"
+                ? matchedPayload?.mqttPublish
+                : urgentMqttPublisher
+            }
+            selectWidget={selectWidget}
+            dashboardId={dashboard_id}
+            editMode={editMode}
+            id={""}
+          />
+        );
+      }
+      if (widget.type === "RangeSlider") {
+        const matchedPayload = payloadDevices?.find(
+          (payload) => payload?.deviceId === widget?.deviceId
+        );
+
+        return (
+          <RangeSlider
+            widget={widget}
+            onDeleteSuccess={onDeleteSuccess}
+            key={index}
+            widgetId={widget?.id}
+            label={widget?.label}
+            min={widget?.configWidget?.min}
+            max={widget?.configWidget?.max}
+            value={widget?.configWidget?.value}
+            fetchAllWidgets={fetchAllWidgets}
+            publishMQTT={
+              typeof matchedPayload?.mqttPublish === "function"
+                ? matchedPayload?.mqttPublish
+                : urgentMqttPublisher
+            }
+            selectWidget={selectWidget}
+            dashboardId={dashboard_id}
+            editMode={editMode}
+            id={""}
+          />
+        );
+      }
+      if (widget.type === "LineChart") {
+        const matchedPayload = payloadDevices?.find(
+          (payload) => payload?.deviceId === widget?.deviceId
+        );
+
+        return (
+          <LineChart
+            widget={widget}
+            onDeleteSuccess={onDeleteSuccess}
+            key={index}
+            widgetId={widget?.id}
+            label={widget?.label}
+            min={widget?.configWidget?.min}
+            max={widget?.configWidget?.max}
+            fetchAllWidgets={fetchAllWidgets}
+            value={
+              matchedPayload !== undefined
+                ? matchedPayload?.[widget?.configWidget?.value]
+                : null
+            }
+            selectWidget={selectWidget}
+            dashboardId={dashboard_id}
+            editMode={editMode}
+            id={""}
+          />
+        );
+      }
+    });
+    const resolvedWidgets = await Promise.all(widgetPromises);
+    return resolvedWidgets.filter(
+      (element): element is JSX.Element => element !== undefined
+    );
+  };
 
   const tasksIds = useMemo(() => {
-    return tasks.map((task) => task.id);
-  }, [tasks]);
+    return widgets.map((widget) => widget.id);
+  }, [widgets]);
 
   const {
     setNodeRef,
@@ -41,13 +263,22 @@ function ColumnContainer({
       type: "Column",
       column,
     },
-    disabled: true,
+    disabled: false,
   });
 
   const style = {
     transition,
     transform: CSS.Transform.toString(transform),
   };
+
+  useEffect(() => {
+    const renderWidgets = async () => {
+      const widgetsToRender = await processWidgets(widgets);
+      setRenderedWidgets(widgetsToRender);
+    };
+
+    renderWidgets();
+  }, [widgets]);
 
   if (isDragging) {
     return (
@@ -74,153 +305,47 @@ function ColumnContainer({
       ref={setNodeRef}
       style={style}
       className="
-  w-[100%]
-  h-fit
-  rounded-md
-  flex
-  flex-col
-  
-  "
-  // border column medieum
-  // bg-blue-500
+w-[100%]
+h-fit
+rounded-md
+flex
+flex-col
+"
     >
-      {/* Column title */}
       <div
         {...attributes}
         {...listeners}
-        onClick={() => {
-          setEditMode(true);
-        }}
-        // border-2
-        // bg-red-500
         className="
-        text-md
-        cursor-grab
-        rounded-md
-        rounded-b-none
-        font-bold
-      
-        flex
-        items-center
-        justify-between
-        text-black
-        "
+      text-md
+      cursor-grab
+      rounded-md
+      rounded-b-none
+      font-bold
+    
+      flex
+      items-center
+      justify-between
+      text-black
+      "
       >
         <div className="flex gap-2">
           <div
             className="
-        flex
-        justify-center
-        items-center
-        px-2
-        py-1
-        text-sm
-        rounded-full
-        text-white
-        "
-          >
-            {/* 0 */}
-          </div>
-          {/* {!editMode && column.id} */}
-          {editMode && (
-            <input
-              className=" focus:border-[#1966fb] border rounded outline-none px-2"
-              value={column.title}
-              onChange={(e) => updateColumn(column.id, e.target.value)}
-              autoFocus
-              onBlur={() => {
-                setEditMode(false);
-              }}
-              onKeyDown={(e) => {
-                if (e.key !== "Enter") return;
-                setEditMode(false);
-              }}
-            />
-          )}
+      flex
+      justify-center
+      items-center
+      px-2
+      py-1
+      text-sm
+      rounded-full
+      text-white
+      "
+          ></div>
         </div>
-        {/* <button
-          onClick={() => {
-            deleteColumn(column.id);
-          }}
-          className="
-        stroke-gray-500
-        hover:stroke-white
-        hover:bg-columnBackgroundColor
-        rounded
-        px-1
-        py-2
-        "
-        >
-          TrashIcon
-        </button> */}
       </div>
-
-      {/* Column task container */}
       <div className="flex grow flex-col gap-4 p-2 overflow-x-hidden overflow-y-auto ">
-        <SortableContext items={tasksIds}>
-          {tasks.map((task) => {
-            if (task?.category === "Gauge") {
-              return (
-                <Gauge
-                  key={task.id}
-                  task={task}
-                  isDeleteConfirmOpen={isDeleteConfirmOpen}
-                  setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-                />
-              );
-            }
-            if (task?.category === "ButtonControl") {
-              return (
-                <ButtonControl
-                  key={task.id}
-                  task={task}
-                  isDeleteConfirmOpen={isDeleteConfirmOpen}
-                  setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-                />
-              );
-            }
-            if (task?.category === "MessageBox") {
-              return (
-                <MessageBox
-                  key={task.id}
-                  task={task}
-                  isDeleteConfirmOpen={isDeleteConfirmOpen}
-                  setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-                />
-              );
-            }
-            if (task?.category === "RangeSlider") {
-              return (
-                <RangeSlider
-                  key={task.id}
-                  task={task}
-                  isDeleteConfirmOpen={isDeleteConfirmOpen}
-                  setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-                />
-              );
-            }
-            if (task?.category === "ToggleSwitch") {
-              return (
-                <ToggleSwitch
-                  key={task.id}
-                  task={task}
-                  isDeleteConfirmOpen={isDeleteConfirmOpen}
-                  setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-                />
-              );
-            }
-          })}
-        </SortableContext>
+        <SortableContext items={tasksIds}>{renderedWidgets}</SortableContext>
       </div>
-      {/* Column footer */}
-      {/* <button
-        className="hidden gap-2 items-center border-columnBackgroundColor border-2 rounded-md p-4 border-x-columnBackgroundColor hover:bg-mainBackgroundColor hover:text-[#1966fb] active:bg-black"
-        onClick={() => {
-          createTask(column.id);
-        }}
-      > */}
-        {/* + Add task */}
-      {/* </button> */}
     </div>
   );
 }

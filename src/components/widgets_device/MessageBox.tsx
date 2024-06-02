@@ -6,32 +6,37 @@ import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-interface IProp {
-  label: string;
-  value: string;
-  unit?: string;
-  widgetId: string;
-  fetchAllWidgets: () => void
-  selectWidget: (widget_id: string) => void
-}
-function MessageBox({ label, value, unit, widgetId, fetchAllWidgets, selectWidget }: IProp) {
+import { IMessageBoxDeviceProp } from "./types";
+
+function MessageBox({
+  label,
+  value,
+  unit,
+  widgetId,
+  fetchAllWidgets,
+  selectWidget,
+}: IMessageBoxDeviceProp) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   function checkThaiLanguage(text: string) {
     // ใช้ Regular Expression เพื่อตรวจสอบว่า text มีตัวอักษรภาษาไทยหรือไม่
-    
+
     // eslint-disable-next-line prefer-const
     let thaiRegex = new RegExp(/[\u0E00-\u0E7F]+/);
     return thaiRegex.test(text);
   }
 
   // ตัวอย่างการใช้งาน
-  console.log(checkThaiLanguage("Hello, สวัสดี")); // true
-  console.log(checkThaiLanguage("Hello, World!")); // false
+  // console.log(checkThaiLanguage("Hello, สวัสดี")); // true
+  // console.log(checkThaiLanguage("Hello, World!")); // false
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
   return (
     <div className="h-[130px] w-[100%] bg-white relative shadow-md flex justify-center items-center rounded-md hover:ring-2 overflow-hidden">
-      {!value && <div className="w-[100%] h-[100%] bg-white z-10 flex absolute justify-center items-center font-bold text-[#0075ff]">IDLE</div>}
+      {!value && (
+        <div className="w-[100%] h-[100%] bg-white z-10 flex absolute justify-center items-center font-bold text-[#0075ff]">
+          IDLE
+        </div>
+      )}
       <div className="z-30 absolute left-2 top-2 text-[#1d4469] text-[12px]">
         {label}
       </div>
@@ -45,10 +50,13 @@ function MessageBox({ label, value, unit, widgetId, fetchAllWidgets, selectWidge
       </div>
       {isOptionOpen && (
         <div className="z-30 bg-white flex flex-col absolute top-6 right-2 border-[1px] rounded-md shadow-sm">
-          <button onClick={() => {
-            selectWidget(widgetId)
-            setIsOptionOpen(false)
-          }} className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]">
+          <button
+            onClick={() => {
+              selectWidget(widgetId);
+              setIsOptionOpen(false);
+            }}
+            className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]"
+          >
             Edit
           </button>
           <button
@@ -61,8 +69,11 @@ function MessageBox({ label, value, unit, widgetId, fetchAllWidgets, selectWidge
           </button>
         </div>
       )}
-      <div className={`text-[#1966fb] font-bold flex ${checkThaiLanguage(value) ? "text-[12.8px] font-thin" : "text-[19px]"}`}>
-
+      <div
+        className={`text-[#1966fb] font-bold flex ${
+          checkThaiLanguage(value) ? "text-[12.8px] font-thin" : "text-[19px]"
+        }`}
+      >
         {value}
         <div className="text-[11px] font-medium text-[#5353538a] text-right ml-2">
           {unit}
@@ -96,7 +107,7 @@ function ConfirmDelete({
   widgetId,
   isDeleteConfirmOpen,
   setIsDeleteConfirmOpen,
-  fetchAllWidgets
+  fetchAllWidgets,
 }: IProps) {
   const axiosPrivate = useAxiosPrivate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -107,11 +118,10 @@ function ConfirmDelete({
   const onDelete = async () => {
     setIsLoading(true);
     try {
-      const { data } = await axiosPrivate.delete(`/widgets/${widgetId}`);
-      console.log(data);
+      await axiosPrivate.delete(`/widgets/${widgetId}`);
       setIsLoading(false);
       setIsDeleteConfirmOpen(false);
-      fetchAllWidgets()
+      fetchAllWidgets();
     } catch (err) {
       setIsLoading(false);
     }

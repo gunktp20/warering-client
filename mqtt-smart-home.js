@@ -38,7 +38,7 @@ client.on("connect", function () {
         retain: true,
       }
     );
-  }, 500);
+  }, 1000);
 
   setInterval(() => {
     client.subscribe(

@@ -2,11 +2,7 @@ import { RiMenu2Fill } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../app/hooks";
 import userAvatar from "../assets/images/user-avatar.png";
-import { useEffect, useState } from "react";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import { jwtDecode } from "jwt-decode";
-import { AccessTokenPayload } from "../features/auth/types";
-import getAxiosErrorMessage from "../utils/getAxiosErrorMessage";
+import { useEffect, memo } from "react";
 
 interface IProps {
   setIsAccountUserDrawerOpen: (active: boolean) => void;
@@ -17,30 +13,9 @@ interface IProps {
 
 function BigNavbar(props: IProps) {
   const navigate = useNavigate();
-  const { user, token } = useAppSelector((state) => state.auth);
-  const [profileImage, setProfileImg] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const axiosPrivate = useAxiosPrivate();
-  const decoded: AccessTokenPayload | undefined = token
-    ? jwtDecode(token)
-    : undefined;
+  const { user, profileImg, isLoading } = useAppSelector((state) => state.auth);
 
-  const getUserInfo = async () => {
-    setIsLoading(true);
-    try {
-      const { data } = await axiosPrivate.get(`/users/${decoded?.sub}`);
-      setIsLoading(false);
-      setProfileImg(data?.profileUrl);
-    } catch (err: unknown) {
-      const msg = await getAxiosErrorMessage(err);
-      console.log(msg);
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    getUserInfo();
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <div className="bg-[#fff] w-[100%] p-3 flex justify-between shadow-sm items-center">
@@ -66,31 +41,37 @@ function BigNavbar(props: IProps) {
         </button>
       </div>
       <div className=" flex items-center pr-[3rem] sm:pr-2">
-        <div className="text-[13.5px] sm:hidden text-[#1d4469] font-semibold">
-          {user?.username}
+        {isLoading && <div className="loader w-[20px] h-[20px]"></div>}
+        <div
+          onClick={() => {
+            if (isLoading) {
+              return;
+            }
+            props.setIsAccountUserDrawerOpen(!props.isAccountUserDrawerOpen);
+          }}
+          className="text-[13.5px] sm:hidden text-[#1d4469] font-semibold text-nowrap cursor-pointer"
+        >
+          {isLoading ? "loading..." : user?.username}
         </div>
-        <img
-          src={profileImage ? profileImage : userAvatar}
-          onClick={() => {
-            props.setIsAccountUserDrawerOpen(!props.isAccountUserDrawerOpen);
-          }}
-          className={`ml-4 w-[42px] h-[42px]text-[#dbdbdb] ${
-            profileImage ? "opacity-100 object-cover object-top" : "opacity-60"
-          }`}
-        ></img>
-        {/* <img
-          id="account-user-drawer-toggle"
-          src={
-            "https://www.wilsoncenter.org/sites/default/files/media/images/person/james-person-1.jpg"
-          }
-          className="ml-5 w-[42px] h-[42px] object-cover rounded-[100px]"
-          onClick={() => {
-            props.setIsAccountUserDrawerOpen(!props.isAccountUserDrawerOpen);
-          }}
-        ></img> */}
+        {isLoading ? (
+          <div className="loader w-[23px] h-[23px]"></div>
+        ) : (
+          <img
+            src={profileImg ? profileImg : userAvatar}
+            onClick={() => {
+              if (isLoading) {
+                return;
+              }
+              props.setIsAccountUserDrawerOpen(!props.isAccountUserDrawerOpen);
+            }}
+            className={`cursor-pointer ml-4 w-[42px] h-[42px]text-[#dbdbdb] rounded-[100%] ${
+              profileImg ? "opacity-100 object-cover object-top" : "opacity-60"
+            }`}
+          ></img>
+        )}
       </div>
     </div>
   );
 }
 
-export default BigNavbar;
+export default memo(BigNavbar);

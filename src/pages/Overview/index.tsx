@@ -14,7 +14,6 @@ import { IoBan } from "react-icons/io5";
 function Overview() {
   const dispatch = useAppDispatch();
   const axiosPrivate = useAxiosPrivate();
-  // const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
   const { deviceOffline, deviceOnline, totalDevice, totalDeviceDeny } =
     useAppSelector((state) => state.device);
@@ -23,29 +22,24 @@ function Overview() {
     useState<boolean>(false);
 
   const fetchDeviceOverview = async () => {
-    // setIsLoading(true);
-    try {
-      const { data } = await axiosPrivate.get(`/api/overview`);
-      dispatch(setDeviceOverview(data));
-      // setIsLoading(false);
-    } catch (err: any) {
-      // setIsLoading(false);
-    }
+    const response = await axiosPrivate.get(`/api/overview`);
+    console.log("response", response);
+    dispatch(setDeviceOverview(response?.data));
   };
 
   useEffect(() => {
     fetchDeviceOverview();
   }, []);
 
-  useEffect(() => {
-    const timeoutID = setInterval(() => {
-      fetchDeviceOverview();
-    }, 5000);
+  // useEffect(() => {
+  //   const timeoutID = setInterval(() => {
+  //     fetchDeviceOverview();
+  //   }, 5000);
 
-    return () => {
-      clearInterval(timeoutID);
-    };
-  }, []);
+  //   return () => {
+  //     clearInterval(timeoutID);
+  //   };
+  // }, []);
 
   return (
     <Wrapper>
@@ -82,7 +76,6 @@ function Overview() {
           >
             Overview
           </div>
-
           <div className="grid w-[100%] gap-[3rem] grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 ">
             <div className="w-[100%] device-status border-solid border-t-[4px] border-[#45a2f9] h-fit p-3 pl-5 bg-[#fff] shadow-md">
               <div className="mb-2 text-[#1966fb]">All Device</div>
@@ -90,7 +83,7 @@ function Overview() {
                 <div className="flex justify-between items-center mb-1">
                   <div
                     id="total-device-val"
-                    className="text-[30px] text-[#1966fb]"
+                    className="text-[30.5px] text-[#1966fb]"
                   >
                     {totalDevice ? totalDevice : "0"}
                   </div>
@@ -98,8 +91,8 @@ function Overview() {
                     <GoCpu className="text-[25px] text-[#45a2f9]" />
                   </div>
                 </div>
-                <div className="text-[13px] text-[#7a7a7a]">
-                  SN: Device0001 - 2024-01-07 12:57:46
+                <div className="text-[13px] text-[#7a7a7a] w-[100%] h-[10px]">
+                  {/* SN: Device0001 - 2024-01-07 12:57:46 */}
                 </div>
               </div>
             </div>
@@ -118,8 +111,8 @@ function Overview() {
                     <HiOutlineStatusOnline className="text-[25px] text-[#2e7d32]" />
                   </div>
                 </div>
-                <div className="text-[13px] text-[#7a7a7a]">
-                  SN: Device0001 - 2024-01-07 12:57:46
+                <div className="text-[13px] text-[#7a7a7a] w-[100%] h-[10px]">
+                  {/* SN: Device0001 - 2024-01-07 12:57:46 */}
                 </div>
               </div>
             </div>
@@ -129,7 +122,7 @@ function Overview() {
                 <div className="flex justify-between items-center mb-1">
                   <div
                     id="device-offline-val"
-                    className="text-[30px] text-[#7a7a7a]"
+                    className="text-[30.5px] text-[#7a7a7a]"
                   >
                     {deviceOffline ? deviceOffline : "0"}
                   </div>
@@ -137,8 +130,8 @@ function Overview() {
                     <MdOutlineWifiOff className="text-[25px] text-[#7a7a7a]" />
                   </div>
                 </div>
-                <div className="text-[13px] text-[#7a7a7a]">
-                  SN: Device0001 - 2024-01-07 12:57:46
+                <div className="text-[13px] text-[#7a7a7a] w-[100%] h-[10px]">
+                  {/* SN: Device0001 - 2024-01-07 12:57:46 */}
                 </div>
               </div>
             </div>
@@ -149,7 +142,7 @@ function Overview() {
                 <div className="flex justify-between items-center mb-1">
                   <div
                     id="total-device-val"
-                    className="text-[30px] text-[#dc3546]"
+                    className="text-[30.5px] text-[#dc3546]"
                   >
                     {totalDeviceDeny ? totalDeviceDeny : "0"}
                   </div>
@@ -157,8 +150,8 @@ function Overview() {
                     <IoBan className="text-[25px] text-[#dc3546]" />
                   </div>
                 </div>
-                <div className="text-[13px] text-[#7a7a7a]">
-                  SN: Device0001 - 2024-01-07 12:57:46
+                <div className="text-[13px] text-[#7a7a7a] w-[100%] h-[10px]">
+                  {/* SN: Device0001 - 2024-01-07 12:57:46 */}
                 </div>
               </div>
             </div>

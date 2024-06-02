@@ -8,25 +8,23 @@ import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { IGaugeDeviceProp } from "./types";
 
 export type Id = string | number;
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const options = {};
-
-interface IProp {
-  label: string;
-  value: number;
-  min: number;
-  max: number;
-  unit: string;
-  widgetId: string;
-  fetchAllWidgets:()=>void
-  selectWidget:(widget_id:any)=>void
-}
-
-function Gauge({ label, value, min, max, unit, widgetId ,fetchAllWidgets ,selectWidget }: IProp) {
+function Gauge({
+  label,
+  value,
+  min,
+  max,
+  unit,
+  widgetId,
+  fetchAllWidgets,
+  selectWidget,
+}: IGaugeDeviceProp) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
@@ -52,7 +50,11 @@ function Gauge({ label, value, min, max, unit, widgetId ,fetchAllWidgets ,select
   };
   return (
     <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 overflow-hidden">
-      {!value && <div className="w-[100%] h-[100%] bg-white z-10 flex absolute justify-center items-center font-bold text-[#0075ff]">IDLE</div>}
+      {!value && (
+        <div className="w-[100%] h-[100%] bg-white z-10 flex absolute justify-center items-center font-bold text-[#0075ff]">
+          IDLE
+        </div>
+      )}
       <div className="z-30 absolute left-2 top-2 text-[#1d4469] text-[12px]">
         {label}
       </div>
@@ -66,10 +68,13 @@ function Gauge({ label, value, min, max, unit, widgetId ,fetchAllWidgets ,select
       </div>
       {isOptionOpen && (
         <div className="z-30 bg-white flex flex-col absolute top-6 right-2 border-[1px] rounded-md shadow-sm">
-          <button onClick={()=>{
-            selectWidget(widgetId)
-            setIsOptionOpen(false)
-          }} className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]">
+          <button
+            onClick={() => {
+              selectWidget(widgetId);
+              setIsOptionOpen(false);
+            }}
+            className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]"
+          >
             Edit
           </button>
           <button
@@ -94,14 +99,13 @@ function Gauge({ label, value, min, max, unit, widgetId ,fetchAllWidgets ,select
         setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
         fetchAllWidgets={fetchAllWidgets}
       />
-      
     </div>
   );
 }
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
-    children: React.ReactElement<any, any>;
+    children: React.ReactElement;
   },
   ref: React.Ref<unknown>
 ) {
@@ -112,14 +116,14 @@ interface IProps {
   widgetId: string;
   isDeleteConfirmOpen: boolean;
   setIsDeleteConfirmOpen: (active: boolean) => void;
-  fetchAllWidgets:()=>void
+  fetchAllWidgets: () => void;
 }
 
 function ConfirmDelete({
   widgetId,
   isDeleteConfirmOpen,
   setIsDeleteConfirmOpen,
-  fetchAllWidgets
+  fetchAllWidgets,
 }: IProps) {
   const axiosPrivate = useAxiosPrivate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -134,7 +138,7 @@ function ConfirmDelete({
       console.log(data);
       setIsLoading(false);
       setIsDeleteConfirmOpen(false);
-      fetchAllWidgets()
+      fetchAllWidgets();
     } catch (err) {
       setIsLoading(false);
     }

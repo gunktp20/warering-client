@@ -16,15 +16,14 @@ import { Button } from "@mui/material";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Alert } from "@mui/material";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
-import LineChartPreview from "../../components/widgets_preview/LineChart";
+import LineChartPreview from "../../components/widgets_preview/LineChartPreview";
 
 interface IWidget {
   id: string;
   type?: string;
   label?: string;
-  configWidget: IConfigWidget;
+  configWidget?: IConfigWidget;
 }
-
 interface IConfigWidget {
   value?: string;
   min?: number;
@@ -32,10 +31,9 @@ interface IConfigWidget {
   unit?: string;
   button_label?: string;
   payload?: string;
-  on_payload?: string | undefined;
-  off_payload?: string | undefined;
+  on_payload?: string | number;
+  off_payload?: string | number;
 }
-
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
     children: React.ReactElement;
@@ -61,8 +59,8 @@ const initialState: {
   unit: string;
   payload: '{ "key":value , "key":value }';
   button_label: string;
-  on_payload: string | number;
-  off_payload: string | number;
+  on_payload: string | number | undefined;
+  off_payload: string | number | undefined;
 } = {
   label: "",
   value: "",
@@ -84,6 +82,7 @@ export default function AddWidgetDialog(props: IProps) {
     "error" | "success" | "info" | "warning"
   >("error");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+
   const handleClose = () => {
     setOccupation("");
     setValues(initialState);
@@ -100,7 +99,6 @@ export default function AddWidgetDialog(props: IProps) {
     setTimeoutIds([]);
   };
   const clearAlert = () => {
-    setIsLoading(true);
     clearAllTimeouts();
     const newTimeoutId = setTimeout(() => {
       setShowSnackBar(false);
@@ -110,7 +108,9 @@ export default function AddWidgetDialog(props: IProps) {
   const onSubmit = () => {
     const { label, value, min, max, unit, payload, on_payload, off_payload } =
       values;
-    const widgetInfo: IWidget = {};
+    const widgetInfo: IWidget = {
+      id: "",
+    };
     if (
       occupation === "Gauge" &&
       (!label || !value || min === null || !max || !unit)
@@ -209,12 +209,12 @@ export default function AddWidgetDialog(props: IProps) {
           widgetInfo.type = occupation;
           widgetInfo.configWidget = {
             value: values.value,
-            on_payload: isNaN(values.on_payload)
+            on_payload: isNaN(Number(values.on_payload))
               ? values.on_payload
-              : parseInt(values.on_payload),
-            off_payload: isNaN(values.off_payload)
+              : parseInt(values.on_payload?.toString() || "0"),
+            off_payload: isNaN(Number(values.off_payload))
               ? values.off_payload
-              : parseInt(values.off_payload),
+              : parseInt(values.off_payload?.toString() || "0"),
           };
           createWidget(widgetInfo);
           return;
@@ -276,12 +276,13 @@ export default function AddWidgetDialog(props: IProps) {
       props.fetchAllWidgets();
       setValues(initialState);
     } catch (err: unknown) {
+      setIsLoading(false);
       const msg = await getAxiosErrorMessage(err);
       setShowSnackBar(true);
       setSnackBarType("error");
       setSnackBarText(msg);
       clearAlert();
-      setIsLoading(false);
+      return;
     }
   };
 
@@ -304,6 +305,7 @@ export default function AddWidgetDialog(props: IProps) {
               <div className="text-[17px] font-bold text-[#1D4469]">
                 Add widget
               </div>
+              {isLoading ? "isLoading" : "is not loading"}
               <div className="text-[12px] mt-2">
                 Please select widget occupation and provide your values.
               </div>
@@ -525,11 +527,11 @@ export default function AddWidgetDialog(props: IProps) {
             )}
             {occupation === "LineChart" && (
               <div className="flex gap-10 mt-5 sm:flex-col sm:gap-0 w-[100%]">
-                 <LineChartPreview
-                    label={values.label}
-                    min={values.min}
-                    max={values.max}
-                  />
+                <LineChartPreview
+                  label={values.label}
+                  min={values.min}
+                  max={values.max}
+                />
               </div>
             )}
 
@@ -595,7 +597,6 @@ export default function AddWidgetDialog(props: IProps) {
                       severity={snackBarType}
                       showSnackBar={showSnackBar}
                       snackBarText={snackBarText}
-                      setShowSnackBar={setShowSnackBar}
                     />
                   </div>
                 )}

@@ -1,5 +1,4 @@
 import { RxDotsHorizontal } from "react-icons/rx";
-import { Button } from "@mui/material";
 import { useState } from "react";
 import * as React from "react";
 import Dialog from "@mui/material/Dialog";
@@ -15,18 +14,8 @@ import {
   PointElement,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import { ILineChartDeviceProp } from "./types";
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
-
-interface IProp {
-  label: string;
-  widgetId: string;
-  value: string;
-  min: number;
-  max: number;
-  fetchAllWidgets: () => void;
-  publishMQTT: (payload: string) => void;
-  selectWidget: (widget_id: string) => void;
-}
 
 function LineChart({
   label,
@@ -35,33 +24,38 @@ function LineChart({
   min,
   max,
   fetchAllWidgets,
-  publishMQTT,
   selectWidget,
-}: IProp) {
+}: ILineChartDeviceProp) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
+  const [values, setValues] = useState<number[]>([]);
+  const [timeStamps, setTimeStamps] = useState<string[]>([]);
 
-  function calculatePercentage(percent: number, baseNumber: number) {
-    const result = (percent / 100) * baseNumber;
-    console.log(`${percent}% of ${baseNumber} is ${result}`);
-    return result;
+  function getCurrentTime() {
+    // Create a new Date object to get the current time
+    const now = new Date();
+
+    // Get the current minutes and seconds
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+
+    // Format the minutes and seconds to be two digits (e.g., 02 instead of 2)
+    const formattedMinutes = String(minutes).padStart(2, "0");
+    const formattedSeconds = String(seconds).padStart(2, "0");
+
+    // Combine the formatted minutes and seconds into a single string
+    const timeString = `${formattedMinutes}:${formattedSeconds}`;
+
+    return timeString;
   }
 
   const data = {
-    labels: ["5", "15", "20", "21", "22", "25", "26"],
+    labels: [...timeStamps],
     datasets: [
       {
-        label: "Sales of the Week",
-        data: [
-          calculatePercentage(5, max),
-          calculatePercentage(21, max),
-          calculatePercentage(42, max),
-          calculatePercentage(23, max),
-          calculatePercentage(24, max),
-          calculatePercentage(25, max),
-          calculatePercentage(40, max),
-        ],
+        label: "",
+        data: [...values],
         //  Data Y
         backgroundColor: "#1966fb",
         borderColor: "#00000013",
@@ -75,14 +69,66 @@ function LineChart({
   };
 
   const options = {
-    legend: true,
-    scales: {
-      y: {
-        min: Math.floor(min),
-        max: Math.floor(max),
+    animation: {
+      duration: 1,
+    },
+    plugins: {
+      legend: {
+        display: false,
+      },
+      scales: {
+        y: {
+          min: Math.floor(min),
+          max: Math.floor(max),
+        },
+        // x: {
+        //     display: false // Hide X axis labels
+        // }
       },
     },
   };
+
+  const pushNumber = (number: number): void => {
+    setValues((prevNumbers) => {
+      // Create a new array based on the previous state
+      const newNumbers = [...prevNumbers];
+      console.log(newNumbers);
+
+      // Check if the array length is equal to 7
+      if (newNumbers.length === 6) {
+        // Remove the first element from the array (index 0)
+        newNumbers.shift();
+      }
+
+      // Push the new number to the end of the array
+      newNumbers.push(number);
+
+      // Return the new array state
+      return newNumbers;
+    });
+    setTimeStamps((prevStamps) => {
+      // Create a new array based on the previous state
+
+      const newStamp = [...prevStamps];
+      console.log(newStamp);
+
+      // Check if the array length is equal to 6
+      if (newStamp.length === 6) {
+        // Remove the first element from the array (index 0)
+        newStamp.shift();
+      }
+
+      // Push the new number to the end of the array
+      newStamp.push(getCurrentTime());
+
+      // Return the new array state
+      return newStamp;
+    });
+  };
+
+  React.useEffect(() => {
+    pushNumber(value);
+  }, [value]);
 
   return (
     <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2">
@@ -95,7 +141,10 @@ function LineChart({
         }}
         className="absolute right-3 top-2 text-[18px] text-[#7a7a7a] cursor-pointer hover:bg-[#f7f7f7] hover:rounded-md "
       >
-        <Line data={data} options={options} className="flex flex-grow"></Line>
+        <RxDotsHorizontal />
+      </div>
+      <div className="h-[100%] flex pt-[5px] w-[100%] justify-center ">
+        <Line data={data} options={options}></Line>
       </div>
       {isOptionOpen && (
         <div className="bg-white flex flex-col absolute top-6 right-2 border-[1px] rounded-md shadow-sm">

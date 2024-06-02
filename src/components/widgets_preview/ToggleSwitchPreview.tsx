@@ -1,12 +1,9 @@
 import { styled } from "@mui/material/styles";
 import Switch, { SwitchProps } from "@mui/material/Switch";
 import { useState } from "react";
+import { IToggleSwitchPreviewProp } from "./types";
 
-interface IProps {
-  label: string;
-}
-
-function ToggleSwitchPreview({ label }: IProps) {
+function ToggleSwitchPreview({ label }: IToggleSwitchPreviewProp) {
   const [isActive, setIsActive] = useState<boolean>(true);
 
   return (
@@ -29,14 +26,7 @@ interface IProp extends SwitchProps {
 }
 
 const SwitchMui = styled((props: IProp) => (
-  <Switch
-    onChange={() => {
-    //   props.setIsActive(!props.isActive);
-    }}
-    focusVisibleClassName=".Mui-focusVisible"
-    disableRipple
-    {...props}
-  />
+  <Switch focusVisibleClassName=".Mui-focusVisible" disableRipple {...props} />
 ))(({ theme }) => ({
   width: 70,
   height: 30,

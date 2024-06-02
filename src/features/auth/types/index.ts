@@ -8,6 +8,7 @@ export interface IAuthState {
     email: string;
     roles: role[];
   } | null;
+  profileImg: string;
   token: string | null;
   isLoading: boolean;
   showAlert: boolean;

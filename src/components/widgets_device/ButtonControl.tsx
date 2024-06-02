@@ -7,19 +7,17 @@ import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { IButtonControlDeviceProp } from "./types";
 
-interface IProp {
-  label: string;
-  widgetId: string;
-  button_label: string;
-  payload: string;
-  fetchAllWidgets: () => void
-  publishMQTT: (payload: string) => void;
-  selectWidget: (widget_id: string) => void
-}
-
-
-function ButtonControl({ label, button_label, widgetId, payload, fetchAllWidgets, publishMQTT, selectWidget }: IProp) {
+function ButtonControl({
+  label,
+  button_label,
+  widgetId,
+  payload,
+  fetchAllWidgets,
+  publishMQTT,
+  selectWidget,
+}: IButtonControlDeviceProp) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
@@ -39,10 +37,13 @@ function ButtonControl({ label, button_label, widgetId, payload, fetchAllWidgets
       </div>
       {isOptionOpen && (
         <div className="bg-white flex flex-col absolute top-6 right-2 border-[1px] rounded-md shadow-sm">
-          <button onClick={() => {
-            selectWidget(widgetId)
-            setIsOptionOpen(false)
-          }} className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]">
+          <button
+            onClick={() => {
+              selectWidget(widgetId);
+              setIsOptionOpen(false);
+            }}
+            className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]"
+          >
             Edit
           </button>
           <button
@@ -57,7 +58,7 @@ function ButtonControl({ label, button_label, widgetId, payload, fetchAllWidgets
       )}
       <Button
         onClick={() => {
-          publishMQTT(payload)
+          publishMQTT(payload);
         }}
         style={{
           textTransform: "none",
@@ -101,14 +102,14 @@ interface IProps {
   widgetId: string;
   isDeleteConfirmOpen: boolean;
   setIsDeleteConfirmOpen: (active: boolean) => void;
-  fetchAllWidgets: () => void
+  fetchAllWidgets: () => void;
 }
 
 function ConfirmDelete({
   widgetId,
   isDeleteConfirmOpen,
   setIsDeleteConfirmOpen,
-  fetchAllWidgets
+  fetchAllWidgets,
 }: IProps) {
   const axiosPrivate = useAxiosPrivate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -123,7 +124,7 @@ function ConfirmDelete({
       console.log(data);
       setIsLoading(false);
       setIsDeleteConfirmOpen(false);
-      fetchAllWidgets()
+      fetchAllWidgets();
     } catch (err) {
       setIsLoading(false);
     }

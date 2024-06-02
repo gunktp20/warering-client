@@ -4,18 +4,17 @@ import {
   NavDialog,
   AccountUserDrawer,
 } from "../../components";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { IoMdCheckmark } from "react-icons/io";
 import { RiMenu2Fill } from "react-icons/ri";
 import { IoArrowBackSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { SiMicrosoftexcel } from "react-icons/si";
 import { BsFiletypeJson } from "react-icons/bs";
-// import { FaClipboardList } from "react-icons/fa";
 import Wrapper from "../../assets/wrappers/Device";
-import { MqttClient } from "mqtt";
 import { LuEye } from "react-icons/lu";
 import { LuEyeOff } from "react-icons/lu";
+import mqtt, { MqttClient } from "mqtt";
 import {
   ButtonControl,
   Gauge,
@@ -33,7 +32,6 @@ import TopicsDialog from "./TopicsDialog";
 import AddWidgetDialog from "./AddWidgetDialog";
 import EditWidgetDialog from "./EditWidgetDialog";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
-// Line Chart Module
 import {
   Chart as ChartJS,
   LineElement,
@@ -41,8 +39,6 @@ import {
   LinearScale,
   PointElement,
 } from "chart.js";
-import { Line } from "react-chartjs-2";
-import ConnectMQTT from "../../services/mqtt";
 import LineChart from "../../components/widgets_device/LineChart";
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
@@ -98,10 +94,15 @@ function Device() {
   const [isTopicsShow, setIsTopicsShow] = useState<boolean>(false);
   const [isAddWidgetShow, setIsAddWidgetShow] = useState<boolean>(false);
   const [selectedWidget, setSelectedWidget] = useState<string>("");
-  const [widgets, setWidgets] = useState<IWidget[]>([]);
 
-  const [configWidgetsDevice, setConfigWidgetsDevice] =
-    useState<IConfigWidget>();
+  const [widgets, setWidgets] = useState<IWidget[]>([]);
+  const [configWidgetsDevice, setConfigWidgetsDevice] = useState<{
+    [key: string]: string | number;
+  }>();
+
+  useEffect(() => {
+    console.log("configWidgetsDevice", configWidgetsDevice);
+  }, [configWidgetsDevice]);
 
   const fetchDeviceById = async () => {
     setIsLoading(true);
@@ -131,7 +132,6 @@ function Device() {
       setIsLoading(false);
     }
   };
-
   const mqttPublish = (payload: string) => {
     if (client) {
       client.publish(
@@ -149,15 +149,19 @@ function Device() {
       );
     }
   };
-
-  const connectEMQX = async (data: {
-    usernameDevice: string;
-    password: string;
-  }) => {
-    const Mqtt = awaitConnectMQTT.getInstance(data?.usernameDevice, data?.password);
-    setClient(Mqtt._mqtt);
-  };
-
+  const connectEMQX = useCallback(
+    async (data: { usernameDevice: string; password: string }) => {
+      const _mqtt = await mqtt.connect(import.meta.env.VITE_EMQX_DOMAIN, {
+        protocol: "ws",
+        host: "localhost",
+        clientId: "emqx_react_" + Math.random().toString(16).substring(2, 8),
+        username: data?.usernameDevice,
+        password: data?.password,
+      });
+      setClient(_mqtt);
+    },
+    []
+  );
   const mqttDisconnect = () => {
     if (client) {
       client.end(() => {
@@ -165,7 +169,6 @@ function Device() {
       });
     }
   };
-
   useEffect(() => {
     fetchDeviceById();
     fetchAllWidgets();
@@ -175,7 +178,6 @@ function Device() {
     if (client) {
       client.on("connect", () => {
         setConnectStatus("Connected");
-        // console.log("connection successful");
         console.log(connectStatus);
         if (client) {
           client.subscribe(
@@ -195,6 +197,7 @@ function Device() {
 
       client.on("message", (topic, message) => {
         const payload = { topic, message: message.toString() };
+        console.log(payload);
         try {
           const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
           setConfigWidgetsDevice(payloadObject);
@@ -204,7 +207,7 @@ function Device() {
         }
       });
     }
-    
+
     return () => {
       mqttDisconnect();
     };
@@ -214,33 +217,6 @@ function Device() {
     setSelectedWidget(widgetID);
     console.log(widgetID);
     setIsEditDisplayShow(true);
-  };
-  const data = {
-    labels: ["2", "4", "6", "8", "10", "12", "14", "16", "18", "20"],
-    datasets: [
-      {
-        label: "Sales of the Week",
-        data: [10, 21, 22, 23, 24, 25, 10, 15, 11, 10],
-        //  Data Y
-        backgroundColor: "#1966fb",
-        borderColor: "#00000013",
-        border: "1px",
-        pointBorderColor: "#1966fb",
-        fill: true,
-        tension: 0.4,
-        borderWidth: 1.8,
-      },
-    ],
-  };
-
-  const options = {
-    legend: true,
-    scales: {
-      y: {
-        min: 10,
-        max: 25,
-      },
-    },
   };
 
   return (
@@ -462,12 +438,6 @@ function Device() {
                 JSON
               </div>
             </div>
-            {/* <div className="flex flex-col justify-center items-center">
-              <FaClipboardList className="text-[#1d4469] text-[25px]" />
-              <div className="text-[13px] mt-3 text-[#1d4469] font-bold">
-                Clip Board
-              </div>
-            </div> */}
           </div>
 
           <div className="w-[300px] mt-8 sm:w-[100%]">
@@ -500,21 +470,20 @@ function Device() {
           </div>
 
           {/* start widget container */}
-
           <div className="grid grid-cols-3 gap-10 mt-8 md:grid-cols-2 sm:grid-cols-1">
             {widgets &&
               widgets.map((widget: IWidget, index: number) => {
-                // console.log(`${[widget.nameDevice]}`, widget);
-                // console.log(`unit`, widget?.configWidget?.unit);
-                // console.log(widget)
-                // console.log(widget?.configWidget);
                 if (widget.type === "Gauge") {
                   return (
                     <Gauge
                       key={index}
                       widgetId={widget?.id}
                       label={widget?.label}
-                      value={configWidgetsDevice?.[widget?.configWidget?.value]}
+                      value={
+                        configWidgetsDevice !== undefined
+                          ? configWidgetsDevice?.[widget?.configWidget?.value]
+                          : null
+                      }
                       min={widget?.configWidget?.min}
                       max={widget?.configWidget?.max}
                       unit={widget?.configWidget?.unit}
@@ -529,7 +498,11 @@ function Device() {
                       key={index}
                       widgetId={widget?.id}
                       label={widget?.label}
-                      value={configWidgetsDevice?.[widget?.configWidget?.value]}
+                      value={
+                        configWidgetsDevice !== undefined
+                          ? configWidgetsDevice?.[widget?.configWidget?.value]
+                          : null
+                      }
                       unit={widget?.configWidget?.unit}
                       fetchAllWidgets={fetchAllWidgets}
                       selectWidget={selectWidget}
@@ -588,46 +561,19 @@ function Device() {
                       label={widget?.label}
                       min={widget?.configWidget?.min}
                       max={widget?.configWidget?.max}
-                      value={widget?.configWidget?.value}
                       fetchAllWidgets={fetchAllWidgets}
-                      publishMQTT={mqttPublish}
+                      value={
+                        configWidgetsDevice !== undefined
+                          ? configWidgetsDevice?.[widget?.configWidget?.value]
+                          : null
+                      }
                       selectWidget={selectWidget}
                     />
                   );
                 }
-                
               })}
-            {/* <Gauge
-              isDeleteConfirmOpen={isDeleteConfirmOpen}
-              setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-            />
-            <MessageBox
-              isDeleteConfirmOpen={isDeleteConfirmOpen}
-              setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-            />
-            <RangeSlider
-              isDeleteConfirmOpen={isDeleteConfirmOpen}
-              setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-            />
-            <ToggleSwitch
-              isDeleteConfirmOpen={isDeleteConfirmOpen}
-              setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-            />
-            <ButtonControl
-              isDeleteConfirmOpen={isDeleteConfirmOpen}
-              setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-            /> */}
-            {/* <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 overflow-hidden">
-              <Line
-                data={data}
-                options={options}
-                className="flex flex-grow mx-14"
-              ></Line>
-            </div> */}
           </div>
-          {/* end widget container */}
         </div>
-        {/* content container */}
       </div>
     </Wrapper>
   );

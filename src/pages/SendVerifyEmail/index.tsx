@@ -8,7 +8,7 @@ import verified_success from "../../assets/images/Verified-amico.svg";
 import verify_error from "../../assets/images/401 Error Unauthorized-amico.svg";
 
 function SendVerifyEmail() {
-  let { token } = useParams();
+  const { token } = useParams();
   const { isLoading, alertText, alertType } = useAppSelector(
     (state) => state.auth
   );

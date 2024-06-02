@@ -93,4 +93,64 @@ table th {
     table tr:nth-child(even){background-color: "#000";}
 }
 
+.device select:required:invalid {
+  color: gray;
+}
+.device option[value=""][disabled] {
+  display: none;
+}
+.device option {
+  color: black;
+}
+
+.crop-container {
+  position: relative;
+  width: 100%;
+  height: 400px; /* Set desired height */
+  background-color: #fff; /* Background color for the container */
+  border: 2px solid #fff; /* Border color for the container */
+  border-radius: 10px; /* Rounded corners */
+  overflow: hidden; /* Hide overflow */
+}
+
+.cropper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.cropper .reactEasyCrop_CropArea {
+  border: 2px solid rgba(255, 255, 255, 0.7); /* Adjust border style as needed */
+  border-radius: 50%; /* Make the crop area circular */
+}
+
+.cropper .reactEasyCrop_CropArea:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8); /* Make the overlay white and semi-transparent */
+  border-radius: 50%; /* Match the crop area shape */
+  z-index: 1;
+  pointer-events: none; /* Allow interactions with the crop area */
+}
+
+.cropper .reactEasyCrop_CropAreaOverlay {
+  background: none !important; /* Remove default overlay */
+}
+
+.cropper .reactEasyCrop_CropAreaOverlay:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6); /* Overlay outside the crop area */
+  z-index: -1;
+  pointer-events: none; /* Allow interactions with the crop area */
+}
+
 

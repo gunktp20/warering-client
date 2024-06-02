@@ -1,7 +1,7 @@
 import { Fade } from "react-awesome-reveal";
 
 interface IProp {
-  img: any;
+  img: string;
   title: string;
   description: string;
 }

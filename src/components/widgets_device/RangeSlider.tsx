@@ -7,6 +7,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
+import { IRangeSliderDeviceProp } from "./types";
 
 // const MAX = 10;
 // const MIN = 0;
@@ -20,37 +21,37 @@ import { TransitionProps } from "@mui/material/transitions";
 //   },
 // ];
 const CustomSliderStyles = {
-    '& .MuiSlider-thumb': {
-        color: "#1966fb"
-    },
-    '& .MuiSlider-track': {
-        color: "#1966fb",
-        height: 8,
-    },
-    '& .MuiSlider-rail': {
-        color: "#8cb3fd",
-        height: 8,
-    },
-    '& .MuiSlider-active': {
-    }}
-interface IProp {
-    label:string
-    min:number
-    max:number
-    value:string
-    widgetId: string;
-    fetchAllWidgets:()=>void
-    publishMQTT: (payload: any) => void;
-    selectWidget:(widget_id:any)=>void
-}
-export default function RangeSlider({label,min,max,widgetId,value,fetchAllWidgets,publishMQTT,selectWidget}:IProp) {
+  "& .MuiSlider-thumb": {
+    color: "#1966fb",
+  },
+  "& .MuiSlider-track": {
+    color: "#1966fb",
+    height: 8,
+  },
+  "& .MuiSlider-rail": {
+    color: "#8cb3fd",
+    height: 8,
+  },
+  "& .MuiSlider-active": {},
+};
+
+export default function RangeSlider({
+  label,
+  min,
+  max,
+  widgetId,
+  value,
+  fetchAllWidgets,
+  publishMQTT,
+  selectWidget,
+}: IRangeSliderDeviceProp) {
   const [val, setVal] = React.useState<number>(min);
   const handleChange = (_: Event, newValue: number | number[]) => {
     setVal(newValue as number);
   };
   const [isOptionOpen, setIsOptionOpen] = React.useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
-  React.useState<boolean>(false);
+    React.useState<boolean>(false);
   return (
     <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2">
       <div className="absolute left-2 top-2 text-[#1d4469] text-[12px]">
@@ -66,10 +67,13 @@ export default function RangeSlider({label,min,max,widgetId,value,fetchAllWidget
       </div>
       {isOptionOpen && (
         <div className="z-30 bg-white flex flex-col absolute top-6 right-2 border-[1px] rounded-md shadow-sm">
-          <button onClick={()=>{
-            selectWidget(widgetId)
-            setIsOptionOpen(false)
-          }} className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]">
+          <button
+            onClick={() => {
+              selectWidget(widgetId);
+              setIsOptionOpen(false);
+            }}
+            className="text-[#7a7a7a] text-sm px-8 py-2 hover:bg-[#f7f7f7]"
+          >
             Edit
           </button>
           <button
@@ -82,24 +86,24 @@ export default function RangeSlider({label,min,max,widgetId,value,fetchAllWidget
           </button>
         </div>
       )}
-      <Box sx={{ width: "100%", paddingLeft:"2rem",paddingRight:"2rem"}}>
-      <Slider
-        onChangeCommitted={()=>{
-          const payload = {
-            [value]:val,
-          };
-          publishMQTT(JSON.stringify(payload))
-        }}
-        step={1}
-        value={val}
-        valueLabelDisplay="auto"
-        min={min}
-        max={max}
-        onChange={handleChange}
-        sx={CustomSliderStyles}
-      />
-    </Box>
-    <ConfirmDelete
+      <Box sx={{ width: "100%", paddingLeft: "2rem", paddingRight: "2rem" }}>
+        <Slider
+          onChangeCommitted={() => {
+            const payload = {
+              [value]: val,
+            };
+            publishMQTT(JSON.stringify(payload));
+          }}
+          step={1}
+          value={val}
+          valueLabelDisplay="auto"
+          min={min}
+          max={max}
+          onChange={handleChange}
+          sx={CustomSliderStyles}
+        />
+      </Box>
+      <ConfirmDelete
         widgetId={widgetId}
         isDeleteConfirmOpen={isDeleteConfirmOpen}
         setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
@@ -111,7 +115,7 @@ export default function RangeSlider({label,min,max,widgetId,value,fetchAllWidget
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
-    children: React.ReactElement<any, any>;
+    children: React.ReactElement;
   },
   ref: React.Ref<unknown>
 ) {
@@ -122,14 +126,14 @@ interface IProps {
   widgetId: string;
   isDeleteConfirmOpen: boolean;
   setIsDeleteConfirmOpen: (active: boolean) => void;
-  fetchAllWidgets:() => void;
+  fetchAllWidgets: () => void;
 }
 
 function ConfirmDelete({
   widgetId,
   isDeleteConfirmOpen,
   setIsDeleteConfirmOpen,
-  fetchAllWidgets
+  fetchAllWidgets,
 }: IProps) {
   const axiosPrivate = useAxiosPrivate();
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -144,7 +148,7 @@ function ConfirmDelete({
       console.log(data);
       setIsLoading(false);
       setIsDeleteConfirmOpen(false);
-      fetchAllWidgets()
+      fetchAllWidgets();
     } catch (err) {
       setIsLoading(false);
     }
