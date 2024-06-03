@@ -17,6 +17,10 @@ import { Button } from "@mui/material";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Alert } from "@mui/material";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import { displayAlert as displayWidgetAlert, clearAlert as clearWidgetAlert } from "../../features/widget/widgetSlice";
+import { useAppDispatch } from "../../app/hooks";
+import useTimeout from "../../hooks/useTimeout";
+import useAlert from "../../hooks/useAlert";
 
 interface IWidget {
   type?: string;
@@ -73,13 +77,10 @@ const initialState: {
 };
 
 export default function AddWidgetDialog(props: IProps) {
+  const dispatch = useAppDispatch()
+  const { showAlert, alertText, alertType, displayAlert } = useAlert()
   const [occupation, setOccupation] = useState<string>("");
   const axiosPrivate = useAxiosPrivate();
-  const [showSnackBar, setShowSnackBar] = useState<boolean>(false);
-  const [snackBarText, setSnackBarText] = useState<string>("");
-  const [snackBarType, setSnackBarType] = useState<
-    "error" | "success" | "info" | "warning"
-  >("error");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleClose = () => {
@@ -87,76 +88,48 @@ export default function AddWidgetDialog(props: IProps) {
     setValues(initialState);
     props.setIsAddWidgetShow(false);
   };
+
   const [values, setValues] = useState<typeof initialState>(initialState);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
-  const [timeoutIds, setTimeoutIds] = useState<NodeJS.Timeout[]>([]);
-  const clearAllTimeouts = () => {
-    timeoutIds.forEach((timeoutId: NodeJS.Timeout) => clearTimeout(timeoutId));
-    setTimeoutIds([]);
-  };
-  const clearAlert = () => {
-    clearAllTimeouts();
-    const newTimeoutId = setTimeout(() => {
-      setShowSnackBar(false);
-    }, 3000);
-    setTimeoutIds([newTimeoutId]);
-  };
+
   const onSubmit = () => {
     const { label, value, min, max, unit, payload, on_payload, off_payload } =
       values;
-    const widgetInfo : IWidget = {}
+    const widgetInfo: IWidget = {}
     if (
       occupation === "Gauge" &&
       (!label || !value || min === null || !max || !unit)
     ) {
-      setShowSnackBar(true);
-      setSnackBarType("error");
-      setSnackBarText("Please provide all value!");
-      clearAlert();
+      displayAlert({ msg: "Please provide all value", type: "error" })
       return;
     }
     if (occupation === "Gauge" && min > max) {
-      setShowSnackBar(true);
-      setSnackBarType("error");
-      setSnackBarText("min value must be < max value");
-      clearAlert();
+      displayAlert({ msg: "min value must be < max value", type: "error" })
       return;
     }
     if (occupation === "ButtonControl" && (!label || !payload)) {
-      setShowSnackBar(true);
-      setSnackBarType("error");
-      setSnackBarText("Please provide all value!");
-      clearAlert();
+      displayAlert({ msg: "Please provide all value", type: "error" })
       return;
     }
     if (
       occupation === "ToggleSwitch" &&
       (!label || on_payload === null || off_payload === null || !value)
     ) {
-      setShowSnackBar(true);
-      setSnackBarType("error");
-      setSnackBarText("Please provide all value!");
-      clearAlert();
+      displayAlert({ msg: "Please provide all value", type: "error" })
       return;
     }
     if (
       occupation === "RangeSlider" &&
       (!label || !value || min === null || !max)
     ) {
-      setShowSnackBar(true);
-      setSnackBarType("error");
-      setSnackBarText("Please provide all value!");
-      clearAlert();
+      displayAlert({ msg: "Please provide all value", type: "error" })
       return;
     }
     if (occupation === "RangeSlider" && min > max) {
-      setShowSnackBar(true);
-      setSnackBarType("error");
-      setSnackBarText("min value must be < max value");
-      clearAlert();
+      displayAlert({ msg: "min value must be < max value", type: "error" })
       return;
     }
     switch (occupation) {
@@ -194,10 +167,7 @@ export default function AddWidgetDialog(props: IProps) {
           createWidget(widgetInfo);
           return;
         } catch (err: unknown) {
-          setShowSnackBar(true);
-          setSnackBarType("error");
-          setSnackBarText("Payload must be JSON format");
-          clearAlert();
+          displayAlert({ msg: "Payload must be JSON format", type: "error" })
           return;
         }
       case "ToggleSwitch":
@@ -216,10 +186,7 @@ export default function AddWidgetDialog(props: IProps) {
           createWidget(widgetInfo);
           return;
         } catch (err: unknown) {
-          setShowSnackBar(true);
-          setSnackBarType("error");
-          setSnackBarText("Payload must be JSON format");
-          clearAlert();
+          displayAlert({ msg: "Payload must be JSON format", type: "error" })
           return;
         }
       case "RangeSlider":
@@ -234,10 +201,7 @@ export default function AddWidgetDialog(props: IProps) {
           createWidget(widgetInfo);
           return;
         } catch (err: unknown) {
-          setShowSnackBar(true);
-          setSnackBarType("error");
-          setSnackBarText("Payload must be JSON format");
-          clearAlert();
+          displayAlert({ msg: "Payload must be JSON format", type: "error" })
           return;
         }
       case "LineChart":
@@ -252,24 +216,20 @@ export default function AddWidgetDialog(props: IProps) {
           createWidget(widgetInfo);
           return;
         } catch (err: unknown) {
-          setShowSnackBar(true);
-          setSnackBarType("error");
-          setSnackBarText("Payload must be JSON format");
-          clearAlert();
+          displayAlert({ msg: "Payload must be JSON format", type: "error" })
           return;
         }
     }
   };
 
+  const { callHandler: callClearWidgetAlert } = useTimeout({ executeAction: () => dispatch(clearWidgetAlert()), duration: 3000 })
+
   const createWidget = async (widgetInfo: IWidget) => {
-    console.log("widgetInfo",widgetInfo)
     setIsLoading(true);
     try {
       await axiosPrivate.post(`/widgets/${props.device_id}`, widgetInfo);
-      setShowSnackBar(true);
-      setSnackBarType("success");
-      setSnackBarText("Created your widget successfully");
-      clearAlert();
+      dispatch(displayWidgetAlert({ msg: "Created your widget successfully", type: "success" }))
+      callClearWidgetAlert();
       setIsLoading(false);
       props.setIsAddWidgetShow(false);
       props.fetchAllWidgets();
@@ -277,10 +237,7 @@ export default function AddWidgetDialog(props: IProps) {
     } catch (err: unknown) {
       setIsLoading(false);
       const msg = await getAxiosErrorMessage(err);
-      setShowSnackBar(true);
-      setSnackBarType("error");
-      setSnackBarText(msg);
-      clearAlert();
+      displayAlert({ msg, type: "error" })
       return;
     }
   };
@@ -304,22 +261,21 @@ export default function AddWidgetDialog(props: IProps) {
               <div className="text-[17px] font-bold text-[#1D4469]">
                 Add widget
               </div>
-              {isLoading ? "isLoading" : "is not loading"}
               <div className="text-[12px] mt-2">
                 Please select widget occupation and provide your values.
               </div>
             </div>
-            {showSnackBar && snackBarType && (
+            {showAlert && alertType && (
               <div className="hidden sm:block">
                 <Alert
-                  severity={snackBarType}
+                  severity={alertType}
                   sx={{
                     fontSize: "11.8px",
                     alignItems: "center",
                     marginTop: "1.5rem",
                   }}
                 >
-                  {snackBarText}
+                  {alertText}
                 </Alert>
               </div>
             )}
@@ -378,17 +334,17 @@ export default function AddWidgetDialog(props: IProps) {
                   occupation === "ToggleSwitch" ||
                   occupation === "LineChart" ||
                   occupation === "RangeSlider") && (
-                  <div className="w-[350px] sm:w-[100%] relative">
-                    <FormRow
-                      type="text"
-                      name="value"
-                      labelText="value"
-                      value={values.value}
-                      handleChange={handleChange}
-                      marginTop="mt-[0.2rem]"
-                    />
-                  </div>
-                )}
+                    <div className="w-[350px] sm:w-[100%] relative">
+                      <FormRow
+                        type="text"
+                        name="value"
+                        labelText="value"
+                        value={values.value}
+                        handleChange={handleChange}
+                        marginTop="mt-[0.2rem]"
+                      />
+                    </div>
+                  )}
               </div>
             )}
 
@@ -397,31 +353,31 @@ export default function AddWidgetDialog(props: IProps) {
                 {(occupation === "Gauge" ||
                   occupation === "RangeSlider" ||
                   occupation === "LineChart") && (
-                  <div className="w-[350px] sm:w-[100%]">
-                    <FormRow
-                      type="number"
-                      name="min"
-                      labelText="min"
-                      value={values.min}
-                      handleChange={handleChange}
-                      marginTop="mt-[0.2rem]"
-                    />
-                  </div>
-                )}
+                    <div className="w-[350px] sm:w-[100%]">
+                      <FormRow
+                        type="number"
+                        name="min"
+                        labelText="min"
+                        value={values.min}
+                        handleChange={handleChange}
+                        marginTop="mt-[0.2rem]"
+                      />
+                    </div>
+                  )}
                 {(occupation === "Gauge" ||
                   occupation === "RangeSlider" ||
                   occupation === "LineChart") && (
-                  <div className="w-[350px] sm:w-[100%]">
-                    <FormRow
-                      type="number"
-                      name="max"
-                      labelText="max"
-                      value={values.max}
-                      handleChange={handleChange}
-                      marginTop="mt-[0.2rem]"
-                    />
-                  </div>
-                )}
+                    <div className="w-[350px] sm:w-[100%]">
+                      <FormRow
+                        type="number"
+                        name="max"
+                        labelText="max"
+                        value={values.max}
+                        handleChange={handleChange}
+                        marginTop="mt-[0.2rem]"
+                      />
+                    </div>
+                  )}
                 {occupation === "ButtonControl" && (
                   <div className="w-[245px] sm:w-[100%]">
                     <FormRow
@@ -589,13 +545,13 @@ export default function AddWidgetDialog(props: IProps) {
                     Done
                   </Button>
                 </div>
-                {showSnackBar && (
+                {showAlert && (
                   <div className="block sm:hidden">
                     <SnackBar
                       id="add-widget-snackbar"
-                      severity={snackBarType}
-                      showSnackBar={showSnackBar}
-                      snackBarText={snackBarText}
+                      severity={alertType}
+                      showSnackBar={showAlert}
+                      snackBarText={alertText}
                     />
                   </div>
                 )}

@@ -23,7 +23,6 @@ function Overview() {
 
   const fetchDeviceOverview = async () => {
     const response = await axiosPrivate.get(`/api/overview`);
-    console.log("response", response);
     dispatch(setDeviceOverview(response?.data));
   };
 
@@ -31,15 +30,15 @@ function Overview() {
     fetchDeviceOverview();
   }, []);
 
-  // useEffect(() => {
-  //   const timeoutID = setInterval(() => {
-  //     fetchDeviceOverview();
-  //   }, 5000);
+  useEffect(() => {
+    const timeoutID = setInterval(() => {
+      fetchDeviceOverview();
+    }, 5000);
 
-  //   return () => {
-  //     clearInterval(timeoutID);
-  //   };
-  // }, []);
+    return () => {
+      clearInterval(timeoutID);
+    };
+  }, []);
 
   return (
     <Wrapper>

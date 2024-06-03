@@ -84,7 +84,6 @@ export default function AddDisplayDialog({
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(`/widgets/${deviceId}`);
-      console.log(data);
       setSelectedWidget("");
       setWidgetOptions(data);
       return setIsLoading(false);

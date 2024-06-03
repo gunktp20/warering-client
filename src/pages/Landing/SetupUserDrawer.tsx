@@ -360,33 +360,6 @@ function SetupUserDrawer(props: IDrawer) {
                     {isMember ? "SignUp" : "SignIn"}
                   </button>
                 </div>
-
-                {/* <Button
-                  onClick={() => {
-                    dispatch(demoAuth())
-                  }}
-                  style={{
-                    textTransform: "none",
-                    width: "100%",
-                    height: "39px",
-                    marginTop: "1.5rem",
-                    fontSize:"13px"
-                  }}
-                  sx={{
-                    // bgcolor: "#1966fb",
-                    ":hover": {
-                    //   bgcolor: "#10269C",
-                    },
-                    ":disabled": {
-                      color: "#fff",
-                    },
-                  }}
-                  variant="outlined"
-                  id="demo-app"
-                >
-                  App Demo
-                </Button> */}
-
               </div>
             )}
           </Typography>

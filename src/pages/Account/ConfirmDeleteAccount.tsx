@@ -6,6 +6,9 @@ import { TransitionProps } from "@mui/material/transitions";
 import { useAppDispatch } from "../../app/hooks";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { logout } from "../../features/auth/authSlice";
+import useAlert from "../../hooks/useAlert";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import { SnackBar } from "../../components";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -25,6 +28,7 @@ export default function ConfirmDeleteAccount(props: IProps) {
   const axiosPrivate = useAxiosPrivate();
   const dispatch = useAppDispatch()
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const { showAlert, alertText, alertType, displayAlert } = useAlert()
   const handleClose = () => {
     props.setIsDeleteConfirmOpen(false);
   };
@@ -37,7 +41,8 @@ export default function ConfirmDeleteAccount(props: IProps) {
       return signOut()
     } catch (err) {
       setIsLoading(false)
-      console.log(err)
+      const msg = await getAxiosErrorMessage(err)
+      displayAlert({ msg, type: "error" })
     }
   }
 
@@ -85,6 +90,16 @@ export default function ConfirmDeleteAccount(props: IProps) {
               {isLoading ? "Loading..." : "Delete Account"}
             </button>
           </div>
+          {showAlert && (
+            <div className="block sm:hidden">
+              <SnackBar
+                id="edit-widget-snackbar"
+                severity={alertType}
+                showSnackBar={showAlert}
+                snackBarText={alertText}
+              />
+            </div>
+          )}
         </DialogContentText>
       </Dialog>
     </React.Fragment>

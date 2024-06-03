@@ -14,7 +14,6 @@ function RequireAdmin() {
 
   useEffect(() => {
     if (!user) {
-      console.log("!user");
       navigate("/home");
       return;
     }

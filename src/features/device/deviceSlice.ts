@@ -8,6 +8,7 @@ const initialState: IDeviceState = {
   totalDevice: 0,
   totalDeviceDeny: 0,
   devices: [],
+  selectedDevice: "",
 };
 
 const DeviceSlice = createSlice({
@@ -31,9 +32,16 @@ const DeviceSlice = createSlice({
         devices: action.payload,
       };
     },
+    setSelectedDevice: (state, action) => {
+      return {
+        ...state,
+        selectedDevice: action.payload,
+      };
+    },
   },
 });
 
-export const { setDeviceOverview, setDevices } = DeviceSlice.actions;
+export const { setDeviceOverview, setDevices, setSelectedDevice } =
+  DeviceSlice.actions;
 
 export default DeviceSlice.reducer;

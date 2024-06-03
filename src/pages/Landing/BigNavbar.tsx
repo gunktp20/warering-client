@@ -12,16 +12,16 @@ interface IBigNavbar {
   setIsAccountUserDrawerOpen: (_: boolean) => void
 }
 
-const BigNavbar: FunctionComponent<IBigNavbar> = (props: IBigNavbar) => {
+const BigNavbar: FunctionComponent<IBigNavbar> = ({ setIsDrawerOpen, setIsMember, isAccountUserDrawerOpen, setIsAccountUserDrawerOpen }: IBigNavbar) => {
   const isLoading = false
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { user , profileImg } = useAppSelector((state) => state.auth);
+  const { user, profileImg } = useAppSelector((state) => state.auth);
 
   const onSelectEndpoint = (endPoint: "login" | "register") => {
     const isMember = endPoint === "login" ? true : false;
-    props.setIsDrawerOpen(true);
-    props.setIsMember(isMember);
+    setIsDrawerOpen(true);
+    setIsMember(isMember);
     dispatch(clearAlert());
   };
 
@@ -48,7 +48,7 @@ const BigNavbar: FunctionComponent<IBigNavbar> = (props: IBigNavbar) => {
                 if (isLoading) {
                   return;
                 }
-                props.setIsAccountUserDrawerOpen(!props.isAccountUserDrawerOpen);
+                setIsAccountUserDrawerOpen(!isAccountUserDrawerOpen);
               }}
               className="text-[13.5px] sm:hidden text-[#1d4469] font-semibold text-nowrap cursor-pointer"
             >
@@ -63,7 +63,7 @@ const BigNavbar: FunctionComponent<IBigNavbar> = (props: IBigNavbar) => {
                   if (isLoading) {
                     return;
                   }
-                  props.setIsAccountUserDrawerOpen(!props.isAccountUserDrawerOpen);
+                  setIsAccountUserDrawerOpen(!isAccountUserDrawerOpen);
                 }}
                 className={`cursor-pointer ml-4 w-[42px] h-[42px]text-[#dbdbdb] rounded-[100%] ${profileImg ? "opacity-100 object-cover object-top" : "opacity-60"
                   }`}

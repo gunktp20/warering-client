@@ -9,6 +9,7 @@ import { Button } from "@mui/material";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAlert from "../../hooks/useAlert";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import { useAppSelector } from "../../app/hooks";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -22,7 +23,6 @@ const Transition = React.forwardRef(function Transition(
 interface IDrawer {
   isEditDialogOpen: boolean;
   setEditDialogOpen: (active: boolean) => void;
-  selectedDashboard: string;
   hookEditSuccess: () => void;
 }
 
@@ -36,8 +36,8 @@ const initialState: IValue = {
   description: "",
 };
 
-export default function EditDashboardDialog(props: IDrawer) {
-  const { setEditDialogOpen } = props;
+export default function EditDashboardDialog({ isEditDialogOpen, setEditDialogOpen, hookEditSuccess }: IDrawer) {
+  const { selectedDashboard } = useAppSelector((state) => state.dashboard)
   const axiosPrivate = useAxiosPrivate();
   const [values, setValues] = useState<IValue>(initialState);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -60,15 +60,15 @@ export default function EditDashboardDialog(props: IDrawer) {
   const editDashboard = async (
     dashboardInfo:
       | {
-          nameDashboard: string;
-          description: string;
-        }
+        nameDashboard: string;
+        description: string;
+      }
       | undefined
   ) => {
     setIsLoading(true);
     try {
       await axiosPrivate.patch(
-        `/dashboards/${props.selectedDashboard}`,
+        `/dashboards/${selectedDashboard}`,
         dashboardInfo
       );
       setIsLoading(false);
@@ -76,8 +76,8 @@ export default function EditDashboardDialog(props: IDrawer) {
         msg: "Updated your dashboard successfully",
         type: "success",
       });
-      setIsLoading(false);
-      props.hookEditSuccess();
+      setEditDialogOpen(false)
+      hookEditSuccess();
       return;
     } catch (err: unknown) {
       setValues(currentDashboardInfo);
@@ -108,10 +108,8 @@ export default function EditDashboardDialog(props: IDrawer) {
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(
-        `/dashboards/${props.selectedDashboard}`
+        `/dashboards/${selectedDashboard}`
       );
-      console.log(`/dashboards/${props.selectedDashboard}`);
-      console.log(data);
       const { nameDashboard, description } = data;
       setValues({ nameDashboard, description });
       setCurrentDashboardInfo({
@@ -125,15 +123,15 @@ export default function EditDashboardDialog(props: IDrawer) {
   };
 
   useEffect(() => {
-    if (props.selectedDashboard) {
+    if (selectedDashboard) {
       fetchDashboardInfo();
     }
-  }, [props.selectedDashboard]);
+  }, [selectedDashboard]);
 
   return (
     <div>
       <Dialog
-        open={props.isEditDialogOpen}
+        open={isEditDialogOpen}
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}

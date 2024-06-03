@@ -67,8 +67,8 @@ function ColumnContainer({
   const { editMode } = useAppSelector((state) => state.dashboard);
   const [renderedWidgets, setRenderedWidgets] = useState<JSX.Element[]>([]);
 
-  const urgentMqttPublisher = (payload: string): void => {
-    console.log(payload);
+  const urgentMqttPublisher = (payload: string): string => {
+    return payload
   };
 
   const processWidgets = async (widgets: IWidget[]): Promise<JSX.Element[]> => {
@@ -158,8 +158,6 @@ function ColumnContainer({
         const matchedPayload = payloadDevices?.find(
           (payload) => payload?.deviceId === widget?.deviceId
         );
-
-        console.log(typeof matchedPayload?.mqttPublish);
 
         return (
           <ToggleSwitch

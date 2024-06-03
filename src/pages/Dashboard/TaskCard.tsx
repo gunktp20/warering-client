@@ -1,7 +1,6 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { useEffect } from "react";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -26,10 +25,6 @@ function TaskCard({ task }: Props) {
       task,
     },
   });
-
-  useEffect(() => {
-    console.log("task", task);
-  }, [task]);
 
   const style = {
     transition,

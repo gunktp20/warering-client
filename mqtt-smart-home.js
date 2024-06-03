@@ -27,7 +27,7 @@ client.on("connect", function () {
      brightness_val = map(brightness_val, 0, 10000, 500, 1200).toFixed(0);
 
     client.publish(
-      "665caac4b6cdb9c0ca9c999f/TestMQTT-1/publish",
+      "665e1d8d8c80d27112e47fa8/TestMQTT-1/publish",
       JSON.stringify({
         tem_val,
         speed_val,
@@ -42,7 +42,7 @@ client.on("connect", function () {
 
   setInterval(() => {
     client.subscribe(
-      "665caac4b6cdb9c0ca9c999f/TestMQTT-1/subscribe",
+      "665e1d8d8c80d27112e47fa8/TestMQTT-1/subscribe",
       {
         qos: 0,
         retain: true,

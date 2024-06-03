@@ -9,8 +9,7 @@ import {
   register,
   forgetPassword,
   clearAlert,
-  displayAlert,
-  demoAuth
+  displayAlert
 } from "../../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { Link, useNavigate } from "react-router-dom";
@@ -53,8 +52,7 @@ const initialState: IValue = {
   email_forget_password: "",
 };
 
-export default function AlertDialogSlide(props: IDrawer) {
-  const { isDrawerOpen, setIsDrawerOpen, setIsMember, isMember } = props;
+export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsMember, isMember }: IDrawer) {
   const { isLoading, showAlert, alertText, alertType } = useAppSelector(
     (state) => state.auth
   );
@@ -387,31 +385,6 @@ export default function AlertDialogSlide(props: IDrawer) {
                     {isMember ? "SignUp" : "SignIn"}
                   </button>
                 </div>
-                <Button
-                  onClick={() => {
-                    dispatch(demoAuth());
-                  }}
-                  style={{
-                    textTransform: "none",
-                    width: "100%",
-                    height: "39px",
-                    marginTop: "1.5rem",
-                    fontSize: "13px",
-                  }}
-                  sx={{
-                    // bgcolor: "#1966fb",
-                    ":hover": {
-                      //   bgcolor: "#10269C",
-                    },
-                    ":disabled": {
-                      color: "#fff",
-                    },
-                  }}
-                  variant="outlined"
-                  id="demo-app"
-                >
-                  App Demo
-                </Button>
               </div>
             )}
           </DialogContentText>

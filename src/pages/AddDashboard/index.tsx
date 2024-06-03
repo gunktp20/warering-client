@@ -15,23 +15,24 @@ import { useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 import { Alert } from "@mui/material";
+import useAlert from "../../hooks/useAlert";
+import { IDashboard } from "../../types/dashboard";
 
 function AddDashboard() {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
+  const { showAlert, alertText, alertType, displayAlert } = useAlert()
+  const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
+    useState<boolean>(false);
+
   const [values, setValues] = useState<{
     nameDashboard: string;
     description: string;
   }>({ nameDashboard: "", description: "" });
-  const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
-    useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [showSnackBar, setShowSnackBar] = useState<boolean>(false);
-  const [snackBarText, setSnackBarText] = useState<string>("");
-  const [snackBarType, setSnackBarType] = useState<
-    "error" | "success" | "info" | "warning"
-  >("error");
+
+
 
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
   const handleChange = (
@@ -40,53 +41,27 @@ function AddDashboard() {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
-  interface IDashboardInfo {}
-
-  const [timeoutIds, setTimeoutIds] = useState<NodeJS.Timeout[]>([]);
-  const clearAllTimeouts = () => {
-    timeoutIds.forEach((timeoutId: NodeJS.Timeout) => clearTimeout(timeoutId));
-    setTimeoutIds([]);
-  };
-  const clearAlert = () => {
-    setIsLoading(true);
-    clearAllTimeouts();
-    const newTimeoutId = setTimeout(() => {
-      setShowSnackBar(false);
-    }, 3000);
-    setTimeoutIds([newTimeoutId]);
-  };
-
   const onSubmit = async () => {
     const { nameDashboard, description } = values;
     if (!nameDashboard || !description) {
-      setShowSnackBar(true);
-      setSnackBarType("error");
-      setSnackBarText("Please provide all value");
-      clearAlert();
+      displayAlert({ msg: "Please provide all", type: "error" })
       return;
     }
-
     await AddDashboard(values);
   };
 
-  const AddDashboard = async (dashboardInfo: IDashboardInfo) => {
+  const AddDashboard = async (dashboardInfo: IDashboard) => {
     setIsLoading(true);
     try {
       await axiosPrivate.post(`/dashboards`, dashboardInfo);
       setIsLoading(false);
-      setShowSnackBar(true);
-      setSnackBarType("success");
-      setSnackBarText("Your dashboard has been added");
-      clearAlert();
+      displayAlert({ msg: "Your dashboard has been added", type: "error" })
       setIsLoading(false);
       navigate("/dashboard-list");
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err);
-      setShowSnackBar(true);
-      setSnackBarType("error");
-      setSnackBarText(msg);
-      clearAlert();
       setIsLoading(false);
+      displayAlert({ msg, type: "error" })
     }
   };
 
@@ -149,17 +124,17 @@ function AddDashboard() {
                 Fill in the information to add a Dashboard from your device.
               </div>
             </div>
-            {showSnackBar && snackBarType && (
+            {showAlert && alertType && (
               <div className="hidden sm:block">
                 <Alert
-                  severity={snackBarType}
+                  severity={alertType}
                   sx={{
                     fontSize: "11.8px",
                     alignItems: "center",
                     marginTop: "2rem",
                   }}
                 >
-                  {snackBarText}
+                  {alertText}
                 </Alert>
               </div>
             )}
@@ -224,13 +199,13 @@ function AddDashboard() {
                   "Add Dashboard"
                 )}
               </Button>
-              {showSnackBar && (
+              {showAlert && (
                 <div id="add-device-snackbar" className="block sm:hidden">
                   <SnackBar
                     id="add-device-snackbar"
-                    severity={snackBarType}
-                    showSnackBar={showSnackBar}
-                    snackBarText={snackBarText}
+                    severity={alertType}
+                    showSnackBar={showAlert}
+                    snackBarText={alertText}
                   />
                 </div>
               )}

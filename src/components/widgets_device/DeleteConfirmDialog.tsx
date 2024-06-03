@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import * as React from "react";
 import Dialog from "@mui/material/Dialog";
 import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 import useAlert from "../../hooks/useAlert";
-import { SnackBar } from "../../components";
+import SnackBar from "../SnackBar";
+import useTimeout from "../../hooks/useTimeout";
+import { clearAlert, displayAlert as displayWidgetAlert } from "../../features/widget/widgetSlice";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -21,35 +24,43 @@ const Transition = React.forwardRef(function Transition(
 interface IProps {
   isDeleteConfirmOpen: boolean;
   setIsDeleteConfirmOpen: (active: boolean) => void;
-  hookDeleteSuccess: () => void;
+  fetchAllWidgets: () => void;
 }
 
-export default function ConfirmDelete({ isDeleteConfirmOpen, setIsDeleteConfirmOpen, hookDeleteSuccess }: IProps) {
+function DeleteConfirmDialog({
+  isDeleteConfirmOpen,
+  setIsDeleteConfirmOpen,
+  fetchAllWidgets,
+}: IProps) {
 
   const axiosPrivate = useAxiosPrivate();
-  const { showAlert, alertText, alertType, displayAlert } = useAlert()
-  const { selectedDashboard } = useAppSelector((state) => state.dashboard)
+  const dispatch = useAppDispatch()
+  const { selectedWidget } = useAppSelector((state) => state.widget)
+  const { showAlert, alertType, alertText } = useAlert()
+  const { displayAlert } = useAlert()
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const deleteDevice = async () => {
+  const handleClose = () => {
+    setIsDeleteConfirmOpen(false);
+  };
+  
+  const { callHandler: clearWidgetAlert } = useTimeout({ executeAction: () => dispatch(clearAlert()), duration: 3000 })
+
+  const deleteWidget = async () => {
     setIsLoading(true);
     try {
-      await axiosPrivate.delete(`/dashboards/${selectedDashboard}`);
+      const { data } = await axiosPrivate.get(`/widgets/${selectedWidget}/widget`);
+      await axiosPrivate.delete(`/widgets/${selectedWidget}/device/${data?.deviceId}`);
       setIsLoading(false);
       setIsDeleteConfirmOpen(false);
-      hookDeleteSuccess();
-    } catch (err: unknown) {
+      fetchAllWidgets();
+      dispatch(displayWidgetAlert({ msg: "Deleted your widget", type: "error" }))
+      clearWidgetAlert()
+    } catch (err) {
       const msg = await getAxiosErrorMessage(err)
       setIsLoading(false);
       displayAlert({ msg, type: "error" })
     }
-  };
-
-  const handleClose = () => {
-    if (isLoading) {
-      return;
-    }
-    setIsDeleteConfirmOpen(false);
   };
 
   return (
@@ -59,31 +70,29 @@ export default function ConfirmDelete({ isDeleteConfirmOpen, setIsDeleteConfirmO
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
+        aria-describedby="alert-dialog-slide-description"
       >
         <DialogContentText
-          id="confirm-delete-device-dialog"
+          id="confirm-delete-dashboard-dialog"
           className="py-7 px-11"
           component={"div"}
           variant={"body2"}
         >
           <div className="text-[#dc3546] text-[15.5px] text-center">
-            Are you sure you want to delete?
+            Are you sure you want to delete this widget?
           </div>
           <div className="mt-4 flex justify-center gap-3 w-[100%]">
             <button
               onClick={handleClose}
-              disabled={isLoading}
-              id="cancel-delete-device"
               className="text-black text-[12.5px] border-[1px] border-[#000] rounded-sm px-10 py-[0.4rem]"
             >
               Cancel
             </button>
             <button
-              onClick={() => {
-                deleteDevice();
-              }}
-              id="confirm-delete-device"
               disabled={isLoading}
+              onClick={() => {
+                deleteWidget();
+              }}
               className="bg-[#dc3546] text-[12.5px] text-white px-10 py-[0.4rem] rounded-sm"
             >
               Delete
@@ -104,3 +113,5 @@ export default function ConfirmDelete({ isDeleteConfirmOpen, setIsDeleteConfirmO
     </React.Fragment>
   );
 }
+
+export default DeleteConfirmDialog

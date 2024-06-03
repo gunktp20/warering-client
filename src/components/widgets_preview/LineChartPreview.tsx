@@ -11,7 +11,6 @@ ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
 function calculatePercentage(percent: number, baseNumber: number) {
   const result = (percent / 100) * baseNumber;
-  console.log(`${percent}% of ${baseNumber} is ${result}`);
   return result;
 }
 

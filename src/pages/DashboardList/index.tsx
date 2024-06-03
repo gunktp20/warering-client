@@ -4,8 +4,9 @@ import {
   NavLinkSidebar,
   NavDialog,
   AccountUserDrawer,
+  SnackBar,
 } from "../../components";
-import Wrapper from "../../assets/wrappers/Dashboard";
+import Wrapper from "../../assets/wrappers/DashboardList";
 import { useEffect, useState } from "react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { IoSearchOutline } from "react-icons/io5";
@@ -15,10 +16,17 @@ import EditDashboardDialog from "./EditDashboardDialog";
 import ConfirmDelete from "./ConfirmDelete";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import moment from "moment";
-import { MdKeyboardArrowLeft, MdKeyboardArrowRight, MdSearchOff } from "react-icons/md";
+import { MdSearchOff } from "react-icons/md";
+import Pagination from "./Pagination";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { setDashboards, setSelectedDashboard } from "../../features/dashboard/dashboardSlice";
+import useAlert from "../../hooks/useAlert";
 
 function DashboardList() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { dashboards } = useAppSelector((state) => state.dashboard)
+  const { showAlert, alertText, alertType, displayAlert } = useAlert()
   const axiosPrivate = useAxiosPrivate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState<boolean>(false);
@@ -27,20 +35,10 @@ function DashboardList() {
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [dashboards, setDashboard] = useState<
-    {
-      id: string;
-      nameDashboard: string;
-      description: string;
-      createdAt: string;
-    }[]
-  >([]);
-
+  const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
   const limitQuery: number = 5;
   const [numOfPage, setNumOfPage] = useState<number>(1);
   const [pageCount, setPageCount] = useState<number>(0);
-  // const [limitQuery, setLimitQuery] = useState<number>(5);
-  const [selectedDashboard, setSelectedDashboard] = useState<string>("");
   const [sortCreatedAt, setSortCreatedAt] = useState<string>("-createdAt");
   const elements = [];
 
@@ -54,11 +52,10 @@ function DashboardList() {
       const { data } = await axiosPrivate.get(
         `/dashboards?limit=${limitQuery}&page=${numOfPage}&query=${values.search_dashboard}&createdAt=${sortCreatedAt}`
       );
-      setDashboard(data?.data);
+      dispatch(setDashboards(data?.data))
       setIsLoading(false);
-      console.log("data.metadata.pageCount", data.metadata.pageCount);
       setPageCount(data.metadata.pageCount);
-
+      
       if (data.metadata.pageCount === 1 && numOfPage !== 1) {
         setNumOfPage(1);
       }
@@ -67,15 +64,16 @@ function DashboardList() {
     }
   };
 
-  const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
   const hookDeleteSuccess = () => {
+    displayAlert({ msg: "deleted your dashboard", type: "error" })
     fetchAllDashboards();
   };
   const hookEditSuccess = () => {
+    displayAlert({ msg: "updated your dashboard", type: "success" })
     fetchAllDashboards();
   };
 
@@ -87,8 +85,8 @@ function DashboardList() {
         }}
         key={i}
         className={`${numOfPage === i
-            ? "bg-[#1966fb] text-white"
-            : "bg-white text-[#7a7a7a]"
+          ? "bg-[#1966fb] text-white"
+          : "bg-white text-[#7a7a7a]"
           } cursor-pointer  border-[#cccccc] border-[1px] text-[13.5px] rounded-md w-[30px] h-[30px] flex items-center justify-center`}
       >
         {i}
@@ -109,13 +107,11 @@ function DashboardList() {
       <ConfirmDelete
         isDeleteConfirmOpen={isDeleteConfirmOpen}
         setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-        selectedDashboard={selectedDashboard}
         hookDeleteSuccess={hookDeleteSuccess}
       />
       <EditDashboardDialog
         isEditDialogOpen={isEditDialogOpen}
         setEditDialogOpen={setEditDialogOpen}
-        selectedDashboard={selectedDashboard}
         hookEditSuccess={hookEditSuccess}
       />
       <BigNavbar
@@ -248,7 +244,7 @@ function DashboardList() {
                     </th>
                   </tr>
                 </thead>
-                {/* <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600"> */}
+
                 <tbody className="divide-y divide-gray-100">
                   {dashboards.map((dashboard, index) => {
                     return (
@@ -285,7 +281,7 @@ function DashboardList() {
                           <div className="flex justify-center sm:justify-start">
                             <button
                               onClick={() => {
-                                setSelectedDashboard(dashboard?.id);
+                                dispatch(setSelectedDashboard(dashboard?.id))
                                 setEditDialogOpen(true);
                               }}
                               className="mr-6 text-[#2E7D32]"
@@ -295,7 +291,7 @@ function DashboardList() {
                             <button
                               className="text-[#dc3546]"
                               onClick={() => {
-                                setSelectedDashboard(dashboard?.id);
+                                dispatch(setSelectedDashboard(dashboard?.id))
                                 setIsDeleteConfirmOpen(!isDeleteConfirmOpen);
                               }}
                             >
@@ -309,37 +305,19 @@ function DashboardList() {
                 </tbody>
               </table>
             </div>
-            {pageCount > 1 && (
-              <div className="flex justify-end items-center w-[100%] mt-4 sm:flex-col">
-                <div className="mr-3 sm:mb-3 text-[12.4px]">1-5 of items</div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      if (numOfPage > 1) {
-                        setNumOfPage(numOfPage - 1);
-                      }
-                    }}
-                    className="cursor-pointer text-[#5e5e5e] bg-gray-50 rounded-md w-[30px] h-[30px] flex items-center justify-center hover:bg-gray-100 hover:border-[1px]"
-                  >
-                    <MdKeyboardArrowLeft />
-                  </button>
-                  {elements}
-                  <button
-                    onClick={() => {
-                      if (numOfPage < pageCount) {
-                        setNumOfPage(numOfPage + 1);
-                      }
-                    }}
-                    className="cursor-pointer text-[#5e5e5e] bg-gray-50 rounded-md w-[30px] h-[30px] flex items-center justify-center hover:bg-gray-100 hover:border-[1px]"
-                  >
-                    <MdKeyboardArrowRight />
-                  </button>
-                </div>
-              </div>
-            )}
+            <Pagination numOfPage={numOfPage} setNumOfPage={setNumOfPage} pageCount={pageCount} />
           </div>
         </div>
+        {showAlert && (
+          <div className="block sm:hidden">
+            <SnackBar
+              id="edit-widget-snackbar"
+              severity={alertType}
+              showSnackBar={showAlert}
+              snackBarText={alertText}
+            />
+          </div>
+        )}
       </div>
     </Wrapper>
   );

@@ -14,6 +14,7 @@ import {
 import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
 import TaskCard from "./TaskCard";
+import { MdSearchOff } from "react-icons/md";
 import {
   BigNavbar,
   NavDialog,
@@ -114,10 +115,6 @@ function KanbanBoard() {
     nameDashboard: string;
     description: string;
   }>({ nameDashboard: "", description: "" });
-  // tasksStorage ? JSON.parse(tasksStorage) : vvv
-  // const [tasks, setTasks] = useState<Task[]>(
-  //   tasksStorage ? JSON.parse(tasksStorage) : defaultTasks
-  // );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedWidget, setSelectedWidget] = useState<string>("");
   const dispatch = useAppDispatch();
@@ -168,7 +165,8 @@ function KanbanBoard() {
       setWidgets(formattedWidgets);
       return setIsLoading(false);
     } catch (err: unknown) {
-      console.log(err);
+      const msg = await getAxiosErrorMessage(err)
+      displayAlert({ msg, type: "error" })
       return setIsLoading(false);
     }
   };
@@ -260,13 +258,13 @@ function KanbanBoard() {
                 {
                   qos: 0,
                 },
-                (err) => {
+                (err: unknown) => {
                   console.log("not sub", err);
                 }
               );
             }
           });
-          client.on("reconnect", () => {});
+          client.on("reconnect", () => { });
 
           client.on("message", async (topic, message) => {
             const payload = { topic, message: message.toString() };
@@ -349,7 +347,6 @@ function KanbanBoard() {
 
   const selectWidget = async (widgetID: string) => {
     setSelectedWidget(widgetID);
-    console.log(widgetID);
     setIsEditDisplayShow(true);
   };
 
@@ -468,7 +465,29 @@ function KanbanBoard() {
             {dashboardInfo?.nameDashboard}
           </div>
 
-          <DndContext
+          {widgets.length === 0 && <div className="w-[100%] h-[500px] flex justify-center flex-col items-center border-dashed border-[1px] bg-[#f9f9f9] rounded-lg border-gray-200 m-6 mr-13">
+            {widgets.length === 0 && !isLoading && (
+              <div className="text-[80px] flex justify-center w-[100%] my-5 text-[#c0c0c0]">
+                {" "}
+                <MdSearchOff />
+              </div>
+            )}
+            {widgets.length === 0 && !isLoading && (
+              <div className="text-md text-center w-[100%] my-5 text-[#c0c0c0]">
+                {" "}
+                Not found any widget
+              </div>
+            )}
+
+            {isLoading && widgets.length <= 0 && (
+              <div className="w-[100%] flex justify-center  h-[165px] items-center">
+                <div className="loader w-[50px] h-[50px] border-blue-200 border-b-transparent"></div>
+              </div>
+            )}
+          </div>}
+
+
+          {widgets.length > 0 && <DndContext
             sensors={sensors}
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
@@ -520,7 +539,7 @@ function KanbanBoard() {
               </DragOverlay>,
               document.body
             )}
-          </DndContext>
+          </DndContext>}
         </div>
       </div>
       {showAlert && (

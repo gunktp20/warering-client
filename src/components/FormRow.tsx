@@ -37,6 +37,8 @@ const FormRow: FunctionComponent<IFormRow> = ({
             : type === "number"
               ? "number"
               : "value"
+
+              
         }
         name={name}
         id={name}

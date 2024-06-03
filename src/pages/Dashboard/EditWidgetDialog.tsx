@@ -95,7 +95,6 @@ export default function EditWidgetDialog(props: IProps) {
       const { data } = await axiosPrivate.get(
         `/widgets/${props?.widget_id}/widget`
       );
-      console.log(data);
       const deviceValues = { ...data?.configWidget, label: data?.label };
       setOccupation(data.type);
       setValues(deviceValues);

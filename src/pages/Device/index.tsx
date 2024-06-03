@@ -3,6 +3,7 @@ import {
   NavLinkSidebar,
   NavDialog,
   AccountUserDrawer,
+  SnackBar,
 } from "../../components";
 import { useEffect, useState, useCallback } from "react";
 import { IoMdCheckmark } from "react-icons/io";
@@ -40,6 +41,7 @@ import {
   PointElement,
 } from "chart.js";
 import LineChart from "../../components/widgets_device/LineChart";
+import { useAppSelector } from "../../app/hooks";
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
 interface IDevice {
@@ -76,6 +78,7 @@ function Device() {
   const axiosPrivate = useAxiosPrivate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isEditDisplayShow, setIsEditDisplayShow] = useState<boolean>(false);
+  const { showAlert, alertText, alertType } = useAppSelector((state) => state.widget)
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -100,10 +103,6 @@ function Device() {
     [key: string]: string | number;
   }>();
 
-  useEffect(() => {
-    console.log("configWidgetsDevice", configWidgetsDevice);
-  }, [configWidgetsDevice]);
-
   const fetchDeviceById = async () => {
     setIsLoading(true);
     try {
@@ -116,22 +115,24 @@ function Device() {
       setIsLoading(false);
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err);
-      console.log(msg);
+      console.log(msg)
       setIsLoading(false);
     }
   };
+
   const fetchAllWidgets = async () => {
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(`/widgets/${device_id}`);
       setWidgets(data);
       setIsLoading(false);
-    } catch (err: unknown) {
+    } catch (err) {
       const msg = await getAxiosErrorMessage(err);
-      console.log(msg);
+      console.log(msg)
       setIsLoading(false);
     }
   };
+
   const mqttPublish = (payload: string) => {
     if (client) {
       client.publish(
@@ -149,6 +150,7 @@ function Device() {
       );
     }
   };
+
   const connectEMQX = useCallback(
     async (data: { usernameDevice: string; password: string }) => {
       const _mqtt = await mqtt.connect(import.meta.env.VITE_EMQX_DOMAIN, {
@@ -215,7 +217,6 @@ function Device() {
 
   const selectWidget = async (widgetID: string) => {
     setSelectedWidget(widgetID);
-    console.log(widgetID);
     setIsEditDisplayShow(true);
   };
 
@@ -584,6 +585,16 @@ function Device() {
               })}
           </div>
         </div>
+        {showAlert && (
+          <div className="block sm:hidden">
+            <SnackBar
+              id="edit-widget-snackbar"
+              severity={alertType}
+              showSnackBar={showAlert}
+              snackBarText={alertText}
+            />
+          </div>
+        )}
       </div>
     </Wrapper>
   );

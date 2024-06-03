@@ -16,6 +16,7 @@ import { SnackBar } from "../../components";
 import { Alert } from "@mui/material";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import useAlert from "../../hooks/useAlert";
 
 interface IDeviceInfo {
   nameDevice: string;
@@ -33,12 +34,8 @@ function AddDevice() {
   const axiosPrivate = useAxiosPrivate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { showAlert, alertType, alertText, displayAlert } = useAlert()
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
-  const [showSnackBar, setShowSnackBar] = useState<boolean>(false);
-  const [snackBarText, setSnackBarText] = useState<string>("");
-  const [snackBarType, setSnackBarType] = useState<
-    "error" | "success" | "info" | "warning"
-  >("error");
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
 
@@ -46,35 +43,12 @@ function AddDevice() {
     setIsLoading(true);
     try {
       await axiosPrivate.post(`/devices`, deviceInfo);
-      setIsLoading(false);
-      setShowSnackBar(true);
-      setSnackBarType("success");
-      setSnackBarText("Your device has been added");
-      clearAlert();
-      setIsLoading(false);
       navigate("/device-list");
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err);
-      setShowSnackBar(true);
-      setSnackBarType("error");
-      setSnackBarText(msg);
-      clearAlert();
+      displayAlert({ msg, type: "error" })
       setIsLoading(false);
     }
-  };
-
-  const [timeoutIds, setTimeoutIds] = useState<NodeJS.Timeout[]>([]);
-  const clearAllTimeouts = () => {
-    timeoutIds.forEach((timeoutId: NodeJS.Timeout) => clearTimeout(timeoutId));
-    setTimeoutIds([]);
-  };
-  const clearAlert = () => {
-    setIsLoading(true);
-    clearAllTimeouts();
-    const newTimeoutId = setTimeout(() => {
-      setShowSnackBar(false);
-    }, 3000);
-    setTimeoutIds([newTimeoutId]);
   };
 
   const [values, setValues] = useState({
@@ -102,10 +76,7 @@ function AddDevice() {
       !description ||
       !topics
     ) {
-      setShowSnackBar(true);
-      setSnackBarType("error");
-      setSnackBarText("Please provide all value");
-      clearAlert();
+      displayAlert({ msg: "Please provide all value", type: "error" })
       return;
     }
     const deviceInfo: IDeviceInfo = {
@@ -181,17 +152,17 @@ function AddDevice() {
               </div>
             </div>
 
-            {showSnackBar && snackBarType && (
+            {showAlert && alertType && (
               <div className="hidden sm:block">
                 <Alert
-                  severity={snackBarType}
+                  severity={alertType}
                   sx={{
                     fontSize: "11.8px",
                     alignItems: "center",
                     marginTop: "2rem",
                   }}
                 >
-                  {snackBarText}
+                  {alertText}
                 </Alert>
               </div>
             )}
@@ -310,13 +281,13 @@ function AddDevice() {
                 {isLoading ? <div className="loader"></div> : "Add Device"}
               </Button>
             </div>
-            {showSnackBar && (
+            {showAlert && (
               <div id="add-device-snackbar" className="block sm:hidden">
                 <SnackBar
                   id="add-device-snackbar"
-                  severity={snackBarType}
-                  showSnackBar={showSnackBar}
-                  snackBarText={snackBarText}
+                  severity={alertType}
+                  showSnackBar={showAlert}
+                  snackBarText={alertText}
                 />
               </div>
             )}

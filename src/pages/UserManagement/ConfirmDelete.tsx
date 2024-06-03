@@ -18,16 +18,16 @@ interface IProps {
     setIsDeleteConfirmOpen: (active: boolean) => void
 }
 
-export default function ConfirmDelete(props: IProps) {
+export default function ConfirmDelete({ isDeleteConfirmOpen, setIsDeleteConfirmOpen }: IProps) {
 
     const handleClose = () => {
-        props.setIsDeleteConfirmOpen(false);
+        setIsDeleteConfirmOpen(false);
     };
 
     return (
         <React.Fragment>
             <Dialog
-                open={props.isDeleteConfirmOpen}
+                open={isDeleteConfirmOpen}
                 TransitionComponent={Transition}
                 keepMounted
                 onClose={handleClose}

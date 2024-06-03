@@ -31,8 +31,7 @@ const initialState: IValue = {
     description: "ภายในบ้าน",
 };
 
-export default function EditDashboardDialog(props: IDrawer) {
-    const { setEditDialogOpen } = props;
+export default function EditDashboardDialog({ isEditDialogOpen, setEditDialogOpen }: IDrawer) {
     const [values, setValues] = useState<IValue>(initialState);
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setValues({ ...values, [e.target.name]: e.target.value });
@@ -45,7 +44,7 @@ export default function EditDashboardDialog(props: IDrawer) {
     return (
         <div>
             <Dialog
-                open={props.isEditDialogOpen}
+                open={isEditDialogOpen}
                 TransitionComponent={Transition}
                 keepMounted
                 onClose={handleClose}

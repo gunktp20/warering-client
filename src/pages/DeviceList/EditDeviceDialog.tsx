@@ -10,6 +10,7 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Alert } from "@mui/material";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 import useAlert from "../../hooks/useAlert";
+import { useAppSelector } from "../../app/hooks";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -23,7 +24,6 @@ const Transition = React.forwardRef(function Transition(
 interface IDrawer {
   isEditDialogOpen: boolean;
   setEditDialogOpen: (active: boolean) => void;
-  selectedDevice: string;
   hookEditSuccess: () => void;
 }
 
@@ -47,9 +47,10 @@ const initialState: IValue = {
   isSaveData: true,
 };
 
-export default function EditDeviceDialog(props: IDrawer) {
-  const { setEditDialogOpen } = props;
+export default function EditDeviceDialog({ isEditDialogOpen, setEditDialogOpen, hookEditSuccess }: IDrawer) {
+
   const axiosPrivate = useAxiosPrivate();
+  const { selectedDevice } = useAppSelector((state) => state.device)
   const { showAlert, alertText, alertType, displayAlert } = useAlert();
   const [values, setValues] = useState<IValue>(initialState);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -59,6 +60,7 @@ export default function EditDeviceDialog(props: IDrawer) {
 
   const [currentDeviceInfo, setCurrentDeviceInfo] =
     useState<IValue>(initialState);
+    
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
@@ -75,9 +77,8 @@ export default function EditDeviceDialog(props: IDrawer) {
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(
-        `/devices/${props.selectedDevice}`
+        `/devices/${selectedDevice}`
       );
-      console.log(data);
       const {
         nameDevice,
         usernameDevice,
@@ -114,6 +115,7 @@ export default function EditDeviceDialog(props: IDrawer) {
       setIsLoading(false);
     }
   };
+
   const onSubmit = async () => {
     const { nameDevice, usernameDevice, password, description, topics } =
       values;
@@ -150,14 +152,11 @@ export default function EditDeviceDialog(props: IDrawer) {
   const editDevice = async (deviceInfo: unknown) => {
     setIsLoading(true);
     try {
-      await axiosPrivate.put(`/devices/${props.selectedDevice}`, deviceInfo);
+      await axiosPrivate.put(`/devices/${selectedDevice}`, deviceInfo);
       setIsLoading(false);
-      displayAlert({
-        msg: "Your device information has been edited successfully",
-        type: "success",
-      });
-      setIsLoading(false);
-      props.hookEditSuccess();
+      setEditDialogOpen(false)
+      hookEditSuccess();
+
     } catch (err: unknown) {
       setValues(currentDeviceInfo);
       const msg = await getAxiosErrorMessage(err);
@@ -170,14 +169,15 @@ export default function EditDeviceDialog(props: IDrawer) {
   };
 
   useEffect(() => {
-    if (props.selectedDevice) {
+    if (selectedDevice) {
       fetchDeviceInfo();
     }
-  }, [props.selectedDevice]);
+  }, [selectedDevice]);
+
   return (
     <div>
       <Dialog
-        open={props.isEditDialogOpen}
+        open={isEditDialogOpen}
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}

@@ -4,6 +4,7 @@ import {
   NavLinkSidebar,
   NavDialog,
   AccountUserDrawer,
+  SnackBar,
 } from "../../components";
 import Wrapper from "../../assets/wrappers/DeviceList";
 import { useEffect, useState } from "react";
@@ -15,18 +16,20 @@ import ConfirmDelete from "./ConfirmDeleteDevice";
 import SwitchSave from "./SwitchSave";
 import { IoSearchOutline } from "react-icons/io5";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { setDevices } from "../../features/device/deviceSlice";
+import { setDevices, setSelectedDevice } from "../../features/device/deviceSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { MdKeyboardArrowRight, MdSearchOff } from "react-icons/md";
+import { MdSearchOff } from "react-icons/md";
 import { GoDotFill } from "react-icons/go";
 import moment from "moment";
 import useTimeout from "../../hooks/useTimeout";
-import { MdKeyboardArrowLeft } from "react-icons/md";
+import Pagination from "./Pagination";
+import useAlert from "../../hooks/useAlert";
 
 function DeviceList() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { devices } = useAppSelector((state) => state.device);
+  const { showAlert, alertText, alertType, displayAlert } = useAlert()
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState<boolean>(false);
   const axiosPrivate = useAxiosPrivate();
@@ -39,11 +42,13 @@ function DeviceList() {
   const limitQuery: number = 5;
   const [numOfPage, setNumOfPage] = useState<number>(1);
   const [pageCount, setPageCount] = useState<number>(0);
-  const [selectedDevice, setSelectedDevice] = useState<string>("");
   const [sortCreatedAt, setSortCreatedAt] = useState<string>("-createdAt");
   const [filterByPermission, setFilterByPermission] = useState<string>("");
   const [filterByisSaveData, setFilterByIsSaveData] = useState<string>("");
-  const elements = [];
+
+  const [values, setValues] = useState({
+    search_device: "",
+  });
 
   const onToggleSwitchSave = ({
     id,
@@ -86,16 +91,16 @@ function DeviceList() {
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(
-        `/devices?limit=${limitQuery}&page=${numOfPage}&query=${
-          values.search_device
-        }&createdAt=${sortCreatedAt}${
-          filterByPermission && "&permission=" + filterByPermission
+        `/devices?limit=${limitQuery}&page=${numOfPage}&query=${values.search_device
+        }&createdAt=${sortCreatedAt}${filterByPermission && "&permission=" + filterByPermission
         }${filterByisSaveData && "&isSaveData=" + filterByisSaveData}`
       );
       dispatch(setDevices(data.data));
       setIsLoading(false);
       setPageCount(data.metadata.pageCount);
 
+      console.log("data.metadata.pageCount", data.metadata.pageCount)
+      console.log("numOfPage", numOfPage)
       if (data.metadata.pageCount === 1 && numOfPage !== 1) {
         setNumOfPage(1);
       }
@@ -117,31 +122,9 @@ function DeviceList() {
     }
   };
 
-  const [values, setValues] = useState({
-    search_device: "",
-  });
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
-
-  for (let i = 1; i < pageCount + 1; i++) {
-    elements.push(
-      <button
-        onClick={() => {
-          setNumOfPage(i);
-        }}
-        key={i}
-        className={`${
-          numOfPage === i
-            ? "bg-[#1966fb] text-white"
-            : "bg-white text-[#7a7a7a]"
-        } cursor-pointer  border-[#cccccc] border-[1px] text-[13.5px] rounded-md w-[30px] h-[30px] flex items-center justify-center`}
-      >
-        {i}
-      </button>
-    );
-  }
 
   useEffect(() => {
     fetchAllDevice();
@@ -154,9 +137,11 @@ function DeviceList() {
   ]);
 
   const hookDeleteSuccess = () => {
+    displayAlert({ msg: "Your device has been deleted", type: "error" })
     fetchAllDevice();
   };
   const hookEditSuccess = () => {
+    displayAlert({ msg: "Your device information has been edited successfully", type: "success" })
     fetchAllDevice();
   };
 
@@ -168,12 +153,10 @@ function DeviceList() {
       />
       <ConfirmDelete
         hookDeleteSuccess={hookDeleteSuccess}
-        selectedDevice={selectedDevice}
         isDeleteConfirmOpen={isDeleteConfirmOpen}
         setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
       />
       <EditDeviceDialog
-        selectedDevice={selectedDevice}
         isEditDialogOpen={isEditDialogOpen}
         setEditDialogOpen={setEditDialogOpen}
         hookEditSuccess={hookEditSuccess}
@@ -317,9 +300,8 @@ function DeviceList() {
             )}
 
             <div
-              className={`overflow-auto rounded-lg shadow block sm:shadow-none ${
-                devices.length === 0 && "hidden"
-              }`}
+              className={`overflow-auto rounded-lg shadow block sm:shadow-none ${devices.length === 0 && "hidden"
+                }`}
             >
               <table className="w-full">
                 <thead className="border-b-2 border-gray-200 sm:hidden">
@@ -344,60 +326,56 @@ function DeviceList() {
                 </thead>
                 <tbody className={`divide-y divide-gray-100 `}>
                   {devices.length > 0 &&
-                    devices.map((i, index) => {
+                    devices.map((device, index) => {
                       return (
                         <tr
                           key={index}
                           className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10"
                         >
                           <td
-                            className={`cursor-pointer flex sm:hidden items-center justify-center capitalize p-3 text-[13px] select-none ${
-                              i.permission === "allow"
-                                ? "text-green-500"
-                                : "text-red-500"
-                            } whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}
+                            className={`cursor-pointer flex sm:hidden items-center justify-center capitalize p-3 text-[13px] select-none ${device.permission === "allow"
+                              ? "text-green-500"
+                              : "text-red-500"
+                              } whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white`}
                             id="toggle-activity-desktop"
                           >
                             <button
                               onClick={() => {
                                 callTogglePermission(
-                                  i.id,
-                                  i.permission === "allow" ? "deny" : "allow"
+                                  device.id,
+                                  device.permission === "allow" ? "deny" : "allow"
                                 );
                               }}
-                              className={`flex items-center justify-center gap-1 transition-all capitalize cursor-pointer border-[1px] ${
-                                isLoading ? "cursor-wait" : "cursor-pointer"
-                              } ${
-                                i.permission === "allow"
+                              className={`flex items-center justify-center gap-1 transition-all capitalize cursor-pointer border-[1px] ${isLoading ? "cursor-wait" : "cursor-pointer"
+                                } ${device.permission === "allow"
                                   ? "hover:bg-green-500 hover:text-white border-green-500"
                                   : "hover:bg-red-500 hover:text-white border-red-500"
-                              } px-2 rounded-lg`}
+                                } px-2 rounded-lg`}
                               disabled={isLoading}
                             >
                               <GoDotFill />
-                              {i.permission}
+                              {device.permission}
                             </button>
                           </td>
 
                           <td
                             onClick={() => {
-                              navigate(`/device/${i.id}`);
+                              navigate(`/device/${device.id}`);
                             }}
                             className="p-3 cursor-pointer text-sm text-[#878787] whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white"
                           >
-                            {i.nameDevice}
+                            {device.nameDevice}
                           </td>
 
                           <td
-                            className={`hidden items-center sm:flex cursor-pointer capitalize p-3 text-[13px] ${
-                              i.permission === "allow"
-                                ? "text-green-500"
-                                : "text-red-500"
-                            } whitespace-nowrap text-center sm:text-start`}
+                            className={`hidden items-center sm:flex cursor-pointer capitalize p-3 text-[13px] ${device.permission === "allow"
+                              ? "text-green-500"
+                              : "text-red-500"
+                              } whitespace-nowrap text-center sm:text-start`}
                             onClick={() => {
                               callTogglePermission(
-                                i.id,
-                                i.permission === "allow" ? "deny" : "allow"
+                                device.id,
+                                device.permission === "allow" ? "deny" : "allow"
                               );
                             }}
                             id="toggle-activity-mobile"
@@ -405,18 +383,17 @@ function DeviceList() {
                             <button
                               onClick={() => {
                                 callTogglePermission(
-                                  i.id,
-                                  i.permission === "allow" ? "deny" : "allow"
+                                  device.id,
+                                  device.permission === "allow" ? "deny" : "allow"
                                 );
                               }}
-                              className={`flex items-center justify-center gap-1 transition-all capitalize cursor-pointer border-[1px] ${
-                                i.permission === "allow"
-                                  ? "hover:bg-green-500 hover:text-white border-green-500"
-                                  : "hover:bg-red-500 hover:text-white border-red-500"
-                              } px-2 rounded-lg`}
+                              className={`flex items-center justify-center gap-1 transition-all capitalize cursor-pointer border-[1px] ${device.permission === "allow"
+                                ? "hover:bg-green-500 hover:text-white border-green-500"
+                                : "hover:bg-red-500 hover:text-white border-red-500"
+                                } px-2 rounded-lg`}
                             >
                               <GoDotFill />
-                              {i.permission}
+                              {device.permission}
                             </button>
                           </td>
 
@@ -425,12 +402,12 @@ function DeviceList() {
                               Save
                             </div>
                             <SwitchSave
-                              checked={i.isSaveData}
-                              id={i.id + "-switch-save"}
+                              checked={device.isSaveData}
+                              id={device.id + "-switch-save"}
                               onClick={() =>
                                 callToggleSwitchSave({
-                                  id: i.id,
-                                  save: !i.isSaveData,
+                                  id: device.id,
+                                  save: !device.isSaveData,
                                 })
                               }
                             />
@@ -439,7 +416,7 @@ function DeviceList() {
                             <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
                               Registration
                             </div>
-                            {moment(i.createdAt)
+                            {moment(device.createdAt)
                               .add(543, "year")
                               .format("DD/MM/YYYY h:mm")}
                           </td>
@@ -450,21 +427,21 @@ function DeviceList() {
                             <div className="flex justify-center sm:justify-start">
                               <button
                                 onClick={() => {
-                                  setSelectedDevice(i.id);
+                                  dispatch(setSelectedDevice(device.id ? device.id : ""))
                                   setEditDialogOpen(true);
                                 }}
                                 className="mr-6 text-[#2E7D32]"
-                                id={i.id + "-edit-device-btn"}
+                                id={device.id + "-edit-device-btn"}
                               >
                                 Edit
                               </button>
                               <button
                                 onClick={() => {
-                                  setSelectedDevice(i.id);
-                                  setIsDeleteConfirmOpen(!isDeleteConfirmOpen);
+                                  dispatch(setSelectedDevice(device.id ? device.id : ""))
+                                  setIsDeleteConfirmOpen(true)
                                 }}
                                 className="text-[#dc3546]"
-                                id={i.id + "-delete-device-btn"}
+                                id={device.id + "-delete-device-btn"}
                               >
                                 Delete
                               </button>
@@ -476,38 +453,19 @@ function DeviceList() {
                 </tbody>
               </table>
             </div>
-
-            {pageCount > 1 && (
-              <div className="flex justify-end items-center w-[100%] mt-4 sm:flex-col">
-                <div className="mr-3 sm:mb-3 text-[12.4px]">1-5 of items</div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      if (numOfPage > 1) {
-                        setNumOfPage(numOfPage - 1);
-                      }
-                    }}
-                    className="cursor-pointer text-[#5e5e5e] bg-gray-50 rounded-md w-[30px] h-[30px] flex items-center justify-center hover:bg-gray-100 hover:border-[1px]"
-                  >
-                    <MdKeyboardArrowLeft />
-                  </button>
-                  {elements}
-                  <button
-                    onClick={() => {
-                      if (numOfPage < pageCount) {
-                        setNumOfPage(numOfPage + 1);
-                      }
-                    }}
-                    className="cursor-pointer text-[#5e5e5e] bg-gray-50 rounded-md w-[30px] h-[30px] flex items-center justify-center hover:bg-gray-100 hover:border-[1px]"
-                  >
-                    <MdKeyboardArrowRight />
-                  </button>
-                </div>
-              </div>
-            )}
+            <Pagination numOfPage={numOfPage} pageCount={pageCount} setNumOfPage={setNumOfPage} />
           </div>
         </div>
+        {showAlert && (
+          <div className="block sm:hidden">
+            <SnackBar
+              id="edit-widget-snackbar"
+              severity={alertType}
+              showSnackBar={showAlert}
+              snackBarText={alertText}
+            />
+          </div>
+        )}
       </div>
     </Wrapper>
   );

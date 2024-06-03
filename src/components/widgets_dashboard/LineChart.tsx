@@ -129,7 +129,7 @@ function LineChart({
   };
 
   React.useEffect(() => {
-    pushNumber(typeof value === "number" ? value : 0);
+    pushNumber(value as number);
   }, [value]);
 
   if (isDragging) {

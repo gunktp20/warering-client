@@ -11,6 +11,7 @@ import {
   ButtonControlPreview,
   ToggleSwitchPreview,
   RangeSliderPreview,
+  LineChartPreview,
 } from "../../components/widgets_preview";
 import { Button } from "@mui/material";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
@@ -88,6 +89,7 @@ export default function EditWidgetDialog(props: IProps) {
     props.setIsEditDisplayShow(false);
   };
   const [values, setValues] = useState<IValue>(initialState);
+
   const fetchWidgetInfo = async () => {
     setIsLoading(true);
     try {
@@ -247,6 +249,24 @@ export default function EditWidgetDialog(props: IProps) {
           });
           return;
         }
+      // case "LineChart":
+      //   try {
+      //     widgetInfo.label = values?.label;
+      //     widgetInfo.type = occupation;
+      //     widgetInfo.configWidget = {
+      //       value: values.value,
+      //       min: Number(values.min),
+      //       max: Number(values.max),
+      //     };
+      //     editWidget(widgetInfo);
+      //     return;
+      //   } catch (err: unknown) {
+      //     displayAlert({
+      //       msg: "Payload must be JSON format",
+      //       type: "error",
+      //     });
+      //     return;
+      //   }
     }
   };
 
@@ -316,7 +336,7 @@ export default function EditWidgetDialog(props: IProps) {
                 </Alert>
               </div>
             )}
-            
+
             {occupation && (
               <div className="flex gap-10 mt-11 sm:flex-col sm:gap-0 relative">
                 <div className="text-[#1d4469] text-[12.3px] font-bold absolute top-[-1.9rem]">
@@ -349,25 +369,26 @@ export default function EditWidgetDialog(props: IProps) {
 
                 {(occupation === "Gauge" ||
                   occupation === "MessageBox" ||
+                  occupation === "LineChart" ||
                   occupation === "ToggleSwitch" ||
                   occupation === "RangeSlider") && (
-                  <div className="w-[350px] sm:w-[100%] relative">
-                    <FormRow
-                      type="text"
-                      name="value"
-                      labelText="value"
-                      value={values.value}
-                      handleChange={handleChange}
-                      marginTop="mt-[0.2rem]"
-                    />
-                  </div>
-                )}
+                    <div className="w-[350px] sm:w-[100%] relative">
+                      <FormRow
+                        type="text"
+                        name="value"
+                        labelText="value"
+                        value={values.value}
+                        handleChange={handleChange}
+                        marginTop="mt-[0.2rem]"
+                      />
+                    </div>
+                  )}
               </div>
             )}
 
             {occupation && (
               <div className="flex gap-10 mt-3 sm:flex-col sm:gap-0">
-                {(occupation === "Gauge" || occupation === "RangeSlider") && (
+                {(occupation === "Gauge" || occupation === "RangeSlider" || occupation === "LineChart") && (
                   <div className="w-[350px] sm:w-[100%]">
                     <FormRow
                       type="number"
@@ -379,7 +400,7 @@ export default function EditWidgetDialog(props: IProps) {
                     />
                   </div>
                 )}
-                {(occupation === "Gauge" || occupation === "RangeSlider") && (
+                {(occupation === "Gauge" || occupation === "RangeSlider" || occupation === "LineChart") && (
                   <div className="w-[350px] sm:w-[100%]">
                     <FormRow
                       type="number"
@@ -427,6 +448,7 @@ export default function EditWidgetDialog(props: IProps) {
                     />
                   </div>
                 )}
+
               </div>
             )}
 
@@ -490,6 +512,15 @@ export default function EditWidgetDialog(props: IProps) {
             {occupation === "RangeSlider" && (
               <div className="flex gap-10 mt-5 sm:flex-col sm:gap-0 w-[100%]">
                 <RangeSliderPreview label={values.label} />
+              </div>
+            )}
+            {occupation === "LineChart" && (
+              <div className="flex gap-10 mt-5 sm:flex-col sm:gap-0 w-[100%]">
+                <LineChartPreview
+                  label={values.label}
+                  min={values.min}
+                  max={values.max}
+                />
               </div>
             )}
 

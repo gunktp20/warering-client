@@ -19,7 +19,6 @@ function useTimeout({ executeAction, duration }: IProp) {
     clearAllTimeouts();
     const newTimeoutId = setTimeout(
       () => {
-        console.log("args", ...args);
         executeAction(...args);
       },
       duration ? duration : 3000

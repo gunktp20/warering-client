@@ -4,6 +4,10 @@ import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { useAppSelector } from "../../app/hooks";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import useAlert from "../../hooks/useAlert";
+import { SnackBar } from "../../components";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -17,38 +21,41 @@ const Transition = React.forwardRef(function Transition(
 interface IProps {
   isDeleteConfirmOpen: boolean;
   setIsDeleteConfirmOpen: (active: boolean) => void;
-  selectedDevice: string;
-  hookDeleteSuccess:()=>void
+  hookDeleteSuccess: () => void
 }
 
-export default function ConfirmDelete(props: IProps) {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+export default function ConfirmDelete({ isDeleteConfirmOpen, setIsDeleteConfirmOpen, hookDeleteSuccess }: IProps) {
+
   const axiosPrivate = useAxiosPrivate();
+  const { selectedDevice } = useAppSelector((state) => state.device)
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { showAlert, alertText, alertType, displayAlert } = useAlert()
 
   const deleteDevice = async () => {
     setIsLoading(true);
     try {
-      await axiosPrivate.delete(`/devices/${props.selectedDevice}`);
+      await axiosPrivate.delete(`/devices/${selectedDevice}`);
       setIsLoading(false);
-      props.setIsDeleteConfirmOpen(false);
-      props.hookDeleteSuccess();
+      setIsDeleteConfirmOpen(false);
+      hookDeleteSuccess();
     } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err)
       setIsLoading(false);
-      props.setIsDeleteConfirmOpen(false);
+      displayAlert({ msg, type: "error" })
     }
   };
 
   const handleClose = () => {
-    if(isLoading){
-       return; 
+    if (isLoading) {
+      return;
     }
-    props.setIsDeleteConfirmOpen(false);
+    setIsDeleteConfirmOpen(false);
   };
 
   return (
     <React.Fragment>
       <Dialog
-        open={props.isDeleteConfirmOpen}
+        open={isDeleteConfirmOpen}
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
@@ -71,14 +78,24 @@ export default function ConfirmDelete(props: IProps) {
             >
               Cancel
             </button>
-            <button onClick={()=>{
-                deleteDevice()
+            <button onClick={() => {
+              deleteDevice()
             }}
-             id="confirm-delete-device"
-             disabled={isLoading} className="bg-[#dc3546] text-[12.5px] text-white px-10 py-[0.4rem] rounded-sm">
+              id="confirm-delete-device"
+              disabled={isLoading} className="bg-[#dc3546] text-[12.5px] text-white px-10 py-[0.4rem] rounded-sm">
               Delete
             </button>
           </div>
+          {showAlert && (
+            <div className="block sm:hidden">
+              <SnackBar
+                id="edit-widget-snackbar"
+                severity={alertType}
+                showSnackBar={showAlert}
+                snackBarText={alertText}
+              />
+            </div>
+          )}
         </DialogContentText>
       </Dialog>
     </React.Fragment>
