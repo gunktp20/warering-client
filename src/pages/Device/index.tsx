@@ -44,6 +44,7 @@ import LineChart from "../../components/widgets_device/LineChart";
 import { useAppSelector } from "../../app/hooks";
 import useAlert from "../../hooks/useAlert";
 import * as XLSX from "xlsx"
+import useTimeout from "../../hooks/useTimeout";
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
 interface IDevice {
@@ -231,6 +232,8 @@ function Device() {
     }
   }
 
+
+
   const exportJsonFile = async () => {
     try {
       const allPayload = await getAllPayload()
@@ -261,6 +264,9 @@ function Device() {
       alert.displayAlert({ msg, type: "error" })
     }
   }
+
+  const { callHandler: callExportJsonFile } = useTimeout({ executeAction: exportJsonFile, duration: 1000 })
+  const { callHandler: callExportExelFile } = useTimeout({ executeAction: exportExcelFile, duration: 1000 })
 
   return (
     <Wrapper>
@@ -454,15 +460,15 @@ function Device() {
           <div className="text-[#1d4469] text-[20px] mt-8 font-bold">
             Export
           </div>
-          <div className="gap-16 flex mt-4 p-5 border-t-[1px] border-b-[1px] border-[#dadada]" onClick={exportExcelFile} id="excel-download">
-            <div className="flex flex-col justify-center items-center">
+          <div className="gap-16 flex mt-4 p-5 border-t-[1px] border-b-[1px] border-[#dadada]" >
+            <div className="flex flex-col justify-center items-center cursor-pointer text-nowrap" onClick={callExportJsonFile} id="excel-download">
               <SiMicrosoftexcel className="text-[#1d4469] text-[25px]" />
               <div className="text-[13px] mt-3 text-[#1d4469] font-bold">
                 Excel
               </div>
             </div>
             {/* Export JSON */}
-            <div className="flex flex-col justify-center items-center cursor-pointer text-nowrap" onClick={exportJsonFile} id="json-dowload">
+            <div className="flex flex-col justify-center items-center cursor-pointer text-nowrap" onClick={callExportExelFile} id="json-dowload">
               <BsFiletypeJson className="text-[#1d4469] text-[25px]" />
               <div className="text-[13px] mt-3 text-[#1d4469] font-bold text-nowrap">
                 JSON
