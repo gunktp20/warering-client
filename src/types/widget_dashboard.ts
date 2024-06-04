@@ -7,7 +7,6 @@ interface IWidget {
 }
 
 export interface IWidgetProp {
-  id: string;
   widgetId: string;
   label: string;
   column?: "column-1" | "column-2" | "column-3" | string;

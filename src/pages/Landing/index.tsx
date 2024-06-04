@@ -26,6 +26,8 @@ function Landing() {
       <BigNavbar setIsMember={setIsMember} setIsDrawerOpen={setIsDrawerOpen} isAccountUserDrawerOpen={isAccountUserDrawerOpen} setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen} />
       <SmallNavbar
         setIsMember={setIsMember}
+        isAccountUserDrawerOpen={isAccountUserDrawerOpen}
+        setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
         setIsDrawerOpen={setIsDrawerOpen}
       />
       {!user && (

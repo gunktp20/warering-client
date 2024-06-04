@@ -97,7 +97,6 @@ function ColumnContainer({
             selectWidget={selectWidget}
             dashboardId={dashboard_id}
             editMode={editMode}
-            id={""}
           />
         );
       }
@@ -123,7 +122,6 @@ function ColumnContainer({
             selectWidget={selectWidget}
             dashboardId={dashboard_id}
             editMode={editMode}
-            id={""}
           />
         );
       }
@@ -150,7 +148,6 @@ function ColumnContainer({
             selectWidget={selectWidget}
             dashboardId={dashboard_id}
             editMode={editMode}
-            id={""}
           />
         );
       }
@@ -178,7 +175,6 @@ function ColumnContainer({
             selectWidget={selectWidget}
             dashboardId={dashboard_id}
             editMode={editMode}
-            id={""}
           />
         );
       }
@@ -206,7 +202,6 @@ function ColumnContainer({
             selectWidget={selectWidget}
             dashboardId={dashboard_id}
             editMode={editMode}
-            id={""}
           />
         );
       }
@@ -233,7 +228,6 @@ function ColumnContainer({
             selectWidget={selectWidget}
             dashboardId={dashboard_id}
             editMode={editMode}
-            id={""}
           />
         );
       }

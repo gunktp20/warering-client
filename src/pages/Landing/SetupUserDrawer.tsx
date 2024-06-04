@@ -139,12 +139,13 @@ function SetupUserDrawer(props: IDrawer) {
         }}
         className="sm:hidden"
         PaperProps={{ id: "setup-user-drawer" }}
+        id="setup-user-drawer"
       >
         <Box p={2} width="420px" textAlign="left" role="presentation">
           <Typography variant="h6" component="div" className="p-5 pb-0">
             {isForgetPassword ? (
               <div>
-                <h3 className="text-left text-[27px] mt-1 font-bold mb-2 text-[#1D4469]">
+                <h3 className="text-left text-[27px] mt-1 font-bold mb-2 text-[#1D4469]" id="forget-password-drawer-title">
                   Forget your password ?
                 </h3>
                 <div className="text-[12px] text-[#0000009d] mb-3">
@@ -155,6 +156,7 @@ function SetupUserDrawer(props: IDrawer) {
                   <Alert
                     severity={alertType}
                     sx={{ fontSize: "11.8px", alignItems: "center" }}
+                    id="alert-forget-password-drawer"
                   >
                     {alertText}
                   </Alert>
@@ -183,20 +185,20 @@ function SetupUserDrawer(props: IDrawer) {
                     ":hover": {
                       bgcolor: "#10269C"
                     },
-                    ":disabled":{
-                      color:"#fff",
+                    ":disabled": {
+                      color: "#fff",
                     }
                   }}
                   variant="contained"
                   disabled={isLoading}
-                  id="forget-pass-submit"
+                  id="forget-pass-drawer-submit"
                 >
                   {isLoading ? "Loading..." : "Continue"}
                 </Button>
               </div>
             ) : (
               <div>
-                <h3 className="text-left text-[27px] mt-1 font-bold mb-3 text-[#1D4469]">
+                <h3 className="text-left text-[27px] mt-1 font-bold mb-3 text-[#1D4469]" id="setup-user-drawer-title">
                   {isMember ? "Sign In" : "Sign Up"}
                 </h3>
 
@@ -204,6 +206,7 @@ function SetupUserDrawer(props: IDrawer) {
                   <Alert
                     severity={alertType}
                     sx={{ fontSize: "11.8px", alignItems: "center" }}
+                    id="alert-setup-user-drawer"
                   >
                     {alertText}
                   </Alert>
@@ -264,7 +267,7 @@ function SetupUserDrawer(props: IDrawer) {
                 {!isMember && (
                   <div className="flex items-center">
                     <input
-                      id="accept-term-btn"
+                      id="agree-term-and-conditions-drawer-checkbox"
                       type="checkbox"
                       value=""
                       onClick={() => setIsAcceptTerm(!isAcceptTerm)}
@@ -278,6 +281,7 @@ function SetupUserDrawer(props: IDrawer) {
                       I agree with the{" "}
                       <Link
                         to="/term-condition"
+                        id="terms-and-conditions-btn"
                         className="text-[#3173B1] dark:text-[#3173B1] hover:underline"
                       >
                         terms and conditions
@@ -290,7 +294,7 @@ function SetupUserDrawer(props: IDrawer) {
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
                       <input
-                        id="link-checkbox"
+                        id="remember-user-drawer-checkbox"
                         type="checkbox"
                         value=""
                         className="w-[13px] h-[13px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#ffffff00] focus:ring-2"
@@ -309,7 +313,7 @@ function SetupUserDrawer(props: IDrawer) {
                           dispatch(clearAlert());
                         }}
                         className="cursor-pointer ms-2 text-[11.5px] text-[#3173B1] font-bold"
-                        id="forget-pass-btn"
+                        id="forget-pass-drawer-btn"
                       >
                         Forget Password ?
                       </button>
@@ -326,20 +330,20 @@ function SetupUserDrawer(props: IDrawer) {
                     width: "100%",
                     height: "39px",
                     marginTop: "1.5rem",
-                    
+
                   }}
                   sx={{
                     bgcolor: "#1966fb",
                     ":hover": {
                       bgcolor: "#10269C"
                     },
-                    ":disabled":{
-                      color:"#fff",
+                    ":disabled": {
+                      color: "#fff",
                     }
                   }}
                   variant="contained"
                   disabled={isLoading}
-                  id="setup-user-submit"
+                  id="setup-user-drawer-submit"
                 >
                   {isLoading ? "Loading..." : isMember ? "Sign In" : "Sign Up"}
                 </Button>
@@ -355,7 +359,7 @@ function SetupUserDrawer(props: IDrawer) {
                       setIsMember(!isMember);
                       dispatch(clearAlert());
                     }}
-                    id="toggle-endpoint"
+                    id="toggle-setup-user-endpoint-drawer-btn"
                   >
                     {isMember ? "SignUp" : "SignIn"}
                   </button>

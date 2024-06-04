@@ -117,7 +117,7 @@ function AddDevice() {
                 setIsDrawerOpen(true);
               }}
               className="hidden p-1 w-fit h-fit relative sm:block text-[#8f8f8f] mb-6"
-              id="small-open-sidebar-btn"
+              id="toggle-nav-links-dialog-btn"
             >
               <RiMenu2Fill className="text-[23px]" />
             </button>
@@ -127,7 +127,7 @@ function AddDevice() {
                 navigate("/device-list");
               }}
               className="flex cursor-pointer text-sm text-[#1D4469] font-bold items-center left-0 mb-10"
-              id="back-prev-btn"
+              id="back-to-devices-list-btn"
             >
               <IoArrowBackSharp className="text-sm mr-2" />
               Back
@@ -161,6 +161,7 @@ function AddDevice() {
                     alignItems: "center",
                     marginTop: "2rem",
                   }}
+                  id="add-device-alert"
                 >
                   {alertText}
                 </Alert>
@@ -246,7 +247,7 @@ function AddDevice() {
                 Retain
               </label>
               <input
-                id="link-checkbox"
+                id="retain-checkbox"
                 type="checkbox"
                 name="retain"
                 onChange={() => setRetain((prev) => !prev)}

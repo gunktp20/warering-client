@@ -3,9 +3,6 @@ import Wrapper from "../../assets/wrappers/UserManagement";
 import { useEffect, useState } from "react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { IoSearchOutline } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
-import EditDashboardDialog from "./EditDashboardDialog";
-import ConfirmDelete from "./ConfirmDelete";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { AxiosError } from "axios";
 import NavLinkSidebarAdmin from "../../components/Admin/NavLinkSidebarAdmin";
@@ -14,15 +11,12 @@ import NavDialogAdmin from "../../components/Admin/NavDialogAdmin";
 import AccountAdminDrawer from "../../components/Admin/AccountAdminDrawer";
 import userAvatar from "../../assets/images/user-avatar.png";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import Pagination from "./Pagination";
 
 function UserManagement() {
-  const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
-  const [isEditDialogOpen, setEditDialogOpen] = useState<boolean>(false);
-  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
-    useState<boolean>(false);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
   const [users, setUsers] = useState<
@@ -112,11 +106,10 @@ function UserManagement() {
           setNumOfPage(i);
         }}
         key={i}
-        className={`${
-          numOfPage === i
-            ? "bg-[#1966fb] text-white"
-            : "bg-white text-[#7a7a7a]"
-        } cursor-pointer  border-[#cccccc] border-[1px] text-[13.5px] rounded-md w-[30px] h-[30px] flex items-center justify-center`}
+        className={`${numOfPage === i
+          ? "bg-[#1966fb] text-white"
+          : "bg-white text-[#7a7a7a]"
+          } cursor-pointer  border-[#cccccc] border-[1px] text-[13.5px] rounded-md w-[30px] h-[30px] flex items-center justify-center`}
       >
         {i}
       </button>
@@ -133,14 +126,6 @@ function UserManagement() {
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
       />
-      <ConfirmDelete
-        isDeleteConfirmOpen={isDeleteConfirmOpen}
-        setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-      />
-      <EditDashboardDialog
-        isEditDialogOpen={isEditDialogOpen}
-        setEditDialogOpen={setEditDialogOpen}
-      />
       <BigNavbarAdmin
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
@@ -153,7 +138,7 @@ function UserManagement() {
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
         />
-        <div className="m-[3rem] top-[4rem] w-[100%] flex h-fit flex-col sm:m-0 sm:my-[3rem]">
+        <div className="m-[3rem] top-[4rem] w-[100%] flex h-fit flex-col sm:m-0 sm:my-[3rem] sm:mx-[1rem]">
           <button
             onClick={() => {
               setIsDrawerOpen(true);
@@ -192,10 +177,10 @@ function UserManagement() {
               <div className="flex justify-start sm:w-[100%]">
                 <div className="pb-2 sm:w-[100%] ">
                   <select
-                    id="countries"
+                    id="sort-by-date"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full px-5 py-2"
                     defaultValue={""}
-                    onChange={() => {}}
+                    onChange={() => { }}
                   >
                     <option value="-createdAt">Sort by Date</option>
                     <option value="%2BcreatedAt">Oldest</option>
@@ -206,7 +191,7 @@ function UserManagement() {
             </div>
 
             <div className="overflow-auto rounded-lg shadow block sm:shadow-none md:shadow-none">
-              <table className="w-full">
+              <table className="w-full" id="table-user-list">
                 <thead className="border-b-2 border-gray-200 sm:hidden md:hidden">
                   <tr>
                     <th className=" w-[20%]  text-center text-sm font-semibold tracking-wide ">
@@ -229,17 +214,14 @@ function UserManagement() {
                 <tbody className="divide-y divide-gray-100">
                   {users &&
                     users.map((user, index) => {
-                      console.log("user", user);
                       return (
                         <tr
-                          key={index}
+                          key={`user-record-${index}`}
                           className="sm:flex sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md ------ md:flex md:flex-col md:my-5 md:border-[1px] md:rounded-lg md:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10"
                         >
                           <td
-                            onClick={() => {
-                              navigate("/dashboard/:dashboard_id");
-                            }}
                             className="cursor-pointer p-3 text-[12.5px] text-[#878787] whitespace-nowrap text-left pl-16 sm:text-start sm:bg-[#1966fb] md:bg-[#1966fb] sm:text-white md:text-white sm:pl-5 md:pl-5"
+                            id={`username-detail-${index}`}
                           >
                             <div className="flex gap-3 items-center">
                               <img
@@ -248,44 +230,43 @@ function UserManagement() {
                                     ? user?.profileUrl
                                     : userAvatar
                                 }
-                                className={`w-[31px] h-[31px] text-[#dbdbdb] ${
-                                  user?.profileUrl
-                                    ? "opacity-100 object-cover object-top rounded-xl"
-                                    : "opacity-60"
-                                }`}
+                                className={`w-[31px] h-[31px] text-[#dbdbdb] ${user?.profileUrl
+                                  ? "opacity-100 object-cover object-top rounded-xl"
+                                  : "opacity-60"
+                                  }`}
                               ></img>
                               {user?.username}
                             </div>
                           </td>
-                          <td className="p-3 text-[12.5px] text-[#878787] whitespace-nowrap text-left pl-[6%] sm:text-start truncate">
+                          <td id={`fname-detail-${index}`} className="p-3 text-[12.5px] text-[#878787] whitespace-nowrap text-left pl-[6%] sm:text-start truncate">
                             <div className="font-bold hidden mr-3 sm:mb-2 sm:block md:mb-2 md:block text-gray-600">
                               First name
                             </div>
                             {user?.fname}
                           </td>
-                          <td className="p-3 text-[12.5px] text-[#878787] whitespace-nowrap text-left pl-[6%] sm:text-start truncate">
+                          <td id={`lname-detail-${index}`} className="p-3 text-[12.5px] text-[#878787] whitespace-nowrap text-left pl-[6%] sm:text-start truncate">
                             <div className="font-bold hidden mr-3 sm:mb-2 sm:block md:mb-2 md:block text-gray-600 ">
                               Last name
                             </div>
                             {user?.lname}
                           </td>
-                          <td className="p-3 text-[12.5px] text-[#878787] whitespace-nowrap text-left pl-[6%] sm:text-start truncate">
+                          <td id={`email-detail-${index}`} className="p-3 text-[12.5px] text-[#878787] whitespace-nowrap text-left pl-[6%] sm:text-start truncate">
                             <div className="font-bold hidden mr-3 sm:mb-2 sm:block md:mb-2 md:block text-gray-600">
                               E-mail
                             </div>
                             {user?.email}
                           </td>
-                          <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start md:text-start">
+                          <td id={`username-detail-${index}`} className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start md:text-start">
                             <div className="font-bold hidden mr-3 sm:mb-2 sm:block md:mb-2 md:block text-gray-600">
                               Action
                             </div>
                             <div className="flex justify-center sm:justify-start md:justify-start">
                               <button
-                                className={`flex justify-center items-center text-white w-[100px] h-[28px] rounded-md transition-all ${
-                                  user?.isActive
-                                    ? "bg-green-500 hover:outline hover:outline-1 hover:outline-green-600 hover:shadow-md"
-                                    : "bg-red-500 hover:outline hover:outline-1 hover:outline-red-600 hover:shadow-md"
-                                }`}
+                                className={`flex justify-center items-center text-white w-[100px] h-[28px] rounded-md transition-all ${user?.isActive
+                                  ? "bg-green-500 hover:outline hover:outline-1 hover:outline-green-600 hover:shadow-md"
+                                  : "bg-red-500 hover:outline hover:outline-1 hover:outline-red-600 hover:shadow-md"
+                                  }`}
+                                id={`toggle-permission-user-btn-${index}`}
                                 onClick={() => {
                                   onToggleUserStatus(user?.id, user?.isActive);
                                 }}
@@ -306,35 +287,7 @@ function UserManagement() {
                 </tbody>
               </table>
             </div>
-            {pageCount > 1 && (
-              <div className="flex justify-end items-center w-[100%] mt-4 sm:flex-col">
-                <div className="mr-3 sm:mb-3 text-[12.4px]">1-5 of items</div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => {
-                      if (numOfPage > 1) {
-                        setNumOfPage(numOfPage - 1);
-                      }
-                    }}
-                    className="cursor-pointer border-[1px] text-[#7a7a7a] border-[#cccccc] rounded-md w-[30px] h-[30px] flex items-center justify-center"
-                  >
-                    {"<"}
-                  </button>
-                  {elements}
-                  <button
-                    onClick={() => {
-                      if (numOfPage < pageCount) {
-                        setNumOfPage(numOfPage + 1);
-                      }
-                    }}
-                    className="cursor-pointer border-[1px] text-[13.5px] text-[#7a7a7a] border-[#cccccc] rounded-md w-[30px] h-[30px] flex items-center justify-center"
-                  >
-                    {">"}
-                  </button>
-                </div>
-              </div>
-            )}
+            <Pagination numOfPage={numOfPage} setNumOfPage={setNumOfPage} pageCount={pageCount} />
           </div>
         </div>
       </div>

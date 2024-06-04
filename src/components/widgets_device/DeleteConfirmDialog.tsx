@@ -43,7 +43,7 @@ function DeleteConfirmDialog({
   const handleClose = () => {
     setIsDeleteConfirmOpen(false);
   };
-  
+
   const { callHandler: clearWidgetAlert } = useTimeout({ executeAction: () => dispatch(clearAlert()), duration: 3000 })
 
   const deleteWidget = async () => {
@@ -71,9 +71,10 @@ function DeleteConfirmDialog({
         keepMounted
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
+        id={`confirm-delete-widget-device-dialog`}
       >
         <DialogContentText
-          id="confirm-delete-dashboard-dialog"
+          id={`confirm-delete-widget-device-dialog-content`}
           className="py-7 px-11"
           component={"div"}
           variant={"body2"}
@@ -85,6 +86,7 @@ function DeleteConfirmDialog({
             <button
               onClick={handleClose}
               className="text-black text-[12.5px] border-[1px] border-[#000] rounded-sm px-10 py-[0.4rem]"
+              id="cancel-delete-widget-device-btn"
             >
               Cancel
             </button>
@@ -93,6 +95,7 @@ function DeleteConfirmDialog({
               onClick={() => {
                 deleteWidget();
               }}
+              id="delete-submit-widget-device-btn"
               className="bg-[#dc3546] text-[12.5px] text-white px-10 py-[0.4rem] rounded-sm"
             >
               Delete
@@ -101,7 +104,7 @@ function DeleteConfirmDialog({
           {showAlert && (
             <div className="block sm:hidden">
               <SnackBar
-                id="edit-widget-snackbar"
+                id="delete-widget-device-snackbar"
                 severity={alertType}
                 showSnackBar={showAlert}
                 snackBarText={alertText}

@@ -27,7 +27,7 @@ function GaugePreview({ label, value, min, max }: IGaugePreviewProp) {
   };
   const options = {};
   return (
-    <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2  cursor-grab">
+    <div id="gauge-preview" className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2  cursor-grab">
       <div className="absolute left-2 top-2 text-[#1d4469] text-sm">
         {label}
       </div>

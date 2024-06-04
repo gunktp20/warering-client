@@ -7,7 +7,7 @@ function ToggleSwitchPreview({ label }: IToggleSwitchPreviewProp) {
   const [isActive, setIsActive] = useState<boolean>(true);
 
   return (
-    <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center ">
+    <div id="toggle-switch-preview" className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center ">
       <div className="absolute left-2 top-2 text-[#1d4469] text-sm">
         {label}
       </div>

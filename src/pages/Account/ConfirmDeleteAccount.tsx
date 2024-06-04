@@ -62,14 +62,15 @@ export default function ConfirmDeleteAccount(props: IProps) {
         keepMounted
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
+        id="confirm-delete-account-dialog"
       >
         <DialogContentText
-          id="confirm-delete-dashboard-dialog"
+          id="confirm-delete-account-dialog-content"
           className="py-7 px-11"
           component={"div"}
           variant={"body2"}
         >
-          <div className="text-[#dc3546] text-[15.5px] text-center">
+          <div className="text-[#dc3546] text-[15.5px] text-center" id="delete-account-dialog-title">
             Delete account
           </div>
           <div className="mt-[1.3rem] text-[#000]">
@@ -82,18 +83,19 @@ export default function ConfirmDeleteAccount(props: IProps) {
           <div className="mt-6 flex justify-end gap-3 w-[100%] text-[#000]">
             <button
               onClick={handleClose}
+              id="cancel-delete-account-btn"
               className="text-[#DC3546] text-[12.5px] border-[1px] border-[#DC3546] rounded-sm px-10 py-[0.5rem]"
             >
               Cancel
             </button>
-            <button onClick={deleteUser} className="bg-[#f1aeb5] hover:bg-[#DC3546] text-[12.5px] text-white px-10 py-[0.5rem] rounded-sm">
+            <button id="submit-delete-account-dialog-btn" onClick={deleteUser} className="bg-[#f1aeb5] hover:bg-[#DC3546] text-[12.5px] text-white px-10 py-[0.5rem] rounded-sm">
               {isLoading ? "Loading..." : "Delete Account"}
             </button>
           </div>
           {showAlert && (
             <div className="block sm:hidden">
               <SnackBar
-                id="edit-widget-snackbar"
+                id="delete-account-snack-bar"
                 severity={alertType}
                 showSnackBar={showAlert}
                 snackBarText={alertText}

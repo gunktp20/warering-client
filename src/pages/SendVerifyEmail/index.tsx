@@ -8,6 +8,7 @@ import verified_success from "../../assets/images/Verified-amico.svg";
 import verify_error from "../../assets/images/401 Error Unauthorized-amico.svg";
 
 function SendVerifyEmail() {
+
   const { token } = useParams();
   const { isLoading, alertText, alertType } = useAppSelector(
     (state) => state.auth
@@ -37,11 +38,10 @@ function SendVerifyEmail() {
       <div>
         <img
           src={alertType === "success" ? verified_success : verify_error}
-          alt="not found"
           className="w-[400px] h-[400px]"
         />
         <div className="text-[#303030] mb-3 text-[20px]">{alertText}</div>
-        <div className="text-[#838383]">
+        <div className="text-[#838383]" id="alert-execution">
           {alertType === "success"
             ? "Thank you for trusting and choosing to use our Platform"
             : "Have an error , Please try again"}
@@ -49,6 +49,7 @@ function SendVerifyEmail() {
         <div className="mt-8">
           <Link
             to="/home"
+            id="back-to-home-btn"
             className="px-9 py-2 text-[#45a2f9] capitalize rounded-md border-[#45a2f9] border-[2px] hover:bg-[#45a2f9] hover:text-white"
           >
             back home

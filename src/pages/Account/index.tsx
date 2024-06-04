@@ -9,6 +9,8 @@ import { jwtDecode } from "jwt-decode";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import userAvatar from "../../assets/images/user-avatar.png";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import useAlert from "../../hooks/useAlert";
+import { SnackBar } from "../../components";
 
 const Account = () => {
   const navigate = useNavigate();
@@ -29,10 +31,12 @@ const Account = () => {
     email: "",
     username: "",
   });
+
   const axiosPrivate = useAxiosPrivate();
   const decoded: AccessTokenPayload | undefined = token
     ? jwtDecode(token)
     : undefined;
+  const { displayAlert, showAlert, alertText, alertType } = useAlert()
 
   const getUserInfo = async () => {
     setIsLoading(true);
@@ -40,11 +44,10 @@ const Account = () => {
       const { data } = await axiosPrivate.get(`/users/${decoded?.sub}`);
       setIsLoading(false);
       setProfileImg(data?.profileUrl)
-      console.log(data);
       setUser(data);
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err);
-      console.log(msg);
+      displayAlert({ msg, type: "error" })
       setIsLoading(false);
     }
   };
@@ -65,11 +68,12 @@ const Account = () => {
             navigate("/");
           }}
           className="absolute top-[-2.5rem] flex cursor-pointer text-sm text-[#1D4469] font-bold items-center left-0 "
+          id="back-to-home-btn"
         >
           <IoArrowBackSharp className="text-sm" />
           Back
         </button>
-        <div className="flex justify-start w-[100%] text-[22px] border-b-[1px] border-[#dfdfdf] text-[#1c1c1c] pb-5 font-semibold">
+        <div id="outlet-title" className="flex justify-start w-[100%] text-[22px] border-b-[1px] border-[#dfdfdf] text-[#1c1c1c] pb-5 font-semibold">
           Account
         </div>
         {isLoading && (
@@ -81,11 +85,11 @@ const Account = () => {
           <>
             <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
               <div className="text-[13.5px]">Email address</div>
-              <div className="text-[#8b8b8b] text-[14px] mr-10">
+              <div className="text-[#8b8b8b] text-[14px] mr-10" id="user-email">
                 {user?.email}
               </div>
             </div>
-            
+
             <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
               <div className="text-[13.5px]">
                 Profile Information
@@ -93,33 +97,33 @@ const Account = () => {
                   Edit your photo, name , bio, etc
                 </div>
               </div>
-              <div className="text-[#8b8b8b] text-[14px] mr-10 flex items-center">
+              <div className="text-[#8b8b8b] text-[14px] mr-10 flex items-center" id="user-full-name">
                 {user?.fname} {user?.lname}{" "}
                 <div className="flex ml-2 w-[39px] h-[39px] bg-[#fff] rounded-lg border-[0px] border-[#fdfdfd]">
                   <img
                     src={profileImage ? profileImage : userAvatar}
-                    className={`w-[100%] h-[100%]  text-[#dbdbdb] rounded-lg ${
-                      profileImage ? "opacity-100 object-cover object-top" : "opacity-60"
-                    }`}
+                    id="user-profile-image"
+                    className={`w-[100%] h-[100%]  text-[#dbdbdb] rounded-lg ${profileImage ? "opacity-100 object-cover object-top" : "opacity-60"
+                      }`}
                   ></img>
                 </div>
               </div>
             </div>
             <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
               <div className="text-[13.5px]">Username</div>
-              <div className="text-[#8b8b8b] text-[14px] mr-10">
+              <div className="text-[#8b8b8b] text-[14px] mr-10" id="user-username">
                 {user?.username}
               </div>
             </div>
             <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
               <div className="text-[13.5px]">Firstname</div>
-              <div className="text-[#8b8b8b] text-[14px] mr-10">
+              <div className="text-[#8b8b8b] text-[14px] mr-10" id="fname">
                 {user?.fname}
               </div>
             </div>
             <div className=" w-[100%] flex items-center justify-between mt-6 sm:mt-8">
               <div className="text-[13.5px]">Lastname</div>
-              <div className="text-[#8b8b8b] text-[14px] mr-10">
+              <div className="text-[#8b8b8b] text-[14px] mr-10" id="lname">
                 {user?.lname}
               </div>
             </div>
@@ -130,6 +134,7 @@ const Account = () => {
                 onClick={() => {
                   setIsDeleteConfirmOpen(!isDeleteConfirmOpen);
                 }}
+                id="delete-account-btn"
               >
                 Delete account
               </div>
@@ -140,6 +145,16 @@ const Account = () => {
           </>
         )}
       </div>
+      {showAlert && (
+        <div className="block sm:hidden">
+          <SnackBar
+            id="account-page-snack-bar"
+            severity={alertType}
+            showSnackBar={showAlert}
+            snackBarText={alertText}
+          />
+        </div>
+      )}
     </Wrapper>
   );
 };

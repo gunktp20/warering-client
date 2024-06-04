@@ -25,9 +25,9 @@ function MessageBox({
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
   return (
-    <div className="h-[130px] w-[100%] bg-white relative shadow-md flex justify-center items-center rounded-md hover:ring-2 overflow-hidden">
+    <div id={widgetId} className="h-[130px] w-[100%] bg-white relative shadow-md flex justify-center items-center rounded-md hover:ring-2 overflow-hidden">
       {!value && (
-        <div className="w-[100%] h-[100%] bg-white z-10 flex absolute justify-center items-center font-bold text-[#0075ff]">
+        <div className=" bg-white z-10 flex absolute justify-center items-center font-bold text-[#0075ff]">
           IDLE
         </div>
       )}
@@ -38,6 +38,7 @@ function MessageBox({
         onClick={() => {
           setIsOptionOpen(!isOptionOpen);
         }}
+        id={`${widgetId}-message-box-device-options`}
         className="z-20 absolute right-3 top-2 text-[18px] text-[#7a7a7a] cursor-pointer hover:bg-[#f7f7f7] hover:rounded-md "
       >
         <RxDotsHorizontal />
@@ -64,7 +65,7 @@ function MessageBox({
           </button>
         </div>
       )}
-      <div
+      {value && <div
         className={`text-[#1966fb] font-bold flex ${checkThaiLanguage(
           value !== null && typeof value !== "number" ? value : ""
         )
@@ -76,7 +77,7 @@ function MessageBox({
         <div className="text-[11px] font-medium text-[#5353538a] text-right ml-2">
           {unit}
         </div>
-      </div>
+      </div>}
       <DeleteConfirmDialog
         isDeleteConfirmOpen={isDeleteConfirmOpen}
         setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}

@@ -41,7 +41,7 @@ export default function RangeSlider({
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     React.useState<boolean>(false);
   return (
-    <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2">
+    <div id={widgetId} className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2">
       <div className="absolute left-2 top-2 text-[#1d4469] text-[12px]">
         {label}
       </div>
@@ -49,6 +49,7 @@ export default function RangeSlider({
         onClick={() => {
           setIsOptionOpen(!isOptionOpen);
         }}
+        id={`${widgetId}-range-slider-device-options`}
         className="z-20 absolute right-3 top-2 text-[18px] text-[#7a7a7a] cursor-pointer hover:bg-[#f7f7f7] hover:rounded-md "
       >
         <RxDotsHorizontal />

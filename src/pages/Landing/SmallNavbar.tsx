@@ -1,14 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../app/hooks";
 import Wrapper from "../../assets/wrappers/Landing/SmallNavbar";
+import userAvatar from "../../assets/images/user-avatar.png"
 
 interface ISmallNavbar {
   setIsDrawerOpen: (active: boolean) => void;
   setIsMember: (member: boolean) => void;
+  isAccountUserDrawerOpen: boolean;
+  setIsAccountUserDrawerOpen: (status: boolean) => void
 }
 
 function SmallNavbar(props: ISmallNavbar) {
-  const { user } = useAppSelector((state) => state.auth);
+  const isLoading = false
+  const { user, profileImg } = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
   return (
     <Wrapper className="w-[100%] fixed h-[80px] flex justify-center bg-white p-5 shadow-md z-10">
@@ -19,7 +23,7 @@ function SmallNavbar(props: ISmallNavbar) {
         {user ? (
           <div className="flex items-center">
             <button
-              id="project-btn"
+              id="small-navbar-project-btn"
               onClick={() => {
                 navigate("/");
               }}
@@ -27,18 +31,37 @@ function SmallNavbar(props: ISmallNavbar) {
             >
               Project
             </button>
-            <div className="text-sm mr-3 text-[#303030]">{user?.username}</div>
-            <img
-              className="w-[45px] h-[45px] object-cover rounded-2xl"
-              src="https://www.wilsoncenter.org/sites/default/files/media/images/person/james-person-1.jpg"
-              alt=""
-            />
+            <div onClick={() => {
+              if (isLoading) {
+                return;
+              }
+
+              props.setIsAccountUserDrawerOpen(!props.isAccountUserDrawerOpen);
+            }}
+              id="username-small-navbar-btn" className=" cursor-pointer text-sm mr-3 text-[#303030]">{user?.username}</div>
+            {isLoading ? (
+              <div className="loader w-[23px] h-[23px]"></div>
+            ) : (
+              <img
+                src={profileImg ? profileImg : userAvatar}
+                id="profile-img-toggle-account-user-small-navbar-btn"
+                onClick={() => {
+                  if (isLoading) {
+                    return;
+                  }
+                  props.setIsAccountUserDrawerOpen(!props.isAccountUserDrawerOpen);
+                }}
+                className={`cursor-pointer ml-4 w-[42px] h-[42px]text-[#dbdbdb] rounded-[100%] ${profileImg ? "opacity-100 object-cover object-top" : "opacity-60"
+                  }`}
+              ></img>
+            )}
           </div>
         ) : (
           <button
             onClick={() => {
               props.setIsDrawerOpen(true);
             }}
+            id="toggle-setup-user-small-navbar-btn"
             className="flex border-[1px] border-[#1D4469] p-2 pr-5 pl-5 rounded-[100px]"
           >
             <div className="border-r-[1px] border-[#1D4469] pr-5 mr-5">

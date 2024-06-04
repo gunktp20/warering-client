@@ -128,7 +128,7 @@ function LineChart({
   }, [value]);
 
   return (
-    <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2">
+    <div id={widgetId} className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2">
       <div className="absolute left-2 top-2 text-[#1d4469] text-[12px]">
         {label}
       </div>
@@ -136,6 +136,7 @@ function LineChart({
         onClick={() => {
           setIsOptionOpen(!isOptionOpen);
         }}
+        id={`${widgetId}-line-chart-device-options`}
         className="absolute right-3 top-2 text-[18px] text-[#7a7a7a] cursor-pointer hover:bg-[#f7f7f7] hover:rounded-md "
       >
         <RxDotsHorizontal />

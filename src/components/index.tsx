@@ -3,7 +3,6 @@ import NavLinkSidebar from "./NavLinkSidebar";
 import RequireAdmin from "./RequireAdmin";
 import RequireUser from "./RequireUser";
 import BigNavbar from "./BigNavbar";
-import FormControl from "./FormControl";
 import NavDialog from "./NavDialog";
 import AccountUserDrawer from "./AccountUserDrawer";
 import SnackBar from "./SnackBar";
@@ -16,7 +15,6 @@ export {
   NavLinkSidebar,
   NavDialog,
   BigNavbar,
-  FormControl,
   AccountUserDrawer,
   SnackBar,
   FormSelect,

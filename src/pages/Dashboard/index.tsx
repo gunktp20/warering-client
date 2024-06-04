@@ -387,7 +387,7 @@ function KanbanBoard() {
                 setIsDrawerOpen(true);
               }}
               className="hidden p-1 w-fit h-fit relative sm:block text-[#8f8f8f] mb-6"
-              id="small-open-sidebar-btn"
+              id="toggle-nav-links-dialog-btn"
             >
               <RiMenu2Fill className="text-[23px]" />
             </button>
@@ -397,6 +397,7 @@ function KanbanBoard() {
                 navigate("/dashboard-list");
               }}
               className="flex cursor-pointer text-sm text-[#1D4469] font-bold items-center left-0 mb-10"
+              id="back-to-dashboards-list-btn"
             >
               <IoArrowBackSharp className="text-sm mr-2" />
               Back
@@ -416,6 +417,7 @@ function KanbanBoard() {
                     dispatch(toggleEditMode());
                   }}
                   className="text-[14px] flex items-center gap-2 text-[#1D4469] h-[39px] bg-[#ebebeb] w-[39px] justify-center rounded-md border-[1px]"
+                  id="switch-to-edit-mode-btn"
                 >
                   <RiDragDropLine className="text-[23px]" />
                 </button>
@@ -424,6 +426,7 @@ function KanbanBoard() {
                 <button
                   onClick={pushWidgetsPosition}
                   className="text-[14px] flex items-center gap-2 h-[39px] bg-[#1D4469] w-[130px] justify-center rounded-md text-white font-semibold"
+                  id="save-widgets-position-btn"
                 >
                   {isLoading ? (
                     <div className="loader w-[20px] h-[20px]"></div>
@@ -454,14 +457,14 @@ function KanbanBoard() {
                   },
                 }}
                 variant="outlined"
-                id="setup-user-submit"
+                id="add-widget-to-dashboard-btn"
               >
                 Add Widget
               </Button>
             </div>
           </div>
 
-          <div className="absolute left-0 top-[-4rem] text-[21px] text-[#1d4469] font-bold">
+          <div className="absolute left-0 top-[-4rem] text-[21px] text-[#1d4469] font-bold" id="dashboard-name">
             {dashboardInfo?.nameDashboard}
           </div>
 
@@ -473,7 +476,7 @@ function KanbanBoard() {
               </div>
             )}
             {widgets.length === 0 && !isLoading && (
-              <div className="text-md text-center w-[100%] my-5 text-[#c0c0c0]">
+              <div className="text-md text-center w-[100%] my-5 text-[#c0c0c0]" id="not-found-widgets-note">
                 {" "}
                 Not found any widget
               </div>
@@ -543,9 +546,9 @@ function KanbanBoard() {
         </div>
       </div>
       {showAlert && (
-        <div id="add-device-snackbar" className="block sm:hidden">
+        <div className="block sm:hidden">
           <SnackBar
-            id="add-widget-dashboard-snackbar"
+            id="dashboard-snackbar"
             severity={alertType}
             showSnackBar={showAlert}
             snackBarText={alertText}

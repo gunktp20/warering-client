@@ -12,11 +12,11 @@ interface IDrawer {
   setIsAccountUserDrawerOpen: (active: boolean) => void;
 }
 
-function AccountUserDrawer(props: IDrawer) {
+function AccountUserDrawer({ isAccountUserDrawerOpen, setIsAccountUserDrawerOpen }: IDrawer) {
   const dispatch = useAppDispatch();
-  const { isAccountUserDrawerOpen, setIsAccountUserDrawerOpen } = props;
 
   const signOut = async () => {
+    setIsAccountUserDrawerOpen(false);
     dispatch(logout());
     await axiosPrivate.get("/auth/logout");
   };
@@ -30,7 +30,8 @@ function AccountUserDrawer(props: IDrawer) {
           setIsAccountUserDrawerOpen(false);
         }}
         className=""
-        PaperProps={{ id: "setup-user-drawer" }}
+        PaperProps={{ id: "account-user-drawer" }}
+        id="account-user-drawer"
       >
         <Box p={2} width="250px" textAlign="left" role="presentation">
           <Typography
@@ -41,7 +42,8 @@ function AccountUserDrawer(props: IDrawer) {
               <NavLink
                 to="/account"
                 key={4}
-                onClick={() => {}}
+                id="account-user-drawer-nav-link"
+                onClick={() => { }}
                 className="flex pl-10 p-5 items-center text-[13px] text-[#1d4469]"
               >
                 <FaRegUser className="mr-3 text-[16px]" />
@@ -50,8 +52,9 @@ function AccountUserDrawer(props: IDrawer) {
 
               <NavLink
                 to="/edit-profile"
+                id="edit-profile-drawer-nav-link"
                 key={5}
-                onClick={() => {}}
+                onClick={() => { }}
                 className="flex pl-10 p-5 items-center text-[13px] text-[#1d4469]"
               >
                 <FiEdit3 className="mr-3 text-[16px]" />
@@ -65,6 +68,7 @@ function AccountUserDrawer(props: IDrawer) {
                 signOut();
               }}
               className="flex pl-10 p-5 items-center text-[13px] text-[#962e39]"
+              id="logout-user-btn"
             >
               <CiLogout className="mr-3 text-[16px]" />
               Logout

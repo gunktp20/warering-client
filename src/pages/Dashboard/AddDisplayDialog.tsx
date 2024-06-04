@@ -129,16 +129,17 @@ export default function AddDisplayDialog({
         keepMounted
         onClose={handleClose}
         className="flex items-center justify-center"
+        id="add-display-dialog"
       >
         <DialogContent>
           <DialogContentText
-            id="alert-dialog-slide-description"
             className="p-3 "
             component={"div"}
             variant={"body2"}
+            id="add-display-dialog-content"
           >
             <div className="w-[100%] flex flex-col">
-              <div className="top-0 left-0 absolute w-[100%] h-[48px] bg-primary-500 flex justify-center items-center text-white text-[16px] font-medium">
+              <div id="add-display-dialog-title" className="top-0 left-0 absolute w-[100%] h-[48px] bg-primary-500 flex justify-center items-center text-white text-[16px] font-medium">
                 Add Display
               </div>
               <div className="text-[12px] text-nowrap text-transparent z-0 h-[0px] sm:mb-7">
@@ -152,6 +153,7 @@ export default function AddDisplayDialog({
                       fontSize: "11.8px",
                       alignItems: "center",
                     }}
+                    id="add-display-alert"
                   >
                     {alertText}
                   </Alert>
@@ -161,7 +163,7 @@ export default function AddDisplayDialog({
                 <div className=" pb-2 sm:w-[100%] mt-3">
                   <label className="text-[12px] text-[#000]">Device</label>
                   <select
-                    id="select_widget"
+                    id="input-select-device"
                     disabled={deivceOptions.length === 0 ? true : false}
                     className={`device bg-gray-50 w-[250px] sm:w-[100%] border border-gray-300 mt-1 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-5 py-2`}
                     value={selectedDevice}
@@ -174,7 +176,7 @@ export default function AddDisplayDialog({
                     </option>
                     {deivceOptions.map((device, index) => {
                       return (
-                        <option key={index} value={device?.id}>
+                        <option key={"device" + index} value={device?.id}>
                           {device?.nameDevice}
                         </option>
                       );
@@ -186,7 +188,7 @@ export default function AddDisplayDialog({
                   <label className="text-[12px] text-[#000]">Widget</label>
                   <select
                     disabled={widgetOptions.length === 0 ? true : false}
-                    id="select_widget"
+                    id="input-select-widget"
                     className={`device bg-gray-50 w-[250px] sm:w-[100%] border border-gray-300 mt-1 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block px-5 py-2 text-gray-900`}
                     value={selectedWidget}
                     aria-placeholder=""
@@ -200,7 +202,7 @@ export default function AddDisplayDialog({
                     {widgetOptions.length !== 0 &&
                       widgetOptions.map((widget, index) => {
                         return (
-                          <option key={index} value={widget?.id}>
+                          <option key={"widget" + index} value={widget?.id}>
                             {widget?.label}
                           </option>
                         );
@@ -234,7 +236,7 @@ export default function AddDisplayDialog({
                     },
                   }}
                   variant="outlined"
-                  id="setup-user-submit"
+                  id="cancel-add-display-btn"
                 >
                   Cancel
                 </Button>
@@ -260,7 +262,7 @@ export default function AddDisplayDialog({
                     },
                   }}
                   variant="contained"
-                  id="setup-user-submit"
+                  id="submit-add-display-dialog"
                 >
                   Add Display
                 </Button>
@@ -269,7 +271,7 @@ export default function AddDisplayDialog({
             {showAlert && (
               <div className="block sm:hidden">
                 <SnackBar
-                  id="edit-widget-snackbar"
+                  id="add-display-snack-bar"
                   severity={alertType}
                   showSnackBar={showAlert}
                   snackBarText={alertText}

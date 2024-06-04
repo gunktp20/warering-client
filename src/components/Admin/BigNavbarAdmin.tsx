@@ -15,7 +15,7 @@ function BigNavbarAdmin(props: IProps) {
   const navigate = useNavigate();
   const { user, profileImg, isLoading } = useAppSelector((state) => state.auth);
 
-  useEffect(() => {}, []);
+  useEffect(() => { }, []);
 
   return (
     <div className="bg-[#fff] w-[100%] p-3 flex justify-between shadow-sm items-center">
@@ -24,14 +24,14 @@ function BigNavbarAdmin(props: IProps) {
           onClick={() => {
             navigate("/home");
           }}
-          className={`text-[#1d4469] font-bold text-[25px] ${
-            !props.isSidebarShow ? "ml-[-5.9rem]" : "ml-[5.5rem]"
-          } flex justify-center sm:pl-2 transition-all sm:ml-0 md:ml-0 md:pl-2`}
+          id="back-home"
+          className={`text-[#1d4469] font-bold text-[25px] ${!props.isSidebarShow ? "ml-[-5.9rem]" : "ml-[5.5rem]"
+            } flex justify-center sm:pl-2 transition-all sm:ml-0 md:ml-0 md:pl-2`}
         >
           WR
         </button>
         <button
-          id="toggle-big-sidebar-btn"
+          id="toggle-big-admin-sidebar-btn"
           onClick={() => {
             props.setIsSidebarShow(!props.isSidebarShow);
           }}
@@ -49,6 +49,7 @@ function BigNavbarAdmin(props: IProps) {
             }
             props.setIsAccountUserDrawerOpen(!props.isAccountUserDrawerOpen);
           }}
+          id="admin-username"
           className="text-[13.5px] sm:hidden md:hidden text-[#1d4469] font-semibold text-nowrap cursor-pointer"
         >
           {isLoading ? "loading..." : user?.username}
@@ -64,9 +65,9 @@ function BigNavbarAdmin(props: IProps) {
               }
               props.setIsAccountUserDrawerOpen(!props.isAccountUserDrawerOpen);
             }}
-            className={`cursor-pointer ml-4 w-[42px] h-[42px]text-[#dbdbdb] rounded-[100%] ${
-              profileImg ? "opacity-100 object-cover object-top" : "opacity-60"
-            }`}
+            id="admin-profile-image"
+            className={`cursor-pointer ml-4 w-[42px] h-[42px]text-[#dbdbdb] rounded-[100%] ${profileImg ? "opacity-100 object-cover object-top" : "opacity-60"
+              }`}
           ></img>
         )}
       </div>

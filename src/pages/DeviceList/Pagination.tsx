@@ -17,6 +17,7 @@ function Pagination({ numOfPage, setNumOfPage, pageCount }: IProp) {
                     setNumOfPage(i);
                 }}
                 key={i}
+                id={`page-${i}`}
                 className={`${numOfPage === i
                     ? "bg-[#1966fb] text-white"
                     : "bg-white text-[#7a7a7a]"
@@ -41,6 +42,7 @@ function Pagination({ numOfPage, setNumOfPage, pageCount }: IProp) {
                             setNumOfPage(numOfPage - 1);
                         }
                     }}
+                    id="prev-page-btn"
                     className="cursor-pointer text-[#5e5e5e] bg-gray-50 rounded-md w-[30px] h-[30px] flex items-center justify-center hover:bg-gray-100 hover:border-[1px]"
                 >
                     <MdKeyboardArrowLeft />
@@ -52,6 +54,7 @@ function Pagination({ numOfPage, setNumOfPage, pageCount }: IProp) {
                             setNumOfPage(numOfPage + 1);
                         }
                     }}
+                    id="next-page-btn"
                     className="cursor-pointer text-[#5e5e5e] bg-gray-50 rounded-md w-[30px] h-[30px] flex items-center justify-center hover:bg-gray-100 hover:border-[1px]"
                 >
                     <MdKeyboardArrowRight />

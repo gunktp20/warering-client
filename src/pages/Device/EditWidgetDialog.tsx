@@ -249,24 +249,6 @@ export default function EditWidgetDialog(props: IProps) {
           });
           return;
         }
-      // case "LineChart":
-      //   try {
-      //     widgetInfo.label = values?.label;
-      //     widgetInfo.type = occupation;
-      //     widgetInfo.configWidget = {
-      //       value: values.value,
-      //       min: Number(values.min),
-      //       max: Number(values.max),
-      //     };
-      //     editWidget(widgetInfo);
-      //     return;
-      //   } catch (err: unknown) {
-      //     displayAlert({
-      //       msg: "Payload must be JSON format",
-      //       type: "error",
-      //     });
-      //     return;
-      //   }
     }
   };
 
@@ -303,17 +285,18 @@ export default function EditWidgetDialog(props: IProps) {
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
+        id="edit-widget-dialog"
       >
         <DialogContent>
           <DialogContentText
-            id="edit-widget-dialog"
+            id="edit-widget-dialog-content"
             className="p-3"
             component={"div"}
             variant={"body2"}
           >
             <div className="w-[100%] flex flex-col">
               <div
-                id="title-edit-widget-dialog"
+                id="edit-widget-title"
                 className="text-[17px] font-bold text-[#1D4469]"
               >
                 Edit widget
@@ -331,6 +314,7 @@ export default function EditWidgetDialog(props: IProps) {
                     alignItems: "center",
                     marginTop: "1.5rem",
                   }}
+                  id="edit-widget-alert"
                 >
                   {alertText}
                 </Alert>

@@ -33,15 +33,16 @@ export default function TopicsDialog(props: IProps) {
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
+        id="topics-dialog"
       >
         <DialogContentText
-          id="topics-dialog-detail"
           className="py-7 px-11 pb-10"
           component={"div"}
           variant={"body2"}
+          id="topics-dialog-content"
         >
           <div>
-            <div className="mb-5 text-[#000] font-bold text-[23.6px]">
+            <div className="mb-5 text-[#000] font-bold text-[23.6px]" id="topics-title">
               Topics
             </div>
             <div className="flex flex-col mb-6 bg-[#f2f2f2] px-5 py-3 rounded-md">
@@ -49,6 +50,7 @@ export default function TopicsDialog(props: IProps) {
                 Publish
                 <div className="cursor-pointer">
                   <FaCopy
+                    id="clipboard-publish-topic"
                     onClick={() => {
                       copy(props.topics[0]);
                     }}
@@ -56,7 +58,7 @@ export default function TopicsDialog(props: IProps) {
                   />
                 </div>
               </div>
-              <div className="text-[#1b1b1b] flex gap-3 text-[12.3px] z-[10]">
+              <div className="text-[#1b1b1b] flex gap-3 text-[12.3px] z-[10]" id="publish-topic">
                 {props.topics[0]}
               </div>
             </div>
@@ -65,6 +67,7 @@ export default function TopicsDialog(props: IProps) {
                 Subscribe
                 <div className="cursor-pointer">
                   <FaCopy
+                    id="clipboard-subscribe-topic"
                     onClick={() => {
                       copy(props.topics[1]);
                     }}
@@ -72,7 +75,7 @@ export default function TopicsDialog(props: IProps) {
                   />
                 </div>
               </div>
-              <div className="text-[#1b1b1b] flex gap-3 text-[12.3px]">
+              <div className="text-[#1b1b1b] flex gap-3 text-[12.3px]" id="subscribe-topic">
                 {props.topics[1]}
               </div>
             </div>

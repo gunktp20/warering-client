@@ -55,7 +55,7 @@ function DashboardList() {
       dispatch(setDashboards(data?.data))
       setIsLoading(false);
       setPageCount(data.metadata.pageCount);
-      
+
       if (data.metadata.pageCount === 1 && numOfPage !== 1) {
         setNumOfPage(1);
       }
@@ -132,7 +132,7 @@ function DashboardList() {
               setIsDrawerOpen(true);
             }}
             className="hidden p-1 w-fit h-fit relative sm:block text-[#8f8f8f] mb-6"
-            id="small-open-sidebar-btn"
+            id="toggle-nav-links-dialog-btn"
           >
             <RiMenu2Fill className="text-[23px]" />
           </button>
@@ -166,7 +166,7 @@ function DashboardList() {
                   },
                 }}
                 variant="outlined"
-                id="setup-user-submit"
+                id="toggle-add-dashboard-dialog-btn"
               >
                 Add Dashboard
               </Button>
@@ -211,7 +211,7 @@ function DashboardList() {
               </div>
             )}
             {dashboards.length === 0 && !isLoading && (
-              <div className="text-md text-center w-[100%] my-5 text-[#c0c0c0]">
+              <div className="text-md text-center w-[100%] my-5 text-[#c0c0c0]" id="not-found-note">
                 {" "}
                 Not found any Dashboard
               </div>
@@ -227,7 +227,7 @@ function DashboardList() {
               className={`overflow-auto rounded-lg shadow block sm:shadow-none ${dashboards.length === 0 && "hidden"
                 }`}
             >
-              <table className="w-full">
+              <table className="w-full" id="dashboards-list-table">
                 <thead className="border-b-2 border-gray-200 sm:hidden">
                   <tr>
                     <th className=" w-[25%]  text-center text-sm font-semibold tracking-wide ">
@@ -250,23 +250,25 @@ function DashboardList() {
                     return (
                       <tr
                         key={index}
+                        id={`dashboard-${dashboard.id}`}
                         className="sm:flex h-[49.5px] sm:h-max sm:flex-col sm:my-5 sm:border-[1px] sm:rounded-lg sm:shadow-md overflow-hidden hover:bg-[#ddd] sm:hover:bg-[#fff] hover:shadow-lg transition ease-in delay-10"
                       >
                         <td
                           onClick={() => {
                             navigate("/dashboard/" + dashboard.id);
                           }}
+                          id={`nav-to-dashboard-${dashboard.id}`}
                           className="cursor-pointer p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start sm:bg-[#1966fb] sm:text-white "
                         >
                           {dashboard?.nameDashboard}
                         </td>
-                        <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
+                        <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start" id={`desr-${dashboard.id}`}>
                           <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600 ">
                             Description{" "}
                           </div>
                           {dashboard?.description}
                         </td>
-                        <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start">
+                        <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start" id={`createdAt-${dashboard.id}`}>
                           <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
                             CreatedAt
                           </div>
@@ -278,13 +280,14 @@ function DashboardList() {
                           <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
                             Action
                           </div>
-                          <div className="flex justify-center sm:justify-start">
+                          <div className="flex justify-center sm:justify-start" id={`options-${dashboard.id}`}>
                             <button
                               onClick={() => {
                                 dispatch(setSelectedDashboard(dashboard?.id))
                                 setEditDialogOpen(true);
                               }}
                               className="mr-6 text-[#2E7D32]"
+                              id={`edit-dashboard-option-${dashboard.id}`}
                             >
                               Edit
                             </button>
@@ -294,6 +297,7 @@ function DashboardList() {
                                 dispatch(setSelectedDashboard(dashboard?.id))
                                 setIsDeleteConfirmOpen(!isDeleteConfirmOpen);
                               }}
+                              id={`delete-dashboard-option-${dashboard.id}`}
                             >
                               Delete
                             </button>

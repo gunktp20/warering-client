@@ -6,7 +6,7 @@ function ButtonControlPreview({
   button_label,
 }: IButtonControlPreviewProp) {
   return (
-    <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2">
+    <div id="button-control-preview" className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2">
       <div className="absolute left-2 top-2 text-[#1d4469] text-sm">
         {label}
       </div>

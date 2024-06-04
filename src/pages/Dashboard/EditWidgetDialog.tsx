@@ -293,18 +293,19 @@ export default function EditWidgetDialog(props: IProps) {
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
+        id="edit-widget-dialog"
       >
         <DialogContent>
           <DialogContentText
-            id="edit-widget-dialog"
+            id="edit-widget-dialog-content"
             className="p-3"
             component={"div"}
             variant={"body2"}
           >
             <div className="w-[100%] flex flex-col">
               <div
-                id="title-edit-widget-dialog"
                 className="text-[17px] font-bold text-[#1D4469]"
+                id="edit-widget-dialog-title"
               >
                 Edit widget
               </div>
@@ -322,6 +323,7 @@ export default function EditWidgetDialog(props: IProps) {
                     alignItems: "center",
                     marginTop: "1.5rem",
                   }}
+                  id="edit-widget-alert"
                 >
                   {alertText}
                 </Alert>
@@ -361,17 +363,17 @@ export default function EditWidgetDialog(props: IProps) {
                   occupation === "MessageBox" ||
                   occupation === "ToggleSwitch" ||
                   occupation === "RangeSlider") && (
-                  <div className="w-[350px] sm:w-[100%] relative">
-                    <FormRow
-                      type="text"
-                      name="value"
-                      labelText="value"
-                      value={values.value}
-                      handleChange={handleChange}
-                      marginTop="mt-[0.2rem]"
-                    />
-                  </div>
-                )}
+                    <div className="w-[350px] sm:w-[100%] relative">
+                      <FormRow
+                        type="text"
+                        name="value"
+                        labelText="value"
+                        value={values.value}
+                        handleChange={handleChange}
+                        marginTop="mt-[0.2rem]"
+                      />
+                    </div>
+                  )}
               </div>
             )}
 
@@ -534,7 +536,7 @@ export default function EditWidgetDialog(props: IProps) {
                       },
                     }}
                     variant="outlined"
-                    id="setup-user-submit"
+                    id="cancel-edit-widget-btn"
                   >
                     Cancel
                   </Button>

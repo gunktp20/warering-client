@@ -513,7 +513,7 @@ export default function AddWidgetDialog(props: IProps) {
                       },
                     }}
                     variant="outlined"
-                    id="setup-user-submit"
+                    id="cancel-add-widget-btn"
                   >
                     Cancel
                   </Button>

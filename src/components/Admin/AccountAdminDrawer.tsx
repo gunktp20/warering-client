@@ -14,8 +14,8 @@ function AccountAdminDrawer(props: IDrawer) {
   const { isAccountUserDrawerOpen, setIsAccountUserDrawerOpen } = props;
 
   const signOut = async () => {
+    await axiosPrivate.post("/auth/logout");
     dispatch(logout());
-    await axiosPrivate.get("/auth/logout");
   };
 
   return (
@@ -27,7 +27,7 @@ function AccountAdminDrawer(props: IDrawer) {
           setIsAccountUserDrawerOpen(false);
         }}
         className=""
-        PaperProps={{ id: "setup-user-drawer" }}
+        PaperProps={{ id: "account-admin-drawer" }}
       >
         <Box p={2} width="250px" textAlign="left" role="presentation">
           <Typography
@@ -40,6 +40,7 @@ function AccountAdminDrawer(props: IDrawer) {
                 signOut();
               }}
               className="flex pl-10 p-5 items-center text-[13px] text-[#962e39]"
+              id="admin-logout-btn"
             >
               <CiLogout className="mr-3 text-[16px]" />
               Logout

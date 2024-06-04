@@ -42,6 +42,8 @@ import {
 } from "chart.js";
 import LineChart from "../../components/widgets_device/LineChart";
 import { useAppSelector } from "../../app/hooks";
+import useAlert from "../../hooks/useAlert";
+import * as XLSX from "xlsx"
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
 interface IDevice {
@@ -79,6 +81,7 @@ function Device() {
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isEditDisplayShow, setIsEditDisplayShow] = useState<boolean>(false);
   const { showAlert, alertText, alertType } = useAppSelector((state) => state.widget)
+  const alert = useAlert()
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -115,7 +118,7 @@ function Device() {
       setIsLoading(false);
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err);
-      console.log(msg)
+      alert.displayAlert({ msg, type: "error" })
       setIsLoading(false);
     }
   };
@@ -128,7 +131,7 @@ function Device() {
       setIsLoading(false);
     } catch (err) {
       const msg = await getAxiosErrorMessage(err);
-      console.log(msg)
+      alert.displayAlert({ msg, type: "error" })
       setIsLoading(false);
     }
   };
@@ -199,7 +202,6 @@ function Device() {
 
       client.on("message", (topic, message) => {
         const payload = { topic, message: message.toString() };
-        console.log(payload);
         try {
           const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
           setConfigWidgetsDevice(payloadObject);
@@ -220,13 +222,43 @@ function Device() {
     setIsEditDisplayShow(true);
   };
 
-  const exportData = async () => {
+  const getAllPayload = async () => {
     try {
       const { data } = await axiosPrivate.get(`export/${device_id}`)
-      console.log(data)
+      return data
+    } catch (err: unknown) {
+      return err
+    }
+  }
+
+  const exportJsonFile = async () => {
+    try {
+      const allPayload = await getAllPayload()
+      const link = document.createElement("a")
+      const blob = new Blob([JSON.stringify(allPayload)], { type: "text/json" });
+      link.download = `${device_id}_${Date.now()}.json`;
+      link.href = URL.createObjectURL(blob)
+      document.body.appendChild(link)
+      link.click();
+      document.body.removeChild(link);
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err)
-      console.log(msg)
+      alert.displayAlert({ msg, type: "error" })
+    }
+  }
+
+  const exportExcelFile = async () => {
+    try {
+      const allPayload = await getAllPayload()
+      const wb = XLSX.utils.book_new()
+      const ws = XLSX.utils.json_to_sheet(allPayload)
+
+      XLSX.utils.book_append_sheet(wb, ws,)
+
+      XLSX.writeFile(wb, `${device_id}_${new Date()}.xlsx`)
+    } catch (err) {
+      const msg = await getAxiosErrorMessage(err)
+      alert.displayAlert({ msg, type: "error" })
     }
   }
 
@@ -283,7 +315,7 @@ function Device() {
                 setIsDrawerOpen(true);
               }}
               className="hidden p-1 w-fit h-fit relative sm:block text-[#8f8f8f] mb-6"
-              id="small-open-sidebar-btn"
+              id="toggle-nav-links-dialog-btn"
             >
               <RiMenu2Fill className="text-[23px]" />
             </button>
@@ -293,6 +325,7 @@ function Device() {
                 navigate("/device-list");
               }}
               className="flex cursor-pointer text-sm text-[#1D4469] font-bold items-center left-0 mb-10"
+              id="back-to-devices-list-btn"
             >
               <IoArrowBackSharp className="text-sm mr-2" />
               Back
@@ -307,39 +340,21 @@ function Device() {
             </div>
           </div>
 
-          <div className="absolute left-0 top-[-4rem] text-[21px] text-[#1d4469] font-bold">
-            {deviceInfo?.nameDevice}
-          </div>
-
-          {/* Back button */}
-
-          <button
-            onClick={() => {
-              navigate("/device-list");
-            }}
-            className="absolute top-[-6.5rem] flex cursor-pointer text-sm text-[#1D4469] font-bold items-center left-0 sm:left-[90%]"
-          >
-            <IoArrowBackSharp className="text-sm" />
-            Back
-          </button>
-
-          {/* Back button
-            
           {/* Start Device info container */}
           <div className="p-5 w-[100%] border-[1px] grid grid-cols-3 border-[#f1f1f1] rounded-md shadow-sm bg-white sm:grid-cols-2">
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="nameDevice-info">
               Device Name
               <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px] ">
                 {deviceInfo?.nameDevice}
               </div>
             </div>
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="description-info">
               Description
               <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
                 {deviceInfo?.description}
               </div>
             </div>
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="createdAt-info">
               CreatedAt
               <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
                 {moment(deviceInfo?.createdAt)
@@ -347,14 +362,14 @@ function Device() {
                   .format("DD/MM/YYYY h:mm")}
               </div>
             </div>
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="usernameDevice-info">
               Username Device
               <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
                 {deviceInfo?.usernameDevice}
               </div>
             </div>
 
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-8 ">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="passwordDevice-info">
               Password Device
               <div className="font-medium mt-2 text-[#7a7a7a] text-[13.3px] flex">
                 <button
@@ -362,6 +377,7 @@ function Device() {
                   onClick={() => {
                     setPasswordVisible(!passwordVisible);
                   }}
+                  id="toggle-device-password-visible-btn"
                 >
                   {passwordVisible ? <LuEye /> : <LuEyeOff />}
                 </button>
@@ -370,10 +386,11 @@ function Device() {
                   type={passwordVisible ? "text" : "password"}
                   readOnly={true}
                   value={deviceInfo?.password ? deviceInfo?.password : ""}
+                  id="device-password-info-text"
                 ></input>
               </div>
             </div>
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="qos-info">
               Qos
               <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
                 {deviceInfo?.qos}
@@ -384,6 +401,7 @@ function Device() {
               <label
                 htmlFor="retain-checkbox"
                 className="ms-2 text-sm mr-2 font-medium text-[#1D4469]"
+                id="retain-viewer"
               >
                 Retain
               </label>
@@ -399,6 +417,7 @@ function Device() {
                 <div
                   className={`ml-2 bottom-[0px] relative ${deviceInfo?.retain ? "text-[#0075ff]" : "text-[#7a7a7a]"
                     } text-[13.4px]`}
+                  id="retain-text"
                 >
                   {deviceInfo?.retain.toString()}
                 </div>
@@ -418,7 +437,7 @@ function Device() {
           </div>
           {/* End Device info container */}
 
-          <div className="text-[#1d4469] text-[20px] mt-8 font-bold">
+          <div onClick={exportJsonFile} className="text-[#1d4469] text-[20px] mt-8 font-bold">
             JSON view
           </div>
           <div className="text-[#7a7a7a text-sm text-[13.2px]">
@@ -435,7 +454,7 @@ function Device() {
           <div className="text-[#1d4469] text-[20px] mt-8 font-bold">
             Export
           </div>
-          <div className="gap-16 flex mt-4 p-5 border-t-[1px] border-b-[1px] border-[#dadada]">
+          <div className="gap-16 flex mt-4 p-5 border-t-[1px] border-b-[1px] border-[#dadada]" onClick={exportExcelFile} id="excel-download">
             <div className="flex flex-col justify-center items-center">
               <SiMicrosoftexcel className="text-[#1d4469] text-[25px]" />
               <div className="text-[13px] mt-3 text-[#1d4469] font-bold">
@@ -443,7 +462,7 @@ function Device() {
               </div>
             </div>
             {/* Export JSON */}
-            <div className="flex flex-col justify-center items-center cursor-pointer text-nowrap" onClick={exportData}>
+            <div className="flex flex-col justify-center items-center cursor-pointer text-nowrap" onClick={exportJsonFile} id="json-dowload">
               <BsFiletypeJson className="text-[#1d4469] text-[25px]" />
               <div className="text-[13px] mt-3 text-[#1d4469] font-bold text-nowrap">
                 JSON
@@ -473,7 +492,7 @@ function Device() {
                 },
               }}
               variant="outlined"
-              id="add-widget-btn"
+              id="toggle-add-widget-dialog-btn"
               disabled={isLoading}
             >
               Add widget
@@ -588,7 +607,7 @@ function Device() {
         {showAlert && (
           <div className="block sm:hidden">
             <SnackBar
-              id="edit-widget-snackbar"
+              id="device-page-snackbar"
               severity={alertType}
               showSnackBar={showAlert}
               snackBarText={alertText}

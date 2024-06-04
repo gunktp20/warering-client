@@ -135,18 +135,18 @@ export default function EditDashboardDialog({ isEditDialogOpen, setEditDialogOpe
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
-        aria-describedby="alert-dialog-slide-description"
         className="m-5 "
+        id="edit-dashboard-dialog"
       >
         <DialogContent>
           <DialogContentText
-            id="alert-dialog-slide-description"
+            id="edit-dashboard-dialog-content"
             className="p-3 "
             component={"div"}
             variant={"body2"}
           >
             <div className=" w-[100%] flex flex-col">
-              <div className="text-[18px] font-bold text-[#1D4469]">
+              <div className="text-[18px] font-bold text-[#1D4469]" id="edit-dashboard-title">
                 Edit Dashboard
               </div>
               <div className="text-sm text-[#a4a4a4] mt-3">
@@ -178,6 +178,7 @@ export default function EditDashboardDialog({ isEditDialogOpen, setEditDialogOpe
                     <textarea
                       onChange={handleChange}
                       value={values?.description}
+                      id="dashboard-description-text-area"
                       name="description"
                       className="peer h-full min-h-[100px] w-full resize-none rounded-[7px] border border-gray-200 px-3 py-2.5 font-sans text-sm font-normal text-blue-gray-700 outline outline-0 transition-all placeholder-shown:border placeholder-shown:border-blue-gray-200 placeholder-shown:border-t-blue-gray-200 focus:border-[1px] focus:border-second focus:border-t-transparent focus:outline-0 disabled:resize-none text-[13.5px] disabled:border-0 disabled:bg-blue-gray-50 text-[#000]"
                       placeholder=" "
@@ -210,7 +211,7 @@ export default function EditDashboardDialog({ isEditDialogOpen, setEditDialogOpe
                   },
                 }}
                 variant="contained"
-                id="setup-user-submit"
+                id="submit-edit-dashboard-btn"
               >
                 Edit Dashboard
               </Button>
@@ -218,7 +219,7 @@ export default function EditDashboardDialog({ isEditDialogOpen, setEditDialogOpe
             {showAlert && (
               <div className="block sm:hidden">
                 <SnackBar
-                  id="edit-widget-snackbar"
+                  id="edit-dashboard-snackbar"
                   severity={alertType}
                   showSnackBar={showAlert}
                   snackBarText={alertText}

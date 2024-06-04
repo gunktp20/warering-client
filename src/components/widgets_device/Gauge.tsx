@@ -47,9 +47,9 @@ function Gauge({
     ],
   };
   return (
-    <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 overflow-hidden">
+    <div id={widgetId} className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 overflow-hidden">
       {!value && (
-        <div className="w-[100%] h-[100%] bg-white z-10 flex absolute justify-center items-center font-bold text-[#0075ff]">
+        <div className=" bg-white z-10 flex absolute justify-center items-center font-bold text-[#0075ff]">
           IDLE
         </div>
       )}
@@ -60,6 +60,7 @@ function Gauge({
         onClick={() => {
           setIsOptionOpen(!isOptionOpen);
         }}
+        id={`${widgetId}-gauge-device-options`}
         className="z-20 absolute right-3 top-2 text-[18px] text-[#7a7a7a] cursor-pointer hover:bg-[#f7f7f7] hover:rounded-md "
       >
         <RxDotsHorizontal />
@@ -86,12 +87,12 @@ function Gauge({
           </button>
         </div>
       )}
-      <div className="w-[100px]">
+      {value && <div className="w-[100px]">
         <Doughnut data={data} options={options}></Doughnut>
-      </div>
-      <div className="w-[100px] text-[#1966fb] absolute text-center bottom-7 text-[12.8px]">
+      </div>}
+      {value && <div className="w-[100px] text-[#1966fb] absolute text-center bottom-7 text-[12.8px]">
         {value} {unit}
-      </div>
+      </div>}
       <DeleteConfirmDialog
         isDeleteConfirmOpen={isDeleteConfirmOpen}
         setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
