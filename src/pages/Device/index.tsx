@@ -158,8 +158,8 @@ function Device() {
   const connectEMQX = useCallback(
     async (data: { usernameDevice: string; password: string }) => {
       const _mqtt = await mqtt.connect(import.meta.env.VITE_EMQX_DOMAIN, {
-        protocol: "ws",
-        host: "localhost",
+        protocol: import.meta.env.VITE_EMQX_PROTOCAL,
+        host: import.meta.env.VITE_EMQX_HOST,
         clientId: "emqx_react_" + Math.random().toString(16).substring(2, 8),
         username: data?.usernameDevice,
         password: data?.password,
@@ -231,8 +231,6 @@ function Device() {
       return err
     }
   }
-
-
 
   const exportJsonFile = async () => {
     try {
