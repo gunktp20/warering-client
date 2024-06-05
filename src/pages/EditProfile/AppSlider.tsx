@@ -2,6 +2,7 @@ import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 
 interface Props {
+  id: string;
   label?: string;
   value: number;
   min: number;
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function AppSlider({
+  id,
   value,
   defaultValue,
   max,
@@ -21,10 +23,10 @@ export default function AppSlider({
     onChange(value as number);
   };
   return (
-    <div>
+    <div id={id}>
       <div className="w-[100%] flex justify-between text-[20px] text-nowrap cursor-default">
-        <div>-</div>
-        <div>+</div>
+        <div id={`${id}-decrease-slider`}>-</div>
+        <div id={`${id}-increase-slider`}>+</div>
       </div>
       <div className="p-2 pt-0">
         <Slider

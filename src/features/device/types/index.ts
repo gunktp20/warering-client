@@ -7,4 +7,7 @@ export interface IDeviceState {
   totalDeviceDeny: number;
   devices: IDevice[];
   selectedDevice: string;
+  alertType: "success" | "error" | "warning" | "info";
+  alertText: string;
+  showAlert:boolean
 }

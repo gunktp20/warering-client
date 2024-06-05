@@ -15,6 +15,7 @@ export default function FileDropZone({ onDrop }: Props) {
 
   return (
     <div
+      id="file-drop-zone"
       {...getRootProps({
         className:
           "w-[100%] border-2 border-gray-300 border-dashed rounded py-10 px-12 text-center flex items-center justify-center cursor-pointer",

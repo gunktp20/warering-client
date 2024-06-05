@@ -93,10 +93,11 @@ export default function ChangePasswordDialog({
                 keepMounted
                 onClose={handleClose}
                 aria-describedby="alert-dialog-slide-description"
+                id="change-password-dialog"
             >
                 <DialogContent>
                     <DialogContentText
-                        id="edit-device-dialog"
+                        id="change-password-dialog-content"
                         className="p-3 "
                         component={"div"}
                         variant={"body2"}
@@ -112,7 +113,7 @@ export default function ChangePasswordDialog({
                             {showAlert && alertType && (
                                 <div className="hidden sm:block">
                                     <Alert
-                                        id="alert-edit-device"
+                                        id="change-password-alert"
                                         severity={alertType}
                                         sx={{
                                             fontSize: "11.8px",
@@ -164,7 +165,7 @@ export default function ChangePasswordDialog({
                         {showAlert && (
                             <div className="block sm:hidden">
                                 <SnackBar
-                                    id="edit-widget-snackbar"
+                                    id="change-password-snack-bar"
                                     severity={alertType}
                                     showSnackBar={showAlert}
                                     snackBarText={alertText}

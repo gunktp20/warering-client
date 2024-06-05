@@ -140,7 +140,7 @@ export default function AddDisplayDialog({
           >
             <div className="w-[100%] flex flex-col">
               <div id="add-display-dialog-title" className="top-0 left-0 absolute w-[100%] h-[48px] bg-primary-500 flex justify-center items-center text-white text-[16px] font-medium">
-                Add Display
+                Add Widget
               </div>
               <div className="text-[12px] text-nowrap text-transparent z-0 h-[0px] sm:mb-7">
                 -----------------------------------------------------------------------------.
@@ -172,7 +172,7 @@ export default function AddDisplayDialog({
                     }}
                   >
                     <option value={""} disabled>
-                      null
+                      select device...
                     </option>
                     {deivceOptions.map((device, index) => {
                       return (
@@ -197,7 +197,7 @@ export default function AddDisplayDialog({
                     }}
                   >
                     <option value={""} disabled>
-                      null
+                      select widget...
                     </option>
                     {widgetOptions.length !== 0 &&
                       widgetOptions.map((widget, index) => {
@@ -264,7 +264,7 @@ export default function AddDisplayDialog({
                   variant="contained"
                   id="submit-add-display-dialog"
                 >
-                  Add Display
+                  Done
                 </Button>
               </div>
             </div>

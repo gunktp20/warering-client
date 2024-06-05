@@ -11,7 +11,18 @@ export type Id = string | number;
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const options = {};
+const options = {
+  // Disable tooltips
+  tooltips: {
+    enabled: false // Disable tooltips
+  },
+  plugins: {
+    tooltip: {
+      enabled: false // Disable tooltips (for Chart.js v3 and above)
+    }
+  }
+};
+
 function Gauge({
   label,
   value,

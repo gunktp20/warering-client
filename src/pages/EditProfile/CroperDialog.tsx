@@ -90,10 +90,11 @@ export default function CroperDialog({
         keepMounted
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
+        id="cropper-image-dialog"
       >
         <DialogContent>
           <DialogContentText
-            id="edit-device-dialog"
+            id="cropper-image-dialog-content"
             className="p-3 "
             component={"div"}
             variant={"body2"}
@@ -101,7 +102,7 @@ export default function CroperDialog({
             {isImageSelected ? (
               <div className=" w-[100%] relative flex flex-col">
                 <div
-                  id="edit-device-title"
+                  id="cropper-image-title"
                   className="text-[18px] mb-2 font-bold text-[#1D4469]"
                 >
                   <div>Choose profile picture</div>
@@ -116,9 +117,11 @@ export default function CroperDialog({
                     onCrop={setCroppedImage}
                     width={250}
                     height={250}
+                    id="image-cropper"
                   />
                 </div>
                 <AppSlider
+                  id="zoom-slider"
                   min={1}
                   max={3}
                   value={zoom}

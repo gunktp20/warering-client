@@ -16,6 +16,7 @@ import { createPortal } from "react-dom";
 import TaskCard from "./TaskCard";
 import { MdSearchOff } from "react-icons/md";
 import {
+  AccountUserDrawer,
   BigNavbar,
   NavDialog,
   NavLinkSidebar,
@@ -31,10 +32,10 @@ import AddDisplayDialog from "./AddDisplayDialog";
 import { toggleEditMode } from "../../features/dashboard/dashboardSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { RiDragDropLine } from "react-icons/ri";
-import mqtt from "mqtt";
 import EditWidgetDialog from "./EditWidgetDialog";
 import useAlert from "../../hooks/useAlert";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import connectEMQX from "../../utils/connectEMQX";
 
 interface ConfigWidget {
   value: string;
@@ -212,14 +213,7 @@ function KanbanBoard() {
         }) => {
           const { usernameDevice, password_law } = device;
 
-          const client = await mqtt.connect(import.meta.env.VITE_EMQX_DOMAIN, {
-            protocol: import.meta.env.VITE_EMQX_PROTOCAL,
-            host: import.meta.env.VITE_EMQX_HOST,
-            clientId:
-              "emqx_react_" + Math.random().toString(16).substring(2, 8),
-            username: usernameDevice,
-            password: password_law,
-          });
+          const client = await connectEMQX(usernameDevice, password_law)
 
           const mqttPublish = (payload: string): void => {
             if (client) {
@@ -352,6 +346,10 @@ function KanbanBoard() {
 
   return (
     <Wrapper>
+      <AccountUserDrawer
+        isAccountUserDrawerOpen={isAccountUserDrawerOpen}
+        setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
+      />
       <AddDisplayDialog
         isEditDialogOpen={isEditDialogOpen}
         setEditDialogOpen={setEditDialogOpen}
@@ -468,7 +466,7 @@ function KanbanBoard() {
             {dashboardInfo?.nameDashboard}
           </div>
 
-          {widgets.length === 0 && <div className="w-[100%] h-[500px] flex justify-center flex-col items-center border-dashed border-[1px] bg-[#f9f9f9] rounded-lg border-gray-200 m-6 mr-13">
+          {widgets.length === 0 && <div className="w-[100%] h-[100vh] mt-9 flex justify-center flex-col items-center border-dashed border-[1px] bg-[#f9f9f9] rounded-lg border-gray-200">
             {widgets.length === 0 && !isLoading && (
               <div className="text-[80px] flex justify-center w-[100%] my-5 text-[#c0c0c0]">
                 {" "}

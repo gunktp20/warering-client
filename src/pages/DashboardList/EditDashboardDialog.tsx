@@ -46,10 +46,10 @@ export default function EditDashboardDialog({ isEditDialogOpen, setEditDialogOpe
     useAlert();
 
   const onSubmit = async () => {
-    const { nameDashboard, description } = values;
-    if (!nameDashboard || !description) {
+    const { nameDashboard } = values;
+    if (!nameDashboard) {
       displayAlert({
-        msg: "Please provide all values",
+        msg: "Please provide dashboard name",
         type: "error",
       });
       return;
