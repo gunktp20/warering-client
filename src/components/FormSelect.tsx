@@ -31,7 +31,7 @@ const FormSelect: FunctionComponent<IFormSelect> = ({
         id={name}
         value={value}
         onChange={(event: React.ChangeEvent<HTMLSelectElement>) => {
-          setValue(event.target.value);
+          setValue(Number(event.target.value));
         }}
         className={`block py-2.5 px-0 w-full text-[13.5px] text-gray-900 bg-transparent border-0 border-b-[1.6px] border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-second peer`}
       >

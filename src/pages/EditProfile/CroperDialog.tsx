@@ -11,6 +11,8 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 import { setProfileImg } from "../../features/auth/authSlice";
 import { useAppDispatch } from "../../app/hooks";
+import useAlert from "../../hooks/useAlert";
+import { SnackBar } from "../../components";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -39,13 +41,13 @@ export default function CroperDialog({
   const [zoom, setZoom] = useState(1);
   const [croppedImage, setCroppedImage] = useState<Blob>();
   const dispatch = useAppDispatch();
+  const { displayAlert, showAlert, alertText, alertType } = useAlert()
 
   const isImageSelected = remoteImage || localImage ? true : false;
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setRemoteImage("");
     setLocalImage(URL.createObjectURL(acceptedFiles[0]));
-    console.log(URL.createObjectURL(acceptedFiles[0]));
   }, []);
 
   const handleOnZoom = useCallback((zoomValue: number) => {
@@ -71,7 +73,7 @@ export default function CroperDialog({
       return onUploadProfileImageSuccess();
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err);
-      console.log(msg);
+      displayAlert({ msg, type: "error" })
     }
   };
 
@@ -175,6 +177,16 @@ export default function CroperDialog({
                     </button>
                   </div>
                 </div>
+              </div>
+            )}
+            {showAlert && (
+              <div id="add-device-snackbar" className="block sm:hidden">
+                <SnackBar
+                  id="add-device-snackbar"
+                  severity={alertType}
+                  showSnackBar={showAlert}
+                  snackBarText={alertText}
+                />
               </div>
             )}
           </DialogContentText>

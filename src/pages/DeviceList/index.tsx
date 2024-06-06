@@ -107,8 +107,6 @@ function DeviceList() {
       dispatch(setDevices(data.data));
       setIsLoading(false);
       setPageCount(data.metadata.pageCount);
-      console.log("data.metadata.pageCount", data.metadata.pageCount)
-      console.log("numOfPage", numOfPage)
       if (data.metadata.pageCount === 1 && numOfPage !== 1) {
         setNumOfPage(1);
       }

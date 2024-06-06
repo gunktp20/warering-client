@@ -96,7 +96,7 @@ function Device() {
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
   const [deviceInfo, setDeviceInfo] = useState<IDevice>();
   const [client, setClient] = useState<MqttClient | null>(null);
-  const [connectStatus, setConnectStatus] = useState("Connect");
+  // const [connectStatus, setConnectStatus] = useState("Connect");
   const [payload, setPayload] = useState({});
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
   const [isTopicsShow, setIsTopicsShow] = useState<boolean>(false);
@@ -149,7 +149,7 @@ function Device() {
         },
         (error) => {
           if (error) {
-            console.log("Publish error: ", error);
+            // console.log("Publish error: ", error);
           }
         }
       );
@@ -167,7 +167,7 @@ function Device() {
   const mqttDisconnect = () => {
     if (client) {
       client.end(() => {
-        setConnectStatus("Disconnected");
+        // setConnectStatus("Disconnected");
       });
     }
   };
@@ -179,8 +179,8 @@ function Device() {
   useEffect(() => {
     if (client) {
       client.on("connect", () => {
-        setConnectStatus("Connected");
-        console.log(connectStatus);
+        // setConnectStatus("Connected");
+        // console.log(connectStatus);
         if (client) {
           client.subscribe(
             subScribeTopic,
@@ -188,13 +188,15 @@ function Device() {
               qos: qos,
             },
             (err) => {
-              console.log("not sub", err);
+              if (err) {
+                // console.log(err);
+              }
             }
           );
         }
       });
       client.on("reconnect", () => {
-        setConnectStatus("Reconnecting");
+        // setConnectStatus("Reconnecting");
       });
 
       client.on("message", (topic, message) => {
@@ -204,7 +206,7 @@ function Device() {
           setConfigWidgetsDevice(payloadObject);
           setPayload(payloadObject);
         } catch (error) {
-          console.log(error);
+          // console.log(error);
         }
       });
     }

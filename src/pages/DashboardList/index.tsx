@@ -208,11 +208,12 @@ function DashboardList() {
                   <select
                     id="sort-by-createdAt"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full px-5 py-2 "
-                    defaultValue={sortCreatedAt}
                     onChange={(e) => {
                       setSortCreatedAt(e.target.value);
                     }}
+                    name="sort-dashboards-by-createdAt"
                     value={sortCreatedAt}
+                    
                   >
                     <option value="">Sort by Date</option>
                     <option value="%2BcreatedAt">Oldest</option>

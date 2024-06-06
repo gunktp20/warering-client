@@ -46,7 +46,7 @@ const ImageCropper: FC<Props> = ({
   const desiredHeight = height;
 
   const handleCrop = (_: Area, croppedAreaPixels: Area) => {
-    console.log("croppedAreaPixels", croppedAreaPixels);
+
     try {
       if (!croppedAreaPixels) return;
       const canvas = document.createElement("canvas");
@@ -101,7 +101,7 @@ const ImageCropper: FC<Props> = ({
 
       image.src = source;
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 

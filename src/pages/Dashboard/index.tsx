@@ -226,7 +226,7 @@ function KanbanBoard() {
                 },
                 (error) => {
                   if (error) {
-                    console.log("Publish error: ", error);
+                    // console.log("Publish error: ", error);
                   }
                 }
               );
@@ -252,8 +252,10 @@ function KanbanBoard() {
                 {
                   qos: 0,
                 },
-                (err: unknown) => {
-                  console.log("not sub", err);
+                (err) => {
+                  if (err) {
+                    // console.log("not sub", err);
+                  }
                 }
               );
             }

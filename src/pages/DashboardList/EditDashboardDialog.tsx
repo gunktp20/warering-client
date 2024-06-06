@@ -5,7 +5,6 @@ import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
 import { FormRow, SnackBar } from "../../components";
-import { Button } from "@mui/material";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAlert from "../../hooks/useAlert";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
@@ -191,31 +190,14 @@ export default function EditDashboardDialog({ isEditDialogOpen, setEditDialogOpe
               </div>
             </div>
             <div className="w-[250px] sm:w-[100%]">
-              <Button
-                onClick={() => {
-                  onSubmit();
-                }}
-                style={{
-                  textTransform: "none",
-                  width: "100%",
-                  height: "39px",
-                  marginTop: "1.5rem",
-                }}
-                sx={{
-                  bgcolor: "#1966fb",
-                  ":hover": {
-                    bgcolor: "#10269C",
-                  },
-                  ":disabled": {
-                    color: "#fff",
-                  },
-                }}
-                variant="contained"
+              <button
                 id="submit-edit-dashboard-btn"
+                onClick={onSubmit}
+                disabled={isLoading || values.description === currentDashboardInfo.description && values.nameDashboard === currentDashboardInfo.nameDashboard}
+                className="flex bg-[#1966fb] mt-[1.5rem] hover:bg-[#10269C] justify-center items-center transition-all disabled:bg-primary-100 text-white rounded-md w-[100%] h-[39px]"
               >
-                Edit Dashboard
-              </Button>
-            </div>
+                Save
+              </button></div>
             {showAlert && (
               <div className="block sm:hidden">
                 <SnackBar

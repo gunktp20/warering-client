@@ -334,31 +334,14 @@ export default function EditDeviceDialog({ isEditDialogOpen, setEditDialogOpen, 
                 </Button>
               </div>
               <div className="w-[250px] sm:w-[100%]">
-                <Button
-                  onClick={() => {
-                    onSubmit();
-                  }}
-                  style={{
-                    textTransform: "none",
-                    width: "100%",
-                    height: "39px",
-                    marginTop: "1.5rem",
-                  }}
-                  sx={{
-                    bgcolor: "#1966fb",
-                    ":hover": {
-                      bgcolor: "#10269C",
-                    },
-                    ":disabled": {
-                      color: "#fff",
-                    },
-                  }}
-                  variant="contained"
-                  id="edit-device-submit-btn"
-                  disabled={isLoading}
+                <button
+                  id="submit-edit-dashboard-btn"
+                  onClick={onSubmit}
+                  disabled={isLoading || (values.nameDevice === currentDeviceInfo.nameDevice && values.usernameDevice === currentDeviceInfo.usernameDevice && values.password === currentDeviceInfo.password && values.description === currentDeviceInfo.password && values.topics === currentDeviceInfo.topics && qos === currentDeviceInfo.qos && retain === currentDeviceInfo.retain)}
+                  className="flex bg-[#1966fb] mt-[1.5rem] hover:bg-[#10269C] justify-center items-center transition-all disabled:bg-primary-100 text-white rounded-md w-[100%] h-[39px]"
                 >
                   Save
-                </Button>
+                </button>
               </div>
               {showAlert && (
                 <div className="block sm:hidden">
