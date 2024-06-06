@@ -31,6 +31,7 @@ function DeviceList() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const DeviceState = useAppSelector((state) => state.device);
+  const { token } = useAppSelector((state) => state.auth);
   const { devices } = DeviceState
   const { showAlert, alertText, alertType, displayAlert } = useAlert()
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
@@ -133,7 +134,9 @@ function DeviceList() {
   };
 
   useEffect(() => {
-    fetchAllDevice();
+    if(token){
+      fetchAllDevice();
+    }
   }, [
     numOfPage,
     sortCreatedAt,

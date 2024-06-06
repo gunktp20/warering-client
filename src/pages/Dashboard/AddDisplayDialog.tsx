@@ -9,6 +9,7 @@ import { Button, Alert } from "@mui/material";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAlert from "../../hooks/useAlert";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import { useAppSelector } from "../../app/hooks";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -35,7 +36,7 @@ export default function AddDisplayDialog({
 }: IDrawer) {
   const axiosPrivate = useAxiosPrivate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
+  const { token } = useAppSelector((state) => state.auth)
   const { alertType, alertText, showAlert, displayAlert } = useAlert();
 
   const fetchAllDevice = async () => {
@@ -50,7 +51,9 @@ export default function AddDisplayDialog({
   };
 
   useEffect(() => {
-    fetchAllDevice();
+    if (token) {
+      fetchAllDevice();
+    }
   }, []);
 
   const onSubmit = async () => {

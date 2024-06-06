@@ -44,7 +44,7 @@ function DashboardList() {
   const [pageCount, setPageCount] = useState<number>(0);
   const [sortCreatedAt, setSortCreatedAt] = useState<string>("");
   const elements = [];
-
+  const { token } = useAppSelector((state) => state.auth)
   const [values, setValues] = useState({
     search_dashboard: "",
   });
@@ -112,7 +112,9 @@ function DashboardList() {
   }, [showAlert])
 
   useEffect(() => {
-    fetchAllDashboards();
+    if (token) {
+      fetchAllDashboards();
+    }
   }, [values.search_dashboard, numOfPage, sortCreatedAt]);
 
   return (
@@ -213,7 +215,7 @@ function DashboardList() {
                     }}
                     name="sort-dashboards-by-createdAt"
                     value={sortCreatedAt}
-                    
+
                   >
                     <option value="">Sort by Date</option>
                     <option value="%2BcreatedAt">Oldest</option>

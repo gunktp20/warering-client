@@ -17,6 +17,7 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Alert } from "@mui/material";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 import useAlert from "../../hooks/useAlert";
+import { useAppSelector } from "../../app/hooks";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -79,6 +80,7 @@ interface IValue {
 export default function EditWidgetDialog(props: IProps) {
   const [occupation, setOccupation] = useState<string>("");
   const axiosPrivate = useAxiosPrivate();
+  const { token } = useAppSelector((state) => state.auth)
   const { alertType, alertText, showAlert, displayAlert } = useAlert();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const handleClose = () => {
@@ -283,7 +285,10 @@ export default function EditWidgetDialog(props: IProps) {
   };
 
   useEffect(() => {
-    fetchWidgetInfo();
+    if (token) {
+      fetchWidgetInfo();
+    }
+
   }, []);
 
   return (

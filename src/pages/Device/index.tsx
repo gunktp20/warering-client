@@ -83,6 +83,7 @@ function Device() {
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isEditDisplayShow, setIsEditDisplayShow] = useState<boolean>(false);
   const { showAlert, alertText, alertType } = useAppSelector((state) => state.widget)
+  const { token } = useAppSelector((state) => state.auth)
   const alert = useAlert()
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
@@ -172,43 +173,47 @@ function Device() {
     }
   };
   useEffect(() => {
-    fetchDeviceById();
-    fetchAllWidgets();
+    if (token) {
+      fetchDeviceById();
+      fetchAllWidgets();
+    }
   }, []);
 
   useEffect(() => {
-    if (client) {
-      client.on("connect", () => {
-        // setConnectStatus("Connected");
-        // console.log(connectStatus);
-        if (client) {
-          client.subscribe(
-            subScribeTopic,
-            {
-              qos: qos,
-            },
-            (err) => {
-              if (err) {
-                // console.log(err);
+    if (token) {
+      if (client) {
+        client.on("connect", () => {
+          // setConnectStatus("Connected");
+          // console.log(connectStatus);
+          if (client) {
+            client.subscribe(
+              subScribeTopic,
+              {
+                qos: qos,
+              },
+              (err) => {
+                if (err) {
+                  // console.log(err);
+                }
               }
-            }
-          );
-        }
-      });
-      client.on("reconnect", () => {
-        // setConnectStatus("Reconnecting");
-      });
+            );
+          }
+        });
+        client.on("reconnect", () => {
+          // setConnectStatus("Reconnecting");
+        });
 
-      client.on("message", (topic, message) => {
-        const payload = { topic, message: message.toString() };
-        try {
-          const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
-          setConfigWidgetsDevice(payloadObject);
-          setPayload(payloadObject);
-        } catch (error) {
-          // console.log(error);
-        }
-      });
+        client.on("message", (topic, message) => {
+          const payload = { topic, message: message.toString() };
+          try {
+            const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
+            setConfigWidgetsDevice(payloadObject);
+            setPayload(payloadObject);
+          } catch (error) {
+            // console.log(error);
+          }
+        });
+      }
     }
 
     return () => {

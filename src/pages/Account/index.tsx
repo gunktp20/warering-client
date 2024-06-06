@@ -53,7 +53,9 @@ const Account = () => {
   };
 
   useEffect(() => {
-    getUserInfo();
+    if (token) {
+      getUserInfo();
+    }
   }, []);
 
   return (

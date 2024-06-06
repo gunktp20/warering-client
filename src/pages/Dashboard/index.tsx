@@ -107,6 +107,7 @@ interface IConfigWidget {
 
 function KanbanBoard() {
   const [columns, setColumns] = useState<Column[]>(defaultCols);
+  const { token } = useAppSelector((state) => state.auth)
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
   const { editMode } = useAppSelector((state) => state.dashboard);
   const { displayAlert, showAlert, alertText, alertType } = useAlert();
@@ -285,7 +286,9 @@ function KanbanBoard() {
   };
 
   useEffect(() => {
-    fetchDashboardById();
+    if (token) {
+      fetchDashboardById();
+    }
   }, []);
 
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);

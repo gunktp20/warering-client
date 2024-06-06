@@ -12,6 +12,7 @@ import userAvatar from "../../assets/images/user-avatar.png";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 import Pagination from "./Pagination";
 import useAlert from "../../hooks/useAlert";
+import { useAppSelector } from "../../app/hooks";
 
 function UserManagement() {
   const axiosPrivate = useAxiosPrivate();
@@ -42,7 +43,7 @@ function UserManagement() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
-
+  const { token } = useAppSelector((state) => state.auth)
   const { displayAlert, showAlert, alertText, alertType } = useAlert()
   const [timeoutIds, setTimeoutIds] = useState<NodeJS.Timeout[]>([]);
   const clearAllTimeouts = () => {
@@ -114,7 +115,9 @@ function UserManagement() {
   }
 
   useEffect(() => {
-    fetchAllUser();
+    if (token) {
+      fetchAllUser();
+    }
   }, [numOfPage]);
 
   return (
