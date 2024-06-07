@@ -17,6 +17,8 @@ import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 import { Alert } from "@mui/material";
 import useAlert from "../../hooks/useAlert";
 import { IDashboard } from "../../types/dashboard";
+import { useAppDispatch } from "../../app/hooks";
+import { displayAlert as displayDashboardAlert } from "../../features/dashboard/dashboardSlice";
 
 function AddDashboard() {
   const navigate = useNavigate();
@@ -26,7 +28,7 @@ function AddDashboard() {
   const { showAlert, alertText, alertType, displayAlert } = useAlert()
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
-
+  const dispatch = useAppDispatch()
   const [values, setValues] = useState<{
     nameDashboard: string;
     description: string;
@@ -40,9 +42,9 @@ function AddDashboard() {
   };
 
   const onSubmit = async () => {
-    const { nameDashboard, description } = values;
-    if (!nameDashboard || !description) {
-      displayAlert({ msg: "Please provide all", type: "error" })
+    const { nameDashboard } = values;
+    if (!nameDashboard) {
+      displayAlert({ msg: "Please provide dashboard name", type: "error" })
       return;
     }
     await AddDashboard(values);
@@ -53,7 +55,7 @@ function AddDashboard() {
     try {
       await axiosPrivate.post(`/dashboards`, dashboardInfo);
       setIsLoading(false);
-      displayAlert({ msg: "Your dashboard has been added", type: "error" })
+      await dispatch(displayDashboardAlert({ msg: `Your ${dashboardInfo?.nameDashboard} dashboard has been added `, type: "success" }))
       setIsLoading(false);
       navigate("/dashboard-list");
     } catch (err: unknown) {

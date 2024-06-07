@@ -1,10 +1,9 @@
-import { FormRow } from "../../components";
+import { FormRow, SnackBar } from "../../components";
 import Wrapper from "../../assets/wrappers/UserManagement";
 import { useEffect, useState } from "react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { IoSearchOutline } from "react-icons/io5";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { AxiosError } from "axios";
 import NavLinkSidebarAdmin from "../../components/Admin/NavLinkSidebarAdmin";
 import BigNavbarAdmin from "../../components/Admin/BigNavbarAdmin";
 import NavDialogAdmin from "../../components/Admin/NavDialogAdmin";
@@ -12,6 +11,8 @@ import AccountAdminDrawer from "../../components/Admin/AccountAdminDrawer";
 import userAvatar from "../../assets/images/user-avatar.png";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 import Pagination from "./Pagination";
+import useAlert from "../../hooks/useAlert";
+import { useAppSelector } from "../../app/hooks";
 
 function UserManagement() {
   const axiosPrivate = useAxiosPrivate();
@@ -42,7 +43,8 @@ function UserManagement() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
-
+  const { token } = useAppSelector((state) => state.auth)
+  const { displayAlert, showAlert, alertText, alertType } = useAlert()
   const [timeoutIds, setTimeoutIds] = useState<NodeJS.Timeout[]>([]);
   const clearAllTimeouts = () => {
     timeoutIds.forEach((timeoutId: NodeJS.Timeout) => clearTimeout(timeoutId));
@@ -73,7 +75,7 @@ function UserManagement() {
       }
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err);
-      console.log(msg);
+      displayAlert({ msg, type: "error" })
       setIsLoading(false);
     }
   };
@@ -88,16 +90,12 @@ function UserManagement() {
       setIsLoading(false);
       fetchAllUser();
     } catch (err: unknown) {
-      if (err instanceof AxiosError) {
-        const msg =
-          typeof err?.response?.data?.msg === "object"
-            ? err?.response?.data?.msg[0]
-            : err?.response?.data?.msg;
-        console.log(msg);
-      }
+      const msg = await getAxiosErrorMessage(err)
+      displayAlert({ msg, type: "error" })
       setIsLoading(false);
+
     }
-  };
+  }
 
   for (let i = 1; i < pageCount + 1; i++) {
     elements.push(
@@ -117,7 +115,9 @@ function UserManagement() {
   }
 
   useEffect(() => {
-    fetchAllUser();
+    if (token) {
+      fetchAllUser();
+    }
   }, [numOfPage]);
 
   return (
@@ -291,8 +291,19 @@ function UserManagement() {
           </div>
         </div>
       </div>
+      {showAlert && (
+        <div className="block sm:hidden">
+          <SnackBar
+            id="user-management-snackbar"
+            severity={alertType}
+            showSnackBar={showAlert}
+            snackBarText={alertText}
+          />
+        </div>
+      )}
     </Wrapper>
   );
 }
+
 
 export default UserManagement;

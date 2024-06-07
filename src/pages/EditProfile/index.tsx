@@ -71,7 +71,7 @@ const EditProfile = () => {
       });
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err);
-      console.log(msg);
+      displayAlert({ msg, type: "error" })
       setIsLoading(false);
     }
   };
@@ -139,7 +139,9 @@ const EditProfile = () => {
   };
 
   useEffect(() => {
-    getUserInfo();
+    if (token) {
+      getUserInfo();
+    }
   }, []);
 
   useEffect(() => {

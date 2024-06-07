@@ -15,6 +15,7 @@ function Overview() {
   const dispatch = useAppDispatch();
   const axiosPrivate = useAxiosPrivate();
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
+  const { token } = useAppSelector((state) => state.auth)
   const { deviceOffline, deviceOnline, totalDevice, totalDeviceDeny } =
     useAppSelector((state) => state.device);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
@@ -25,18 +26,30 @@ function Overview() {
     const response = await axiosPrivate.get(`/api/overview`);
     dispatch(setDeviceOverview(response?.data));
   };
+  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    fetchDeviceOverview();
+    if (token) {
+      fetchDeviceOverview();
+    }
   }, []);
 
   useEffect(() => {
-    const timeoutID = setInterval(() => {
-      fetchDeviceOverview();
-    }, 5000);
+    if (token) {
+      const timeoutID = setInterval(() => {
+        if (token) {
+          setIntervalId
+          fetchDeviceOverview();
+        }
+      }, 5000);
+      setIntervalId(timeoutID)
+    }
+
 
     return () => {
-      clearInterval(timeoutID);
+      if (intervalId) {
+        clearInterval(intervalId)
+      }
     };
   }, []);
 

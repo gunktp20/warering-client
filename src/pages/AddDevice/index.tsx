@@ -17,6 +17,8 @@ import { Alert } from "@mui/material";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 import useAlert from "../../hooks/useAlert";
+import { displayAlert as displayDevicesAlert } from "../../features/device/deviceSlice";
+import { useAppDispatch } from "../../app/hooks";
 
 interface IDeviceInfo {
   nameDevice: string;
@@ -31,6 +33,7 @@ interface IDeviceInfo {
 
 function AddDevice() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch()
   const axiosPrivate = useAxiosPrivate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -43,6 +46,7 @@ function AddDevice() {
     setIsLoading(true);
     try {
       await axiosPrivate.post(`/devices`, deviceInfo);
+      await dispatch(displayDevicesAlert({ msg: `Created your ${deviceInfo?.nameDevice} device`, type: "success" }))
       navigate("/device-list");
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err);
@@ -58,6 +62,7 @@ function AddDevice() {
     description: "",
     topics: "",
   });
+
   const [retain, setRetain] = useState<boolean>(false);
   const options = [0, 1, 2];
   const [qos, setQos] = useState<number | string>(options[0]);
@@ -73,7 +78,6 @@ function AddDevice() {
       !nameDevice ||
       !usernameDevice ||
       !password ||
-      !description ||
       !topics
     ) {
       displayAlert({ msg: "Please provide all value", type: "error" })

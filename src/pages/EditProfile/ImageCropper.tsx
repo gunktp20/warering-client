@@ -3,6 +3,7 @@ import Cropper, { Area } from "react-easy-crop";
 import { loadImage } from "./helper";
 
 interface Props {
+  id: string
   source: string;
   width: number;
   height: number;
@@ -28,6 +29,7 @@ function rotateSize(width: number, height: number, rotation: number) {
 }
 
 const ImageCropper: FC<Props> = ({
+  id,
   source,
   height,
   width,
@@ -44,7 +46,7 @@ const ImageCropper: FC<Props> = ({
   const desiredHeight = height;
 
   const handleCrop = (_: Area, croppedAreaPixels: Area) => {
-    console.log("croppedAreaPixels", croppedAreaPixels);
+
     try {
       if (!croppedAreaPixels) return;
       const canvas = document.createElement("canvas");
@@ -99,7 +101,7 @@ const ImageCropper: FC<Props> = ({
 
       image.src = source;
     } catch (error) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -108,7 +110,7 @@ const ImageCropper: FC<Props> = ({
     const containerRect = containerRef.current?.getBoundingClientRect();
     if (!containerRect) return;
 
-     await loadImage(
+    await loadImage(
       source,
       containerRect.width * (1 / 1),
       containerRect.height * (1 / 1)
@@ -123,6 +125,7 @@ const ImageCropper: FC<Props> = ({
   return (
     <div
       className="w-full h-full flex flex-col items-center justify-center"
+      id={id}
       ref={containerRef}
     >
       {loading ? (

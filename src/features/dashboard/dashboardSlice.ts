@@ -14,6 +14,9 @@ interface IDashboardState {
   dashboards: IDashboard[];
   clientsMqttConnected: MqttClient[];
   selectedDashboard: string;
+  showAlert: boolean;
+  alertType: "error" | "success" | "info" | "warning";
+  alertText: string;
 }
 
 const initialState: IDashboardState = {
@@ -21,6 +24,9 @@ const initialState: IDashboardState = {
   dashboards: [],
   clientsMqttConnected: [],
   selectedDashboard: "",
+  showAlert: false,
+  alertType: "error",
+  alertText: "",
 };
 
 const DashboardSlice = createSlice({
@@ -51,6 +57,23 @@ const DashboardSlice = createSlice({
         clientsMqttConnected: [...state.clientsMqttConnected, action.payload],
       };
     },
+    displayAlert: (state, action) => {
+      const { msg, type } = action.payload;
+      return {
+        ...state,
+        alertText: msg,
+        alertType: type,
+        showAlert: true,
+      };
+    },
+    clearAlert: (state) => {
+      return {
+        ...state,
+        alertText: "",
+        alertType: "error",
+        showAlert: false,
+      };
+    },
   },
 });
 
@@ -59,6 +82,8 @@ export const {
   pushClientMqtt,
   setDashboards,
   setSelectedDashboard,
+  clearAlert,
+  displayAlert,
 } = DashboardSlice.actions;
 
 export default DashboardSlice.reducer;

@@ -47,7 +47,9 @@ function App() {
   };
 
   useEffect(() => {
-    getUserInfo();
+    if (token) {
+      getUserInfo();
+    }
   }, []);
 
   return (

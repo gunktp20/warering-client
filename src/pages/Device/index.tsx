@@ -15,7 +15,7 @@ import { BsFiletypeJson } from "react-icons/bs";
 import Wrapper from "../../assets/wrappers/Device";
 import { LuEye } from "react-icons/lu";
 import { LuEyeOff } from "react-icons/lu";
-import mqtt, { MqttClient } from "mqtt";
+import { MqttClient } from "mqtt";
 import {
   ButtonControl,
   Gauge,
@@ -45,6 +45,7 @@ import { useAppSelector } from "../../app/hooks";
 import useAlert from "../../hooks/useAlert";
 import * as XLSX from "xlsx"
 import useTimeout from "../../hooks/useTimeout";
+import connectEMQX from "../../utils/connectEMQX";
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
 interface IDevice {
@@ -82,6 +83,7 @@ function Device() {
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isEditDisplayShow, setIsEditDisplayShow] = useState<boolean>(false);
   const { showAlert, alertText, alertType } = useAppSelector((state) => state.widget)
+  const { token } = useAppSelector((state) => state.auth)
   const alert = useAlert()
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
@@ -95,7 +97,7 @@ function Device() {
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
   const [deviceInfo, setDeviceInfo] = useState<IDevice>();
   const [client, setClient] = useState<MqttClient | null>(null);
-  const [connectStatus, setConnectStatus] = useState("Connect");
+  // const [connectStatus, setConnectStatus] = useState("Connect");
   const [payload, setPayload] = useState({});
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
   const [isTopicsShow, setIsTopicsShow] = useState<boolean>(false);
@@ -115,7 +117,7 @@ function Device() {
       setPublishTopic(data?.topics[1]);
       setSubScribeTopic(data?.topics[0]);
       setQos(data?.qos);
-      connectEMQX(data);
+      connectMQTTServer(data);
       setIsLoading(false);
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err);
@@ -148,69 +150,70 @@ function Device() {
         },
         (error) => {
           if (error) {
-            console.log("Publish error: ", error);
+            // console.log("Publish error: ", error);
           }
         }
       );
     }
   };
 
-  const connectEMQX = useCallback(
+  const connectMQTTServer = useCallback(
     async (data: { usernameDevice: string; password: string }) => {
-      const _mqtt = await mqtt.connect(import.meta.env.VITE_EMQX_DOMAIN, {
-        protocol: import.meta.env.VITE_EMQX_PROTOCAL,
-        host: import.meta.env.VITE_EMQX_HOST,
-        clientId: "emqx_react_" + Math.random().toString(16).substring(2, 8),
-        username: data?.usernameDevice,
-        password: data?.password,
-      });
-      setClient(_mqtt);
+      const client = await connectEMQX(data.usernameDevice, data.password)
+      setClient(client);
     },
     []
   );
+
   const mqttDisconnect = () => {
     if (client) {
       client.end(() => {
-        setConnectStatus("Disconnected");
+        // setConnectStatus("Disconnected");
       });
     }
   };
   useEffect(() => {
-    fetchDeviceById();
-    fetchAllWidgets();
+    if (token) {
+      fetchDeviceById();
+      fetchAllWidgets();
+    }
   }, []);
 
   useEffect(() => {
-    if (client) {
-      client.on("connect", () => {
-        setConnectStatus("Connected");
-        console.log(connectStatus);
-        if (client) {
-          client.subscribe(
-            subScribeTopic,
-            {
-              qos: qos,
-            },
-            (err) => {
-              console.log("not sub", err);
-            }
-          );
-        }
-      });
-      client.on("reconnect", () => {
-        setConnectStatus("Reconnecting");
-      });
+    if (token) {
+      if (client) {
+        client.on("connect", () => {
+          // setConnectStatus("Connected");
+          // console.log(connectStatus);
+          if (client) {
+            client.subscribe(
+              subScribeTopic,
+              {
+                qos: qos,
+              },
+              (err) => {
+                if (err) {
+                  // console.log(err);
+                }
+              }
+            );
+          }
+        });
+        client.on("reconnect", () => {
+          // setConnectStatus("Reconnecting");
+        });
 
-      client.on("message", (topic, message) => {
-        const payload = { topic, message: message.toString() };
-        try {
-          const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
-          setConfigWidgetsDevice(payloadObject);
-          setPayload(payloadObject);
-        } catch (error) {
-          console.log(error);
-        }
-      });
+        client.on("message", (topic, message) => {
+          const payload = { topic, message: message.toString() };
+          try {
+            const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
+            setConfigWidgetsDevice(payloadObject);
+            setPayload(payloadObject);
+          } catch (error) {
+            // console.log(error);
+          }
+        });
+      }
     }
 
     return () => {
@@ -264,7 +267,7 @@ function Device() {
   }
 
   const { callHandler: callExportJsonFile } = useTimeout({ executeAction: exportJsonFile, duration: 1000 })
-  const { callHandler: callExportExelFile } = useTimeout({ executeAction: exportExcelFile, duration: 1000 })
+  const { callHandler: callExportExcelFile } = useTimeout({ executeAction: exportExcelFile, duration: 1000 })
 
   return (
     <Wrapper>
@@ -459,14 +462,14 @@ function Device() {
             Export
           </div>
           <div className="gap-16 flex mt-4 p-5 border-t-[1px] border-b-[1px] border-[#dadada]" >
-            <div className="flex flex-col justify-center items-center cursor-pointer text-nowrap" onClick={callExportJsonFile} id="excel-download">
+            <div className="flex flex-col justify-center items-center cursor-pointer text-nowrap" onClick={callExportExcelFile} id="excel-download">
               <SiMicrosoftexcel className="text-[#1d4469] text-[25px]" />
               <div className="text-[13px] mt-3 text-[#1d4469] font-bold">
                 Excel
               </div>
             </div>
             {/* Export JSON */}
-            <div className="flex flex-col justify-center items-center cursor-pointer text-nowrap" onClick={callExportExelFile} id="json-dowload">
+            <div className="flex flex-col justify-center items-center cursor-pointer text-nowrap" onClick={callExportJsonFile} id="json-dowload">
               <BsFiletypeJson className="text-[#1d4469] text-[25px]" />
               <div className="text-[13px] mt-3 text-[#1d4469] font-bold text-nowrap">
                 JSON

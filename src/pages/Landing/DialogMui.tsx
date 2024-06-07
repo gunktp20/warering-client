@@ -319,7 +319,7 @@ export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsM
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
                       <input
-                        id="remember-user-checkbox"
+                        id="remember-user-dialog-checkbox"
                         type="checkbox"
                         value=""
                         className="w-[13px] h-[13px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#ffffff00] dark:focus:ring-[#2CB1BC] dark:ring-offset-gray-800 focus:ring-2"
@@ -338,7 +338,7 @@ export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsM
                           dispatch(clearAlert());
                         }}
                         className="cursor-pointer ms-2 text-[11.5px] text-[#3173B1] font-bold"
-                        id="toggle-forget-pass-btn"
+                        id="toggle-forget-pass-dialog-btn"
                       >
                         Forget Password ?
                       </button>
@@ -367,7 +367,7 @@ export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsM
                   }}
                   variant="contained"
                   disabled={isLoading}
-                  id="endpoint-setup-user-submit-btn"
+                  id="endpoint-setup-user-submit-dialog-btn"
                 >
                   {isLoading ? "Loading..." : isMember ? "Sign In" : "Sign Up"}
                 </Button>
@@ -376,7 +376,7 @@ export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsM
                     {isMember ? "Not a member yet?" : "Already a member?"}
                   </p>
                   <button
-                    id="toggle-endpoint-setup-user-btn"
+                    id="toggle-endpoint-setup-user-dialog-btn"
                     className="text-[12px] ml-2 text-[#3173B1] bg-none cursor-pointer"
                     onClick={() => {
                       setIsMember(!isMember);

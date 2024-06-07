@@ -16,16 +16,19 @@ import EditDashboardDialog from "./EditDashboardDialog";
 import ConfirmDelete from "./ConfirmDelete";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import moment from "moment";
-import { MdSearchOff } from "react-icons/md";
+import { MdFilterAltOff, MdSearchOff } from "react-icons/md";
 import Pagination from "./Pagination";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { setDashboards, setSelectedDashboard } from "../../features/dashboard/dashboardSlice";
+import { setDashboards, setSelectedDashboard, clearAlert as clearDashboardAlert } from "../../features/dashboard/dashboardSlice";
 import useAlert from "../../hooks/useAlert";
+import { IoMdCloseCircle } from "react-icons/io";
+import Tooltip from "../../components/ToolTip";
 
 function DashboardList() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { dashboards } = useAppSelector((state) => state.dashboard)
+  const DashboardsState = useAppSelector((state) => state.dashboard)
+  const { dashboards } = DashboardsState
   const { showAlert, alertText, alertType, displayAlert } = useAlert()
   const axiosPrivate = useAxiosPrivate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
@@ -39,9 +42,9 @@ function DashboardList() {
   const limitQuery: number = 5;
   const [numOfPage, setNumOfPage] = useState<number>(1);
   const [pageCount, setPageCount] = useState<number>(0);
-  const [sortCreatedAt, setSortCreatedAt] = useState<string>("-createdAt");
+  const [sortCreatedAt, setSortCreatedAt] = useState<string>("");
   const elements = [];
-
+  const { token } = useAppSelector((state) => state.auth)
   const [values, setValues] = useState({
     search_dashboard: "",
   });
@@ -50,7 +53,7 @@ function DashboardList() {
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(
-        `/dashboards?limit=${limitQuery}&page=${numOfPage}&query=${values.search_dashboard}&createdAt=${sortCreatedAt}`
+        `/dashboards?limit=${limitQuery}&page=${numOfPage}&query=${values.search_dashboard}&createdAt=${sortCreatedAt ? sortCreatedAt : "-createdAt"}`
       );
       dispatch(setDashboards(data?.data))
       setIsLoading(false);
@@ -95,7 +98,23 @@ function DashboardList() {
   }
 
   useEffect(() => {
-    fetchAllDashboards();
+    if (DashboardsState.showAlert) {
+      setTimeout(() => {
+        dispatch(clearDashboardAlert())
+      }, 3000)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (showAlert && DashboardsState.showAlert) {
+      dispatch(clearDashboardAlert())
+    }
+  }, [showAlert])
+
+  useEffect(() => {
+    if (token) {
+      fetchAllDashboards();
+    }
   }, [values.search_dashboard, numOfPage, sortCreatedAt]);
 
   return (
@@ -184,22 +203,37 @@ function DashboardList() {
                   handleChange={handleChange}
                   marginTop="mt-[0.2rem]"
                 />
-                <IoSearchOutline className="absolute text-[#1d4469] end-0 text-[20px]" />
+                {values.search_dashboard !== "" ? <IoMdCloseCircle onClick={() => setValues({ ...values, search_dashboard: "" })} className=" cursor-pointer absolute text-[#1d4469] end-0 text-[20px] bottom-[26px]" /> : <IoSearchOutline className="absolute text-[#1d4469] end-0 text-[20px] bottom-[26px]" />}
               </div>
               <div className="flex justify-start sm:w-[100%]">
                 <div className="pb-2 sm:w-[100%]">
                   <select
                     id="sort-by-createdAt"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full px-5 py-2 "
-                    defaultValue={sortCreatedAt}
                     onChange={(e) => {
                       setSortCreatedAt(e.target.value);
                     }}
+                    name="sort-dashboards-by-createdAt"
+                    value={sortCreatedAt}
+
                   >
-                    <option value="-createdAt">Sort by Date</option>
+                    <option value="">Sort by Date</option>
                     <option value="%2BcreatedAt">Oldest</option>
                     <option value="-createdAt">Latest</option>
                   </select>
+                </div>
+                <div className="pb-2 sm:w-[200%] ml-3">
+                  <Tooltip text="ClearFilter">
+                    <button
+                      onClick={() => {
+                        setSortCreatedAt("")
+                      }}
+                      id="clear-filter-btn"
+                      className=" text-gray-400 hover:bg-primary-700 hover:text-white text-sm rounded-lg transition-all h-[100%] focus:ring-blue-500 focus:border-gray-500 block py-2 px-[9px] w-fit"
+                    >
+                      <MdFilterAltOff className="text-[20px]" />
+                    </button>
+                  </Tooltip>
                 </div>
               </div>
             </div>
@@ -262,13 +296,17 @@ function DashboardList() {
                         >
                           {dashboard?.nameDashboard}
                         </td>
-                        <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start" id={`desr-${dashboard.id}`}>
+                        <td onClick={() => {
+                          navigate("/dashboard/" + dashboard.id);
+                        }} className="p-3 text-sm text-[#878787] whitespace-nowrap cursor-pointer text-center sm:text-start" id={`desr-${dashboard.id}`}>
                           <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600 ">
                             Description{" "}
                           </div>
                           {dashboard?.description}
                         </td>
-                        <td className="p-3 text-sm text-[#878787] whitespace-nowrap text-center sm:text-start" id={`createdAt-${dashboard.id}`}>
+                        <td onClick={() => {
+                          navigate("/dashboard/" + dashboard.id);
+                        }} className="p-3 text-sm text-[#878787] whitespace-nowrap cursor-pointer text-center sm:text-start" id={`createdAt-${dashboard.id}`}>
                           <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
                             CreatedAt
                           </div>
@@ -286,13 +324,13 @@ function DashboardList() {
                                 dispatch(setSelectedDashboard(dashboard?.id))
                                 setEditDialogOpen(true);
                               }}
-                              className="mr-6 text-[#2E7D32]"
+                              className="mr-6 text-[#2E7D32] hover:bg-[#2E7D32] hover:text-white transition-all rounded-md py-1 px-2"
                               id={`edit-dashboard-option-${dashboard.id}`}
                             >
                               Edit
                             </button>
                             <button
-                              className="text-[#dc3546]"
+                              className="text-[#dc3546] hover:bg-[#dc3546] hover:text-white transition-all rounded-md py-1 px-2"
                               onClick={() => {
                                 dispatch(setSelectedDashboard(dashboard?.id))
                                 setIsDeleteConfirmOpen(!isDeleteConfirmOpen);
@@ -319,6 +357,16 @@ function DashboardList() {
               severity={alertType}
               showSnackBar={showAlert}
               snackBarText={alertText}
+            />
+          </div>
+        )}
+        {DashboardsState.showAlert && (
+          <div className="block sm:hidden">
+            <SnackBar
+              id="edit-widget-snackbar"
+              severity={DashboardsState.alertType}
+              showSnackBar={DashboardsState.showAlert}
+              snackBarText={DashboardsState.alertText}
             />
           </div>
         )}

@@ -60,7 +60,7 @@ export default function EditDeviceDialog({ isEditDialogOpen, setEditDialogOpen, 
 
   const [currentDeviceInfo, setCurrentDeviceInfo] =
     useState<IValue>(initialState);
-    
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
@@ -141,8 +141,7 @@ export default function EditDeviceDialog({ isEditDialogOpen, setEditDialogOpen, 
           ? undefined
           : usernameDevice,
       password: password === "" ? undefined : password,
-      description:
-        description === currentDeviceInfo.description ? undefined : description,
+      description,
       topics: topics === currentDeviceInfo.topics ? undefined : topics,
       retain: retain === currentDeviceInfo.retain ? undefined : retain,
       qos: Number(qos),
@@ -182,10 +181,11 @@ export default function EditDeviceDialog({ isEditDialogOpen, setEditDialogOpen, 
         keepMounted
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
+        id="edit-device-dialog"
       >
         <DialogContent>
           <DialogContentText
-            id="edit-device-dialog"
+            id="edit-device-dialog-content"
             className="p-3 "
             component={"div"}
             variant={"body2"}
@@ -204,7 +204,7 @@ export default function EditDeviceDialog({ isEditDialogOpen, setEditDialogOpen, 
             {showAlert && alertType && (
               <div className="hidden sm:block">
                 <Alert
-                  id="alert-edit-device"
+                  id="edit-device-alert"
                   severity={alertType}
                   sx={{
                     fontSize: "11.8px",
@@ -290,7 +290,7 @@ export default function EditDeviceDialog({ isEditDialogOpen, setEditDialogOpen, 
             </div>
             <div className="flex items-center">
               <label
-                htmlFor="link-checkbox"
+                htmlFor="retain-edit-checkbox"
                 className="ms-2 text-sm mr-2 font-medium text-[#1D4469] dark:text-gray-300"
               >
                 Retain
@@ -334,31 +334,14 @@ export default function EditDeviceDialog({ isEditDialogOpen, setEditDialogOpen, 
                 </Button>
               </div>
               <div className="w-[250px] sm:w-[100%]">
-                <Button
-                  onClick={() => {
-                    onSubmit();
-                  }}
-                  style={{
-                    textTransform: "none",
-                    width: "100%",
-                    height: "39px",
-                    marginTop: "1.5rem",
-                  }}
-                  sx={{
-                    bgcolor: "#1966fb",
-                    ":hover": {
-                      bgcolor: "#10269C",
-                    },
-                    ":disabled": {
-                      color: "#fff",
-                    },
-                  }}
-                  variant="contained"
-                  id="edit-device-submit-btn"
-                  disabled={isLoading}
+                <button
+                  id="submit-edit-dashboard-btn"
+                  onClick={onSubmit}
+                  disabled={isLoading || (values.nameDevice === currentDeviceInfo.nameDevice && values.usernameDevice === currentDeviceInfo.usernameDevice && values.password === currentDeviceInfo.password && values.description === currentDeviceInfo.password && values.topics === currentDeviceInfo.topics && qos === currentDeviceInfo.qos && retain === currentDeviceInfo.retain)}
+                  className="flex bg-[#1966fb] mt-[1.5rem] hover:bg-[#10269C] justify-center items-center transition-all disabled:bg-primary-100 text-white rounded-md w-[100%] h-[39px]"
                 >
                   Save
-                </Button>
+                </button>
               </div>
               {showAlert && (
                 <div className="block sm:hidden">
