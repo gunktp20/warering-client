@@ -17,6 +17,7 @@ function Landing() {
   const { user } = useAppSelector((state) => state.auth);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] = useState<boolean>(false);
 
+  
   return (
     <Wrapper>
       <AccountUserDrawer
