@@ -25,14 +25,16 @@ const useAxiosPrivate = () => {
       (response) => response,
       async (error) => {
         const pervRequest = error?.config;
-        if (error?.response?.status === 403 && !pervRequest?.sent) {
-          pervRequest.sent = true;
+        console.log("AxiosPrivate || ", error)
+        if (error?.response?.status === 403 && !pervRequest._retry) {
+          pervRequest._retry = true;
 
           const newAccessToken = await refresh();
-          dispatch(setCredential(newAccessToken));
-
-          pervRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-          return axiosPrivate(pervRequest);
+          if (newAccessToken) {
+            dispatch(setCredential(newAccessToken))
+            pervRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+            return axiosPrivate(pervRequest);
+          }
         }
         return Promise.reject(error);
       }

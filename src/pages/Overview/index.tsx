@@ -3,7 +3,7 @@ import Wrapper from "../../assets/wrappers/Overview";
 import { GoCpu } from "react-icons/go";
 import { NavDialog } from "../../components/";
 import { RiMenu2Fill } from "react-icons/ri";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { setDeviceOverview } from "../../features/device/deviceSlice";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
@@ -12,10 +12,10 @@ import { MdOutlineWifiOff } from "react-icons/md";
 import { IoBan } from "react-icons/io5";
 
 function Overview() {
+
   const dispatch = useAppDispatch();
   const axiosPrivate = useAxiosPrivate();
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
-  const { token } = useAppSelector((state) => state.auth)
   const { deviceOffline, deviceOnline, totalDevice, totalDeviceDeny } =
     useAppSelector((state) => state.device);
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
@@ -23,32 +23,27 @@ function Overview() {
     useState<boolean>(false);
 
   const fetchDeviceOverview = async () => {
-    const response = await axiosPrivate.get(`/api/overview`);
-    dispatch(setDeviceOverview(response?.data));
+    try {
+      const response = await axiosPrivate.get(`/api/overview`);
+      console.log(response)
+      dispatch(setDeviceOverview(response?.data));
+    } catch (err: unknown) {
+      console.log(err)
+    }
   };
-  const [intervalId, setIntervalId] = useState<NodeJS.Timeout | null>(null)
+
+  const intervalIdRef = useRef<number | null>(null);
 
   useEffect(() => {
-    if (token) {
+    const intervalId = window.setInterval(() => {
       fetchDeviceOverview();
-    }
-  }, []);
+    }, 25000);
 
-  useEffect(() => {
-    if (token) {
-      const timeoutID = setInterval(() => {
-        if (token) {
-          setIntervalId
-          fetchDeviceOverview();
-        }
-      }, 5000);
-      setIntervalId(timeoutID)
-    }
-
+    intervalIdRef.current = intervalId;
 
     return () => {
-      if (intervalId) {
-        clearInterval(intervalId)
+      if (intervalIdRef.current !== null) {
+        clearInterval(intervalIdRef.current);
       }
     };
   }, []);

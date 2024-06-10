@@ -6,25 +6,24 @@ import { AccessTokenPayload } from "../features/auth/types";
 
 function RequireAdmin() {
   const navigate = useNavigate();
-  const { user, token } = useAppSelector((state) => state.auth);
+  const { token } = useAppSelector((state) => state.auth);
 
   const decoded: AccessTokenPayload | undefined = token
     ? jwtDecode(token)
     : undefined;
 
   useEffect(() => {
-    if (!user) {
-      navigate("/home");
-      return;
-    }
+
     const isAdmin = decoded?.roles.filter((role) => {
       return role === "admin";
     }).length;
+
     if (!isAdmin) {
       navigate("/unauthorized");
       return;
     }
-  }, [user]);
+    
+  }, []);
 
   return <Outlet />;
 }

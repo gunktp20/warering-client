@@ -9,8 +9,14 @@ import {
   register,
   login,
   forgetPassword,
+  setProfileImg,
+  setAuthLoading
 } from "../../features/auth/authSlice";
 import { Link } from "react-router-dom";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { jwtDecode } from "jwt-decode";
+import { AccessTokenPayload } from "../../features/auth/types";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 
 interface IDrawer {
   isDrawerOpen: boolean;
@@ -41,11 +47,29 @@ const initialState: IValue = {
 
 function SetupUserDrawer(props: IDrawer) {
   const navigate = useNavigate();
+  const axiosPrivate = useAxiosPrivate()
 
   const { isDrawerOpen, setIsDrawerOpen, setIsMember, isMember } = props;
   const { isLoading, showAlert, alertText, alertType } = useAppSelector(
     (state) => state.auth
   );
+
+  const getUserProfile = async (token: string) => {
+    const decoded: AccessTokenPayload | undefined = token
+      ? jwtDecode(token)
+      : undefined;
+
+    dispatch(setAuthLoading(true));
+    try {
+      const { data } = await axiosPrivate.get(`/users/${decoded?.sub}`);
+      dispatch(setProfileImg(data?.profileUrl));
+      dispatch(setAuthLoading(false));
+    } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err);
+      showDisplayAlert("error", msg);
+      dispatch(setAuthLoading(false));
+    }
+  };
 
   const [values, setValues] = useState<IValue>(initialState);
   const [isForgetPassword, setIsForgetPassword] = useState<boolean>(false);
@@ -119,7 +143,9 @@ function SetupUserDrawer(props: IDrawer) {
     if (isMember) {
       const responseLogin = await dispatch(login(values));
       if (responseLogin.meta.requestStatus === "fulfilled") {
+        getUserProfile(responseLogin.payload.access_token)
         navigate("/");
+        return;
       }
       return;
     } else {

@@ -17,40 +17,10 @@ import Account from "./pages/Account";
 import EditProfile from "./pages/EditProfile";
 import SendVerifyEmail from "./pages/SendVerifyEmail";
 import UserManagement from "./pages/UserManagement";
-import { useEffect } from "react";
-import getAxiosErrorMessage from "./utils/getAxiosErrorMessage";
-import useAxiosPrivate from "./hooks/useAxiosPrivate";
-import { useAppDispatch, useAppSelector } from "./app/hooks";
-import { AccessTokenPayload } from "./features/auth/types";
-import { jwtDecode } from "jwt-decode";
-import { setProfileImg, setAuthLoading } from "./features/auth/authSlice";
+import ApiKeys from "./pages/ApiKey";
+import ApiKeyInformation from "./pages/ApiKey/ApiKeyInformation";
 
 function App() {
-  const axiosPrivate = useAxiosPrivate();
-  const dispatch = useAppDispatch();
-  const { token } = useAppSelector((state) => state.auth);
-  const decoded: AccessTokenPayload | undefined = token
-    ? jwtDecode(token)
-    : undefined;
-
-  const getUserInfo = async () => {
-    dispatch(setAuthLoading(true));
-    try {
-      const { data } = await axiosPrivate.get(`/users/${decoded?.sub}`);
-      dispatch(setProfileImg(data?.profileUrl));
-      dispatch(setAuthLoading(false));
-    } catch (err: unknown) {
-      const msg = await getAxiosErrorMessage(err);
-      console.log(msg);
-      dispatch(setAuthLoading(false));
-    }
-  };
-
-  useEffect(() => {
-    if (token) {
-      getUserInfo();
-    }
-  }, []);
 
   return (
     <BrowserRouter>
@@ -61,6 +31,7 @@ function App() {
         <Route element={<RequireUser />}>
           <Route path="/" element={<Overview />} />
           <Route path="/dashboard-list" element={<DashboardList />} />
+          <Route path="/api-keys" element={<DashboardList />} />
           <Route path="/dashboard/:dashboard_id" element={<Dashboard />} />
           <Route path="/add-dashboard" element={<AddDashboard />} />
           <Route path="/device-list" element={<DeviceList />} />
@@ -69,8 +40,11 @@ function App() {
           <Route path="/account" element={<Account />} />
           <Route path="/edit-profile" element={<EditProfile />} />
         </Route>
-        <Route path="/admin" element={<RequireAdmin />}>
+        <Route path="admin" element={<RequireAdmin />}>
           <Route index element={<UserManagement />} />
+          <Route path="user-management" element={<UserManagement />} />
+          <Route path="api-key/:api_key_id" element={<ApiKeyInformation />} />
+          <Route path="api-key/" element={<ApiKeys />} />
         </Route>
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route

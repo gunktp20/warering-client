@@ -1,5 +1,5 @@
 import { Drawer, Box, Typography } from "@mui/material";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FaRegUser } from "react-icons/fa6";
 import { FiEdit3 } from "react-icons/fi";
 import { CiLogout } from "react-icons/ci";
@@ -14,11 +14,13 @@ interface IDrawer {
 
 function AccountUserDrawer({ isAccountUserDrawerOpen, setIsAccountUserDrawerOpen }: IDrawer) {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate()
 
   const signOut = async () => {
     setIsAccountUserDrawerOpen(false);
     dispatch(logout());
-    await axiosPrivate.get("/auth/logout");
+    await axiosPrivate.post("/auth/logout");
+    return navigate("/home")
   };
 
   return (

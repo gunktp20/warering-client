@@ -5,14 +5,14 @@ import { jwtDecode } from "jwt-decode";
 import { AccessTokenPayload } from "../features/auth/types";
 function RequireUser() {
   const navigate = useNavigate();
-  const { user, token } = useAppSelector((state) => state.auth);
+  const { token } = useAppSelector((state) => state.auth);
 
   const decoded: AccessTokenPayload | undefined = token
     ? jwtDecode(token)
     : undefined;
 
   useEffect(() => {
-    if (!user) {
+    if (!token) {
       navigate("/home");
       return;
     }
@@ -24,7 +24,7 @@ function RequireUser() {
       navigate("/admin");
       return;
     }
-  }, [user]);
+  }, []);
 
   return <Outlet />;
 }

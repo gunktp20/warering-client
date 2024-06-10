@@ -7,7 +7,7 @@ import {
   SnackBar,
 } from "../../components";
 import Wrapper from "../../assets/wrappers/DeviceList";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -30,6 +30,7 @@ import { IoMdCloseCircle } from "react-icons/io";
 function DeviceList() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const isFirstRender = useRef(true)
   const DeviceState = useAppSelector((state) => state.device);
   const { token } = useAppSelector((state) => state.auth);
   const { devices } = DeviceState
@@ -108,12 +109,21 @@ function DeviceList() {
       dispatch(setDevices(data.data));
       setIsLoading(false);
       setPageCount(data.metadata.pageCount);
-      if (data.metadata.pageCount === 1 && numOfPage !== 1) {
+      if ((data.metadata.pageCount === 1 && numOfPage !== 1) || (data.metadata.pageCount < numOfPage)) {
         setNumOfPage(1);
       }
     } catch (err: unknown) {
       setIsLoading(false);
     }
+  };
+
+  const { callHandler: callFetchAllDevice } = useTimeout({
+    executeAction: fetchAllDevice,
+    duration: 500,
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValues({ ...values, [e.target.name]: e.target.value });
   };
 
   const setDevicePermission = async (deviceId: string, permission: string) => {
@@ -129,12 +139,8 @@ function DeviceList() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValues({ ...values, [e.target.name]: e.target.value });
-  };
-
   useEffect(() => {
-    if(token){
+    if (token) {
       fetchAllDevice();
     }
   }, [
@@ -144,6 +150,14 @@ function DeviceList() {
     filterByPermission,
     filterByisSaveData,
   ]);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+    } else {
+      callFetchAllDevice()
+    }
+  }, [values.search_device])
 
   useEffect(() => {
     if (DeviceState.showAlert) {
@@ -263,7 +277,6 @@ function DeviceList() {
                   <select
                     id="sort-by-date-select"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg  block w-full px-5 py-2 "
-                    defaultValue={sortCreatedAt}
                     onChange={(e) => {
                       setSortCreatedAt(e.target.value);
                     }}
@@ -278,7 +291,6 @@ function DeviceList() {
                   <select
                     id="filter-by-permission-select"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-5 py-2 "
-                    defaultValue={filterByPermission}
                     onChange={(e) => {
                       setFilterByPermission(e.target.value);
                     }}
@@ -293,7 +305,6 @@ function DeviceList() {
                   <select
                     id="filter-by-is-save-data-select"
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full px-5 py-2 "
-                    defaultValue={filterByisSaveData}
                     onChange={(e) => {
                       setFilterByIsSaveData(e.target.value);
                     }}
