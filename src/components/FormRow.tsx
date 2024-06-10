@@ -4,7 +4,8 @@ import { TbEye, TbEyeOff } from "react-icons/tb";
 interface IFormRow {
   type: string;
   name: string;
-  value?: string | number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value?: any;
   handleChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   labelText?: string;
   width?: string;
@@ -36,9 +37,9 @@ const FormRow: FunctionComponent<IFormRow> = ({
             ? "password"
             : type === "number"
               ? "number"
-              : "value"
+              : type === "date" ? "date" : "text"
 
-              
+
         }
         name={name}
         id={name}

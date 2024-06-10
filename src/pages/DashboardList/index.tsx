@@ -7,7 +7,7 @@ import {
   SnackBar,
 } from "../../components";
 import Wrapper from "../../assets/wrappers/DashboardList";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { IoSearchOutline } from "react-icons/io5";
 import { Button } from "@mui/material";
@@ -23,10 +23,12 @@ import { setDashboards, setSelectedDashboard, clearAlert as clearDashboardAlert 
 import useAlert from "../../hooks/useAlert";
 import { IoMdCloseCircle } from "react-icons/io";
 import Tooltip from "../../components/ToolTip";
+import useTimeout from "../../hooks/useTimeout";
 
 function DashboardList() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const isFirstRender = useRef(true)
   const DashboardsState = useAppSelector((state) => state.dashboard)
   const { dashboards } = DashboardsState
   const { showAlert, alertText, alertType, displayAlert } = useAlert()
@@ -59,16 +61,12 @@ function DashboardList() {
       setIsLoading(false);
       setPageCount(data.metadata.pageCount);
 
-      if (data.metadata.pageCount === 1 && numOfPage !== 1) {
+      if ((data.metadata.pageCount === 1 && numOfPage !== 1) || (data.metadata.pageCount < numOfPage)) {
         setNumOfPage(1);
       }
     } catch (err: unknown) {
       setIsLoading(false);
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValues({ ...values, [e.target.name]: e.target.value });
   };
 
   const hookDeleteSuccess = () => {
@@ -97,6 +95,15 @@ function DashboardList() {
     );
   }
 
+  const { callHandler: callFetchAllDashboards } = useTimeout({
+    executeAction: fetchAllDashboards,
+    duration: 500,
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValues({ ...values, [e.target.name]: e.target.value });
+  };
+
   useEffect(() => {
     if (DashboardsState.showAlert) {
       setTimeout(() => {
@@ -115,7 +122,15 @@ function DashboardList() {
     if (token) {
       fetchAllDashboards();
     }
-  }, [values.search_dashboard, numOfPage, sortCreatedAt]);
+  }, [numOfPage, sortCreatedAt]);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+    } else {
+      callFetchAllDashboards()
+    }
+  }, [values.search_dashboard])
 
   return (
     <Wrapper>

@@ -220,7 +220,7 @@ const AuthSlice = createSlice({
         const roles = decoded?.roles || [];
         user.roles = roles;
         state.isLoading = false;
-        state.user = user;
+        state.user = { ...user, roles: undefined };
         state.token = access_token;
         addUserToLocalStorage(user, access_token);
       }),
