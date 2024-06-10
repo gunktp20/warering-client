@@ -5,6 +5,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
 import { NavLink } from "react-router-dom";
+import { FaKey } from "react-icons/fa";
 import { FaUserFriends } from "react-icons/fa";
 
 const Transition = React.forwardRef(function Transition(
@@ -55,16 +56,30 @@ export default function SmallNavLinks(props: INavDialog) {
             </div>
             <NavLink
               to="/admin"
-              key={3}
+              key={1}
               id="user-list-nav-link-sidebar"
               onClick={() => { }}
               className={({ isActive }) =>
-                `flex pl-10 p-5 items-center text-[14px] ransition-all ${isActive ? "text-[#1966fb]" : "text-[#1966fb]"
+                `flex pl-10 p-5 items-center text-[14px] transition-all ${isActive ? "text-[#1966fb]" : "text-[#8e8e8e]"
                 }`
               }
+              end
             >
               <FaUserFriends className="mr-3 text-[16px]" />
               User List
+            </NavLink>
+            <NavLink
+              to="/admin/api-key"
+              key={2}
+              id="api-keys-nav-link-sidebar"
+              onClick={() => { }}
+              className={({ isActive }) =>
+                `flex pl-10 p-5 items-center text-[14px] transition-all ${isActive ? "text-[#1966fb]" : "text-[#8e8e8e]"
+                }`
+              }
+            >
+              <FaKey className="mr-3 text-[16px]" />
+              API Keys
             </NavLink>
           </DialogContentText>
         </DialogContent>

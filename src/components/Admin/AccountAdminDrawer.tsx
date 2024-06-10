@@ -3,6 +3,7 @@ import { CiLogout } from "react-icons/ci";
 import { useAppDispatch } from "../../app/hooks";
 import { axiosPrivate } from "../../services/api";
 import { logout } from "../../features/auth/authSlice";
+import { useNavigate } from "react-router-dom";
 
 interface IDrawer {
   isAccountUserDrawerOpen: boolean;
@@ -10,12 +11,15 @@ interface IDrawer {
 }
 
 function AccountAdminDrawer(props: IDrawer) {
+  const navigate = useNavigate()
   const dispatch = useAppDispatch();
   const { isAccountUserDrawerOpen, setIsAccountUserDrawerOpen } = props;
 
   const signOut = async () => {
-    await axiosPrivate.post("/auth/logout");
+    setIsAccountUserDrawerOpen(false);
     dispatch(logout());
+    await axiosPrivate.post("/auth/logout");
+    return navigate("/home")
   };
 
   return (
