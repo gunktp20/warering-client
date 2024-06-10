@@ -55,7 +55,6 @@ function LineChart({
       {
         label: "",
         data: [...values],
-        //  Data Y
         backgroundColor: "#1966fb",
         borderColor: "#00000013",
         border: "1px",
@@ -68,6 +67,8 @@ function LineChart({
   };
 
   const options = {
+    maintainAspectRatio: false,
+    responsive: true,
     animation: {
       duration: 1,
     },
@@ -80,12 +81,10 @@ function LineChart({
           min: Math.floor(min),
           max: Math.floor(max),
         },
-        // x: {
-        //     display: false // Hide X axis labels
-        // }
       },
     },
   };
+
 
   const pushNumber = (number: number): void => {
     setValues((prevNumbers) => {
@@ -141,8 +140,10 @@ function LineChart({
       >
         <RxDotsHorizontal />
       </div>
-      <div className="h-[100%] flex pt-[5px] w-[100%] justify-center ">
-        <Line data={data} options={options}></Line>
+      <div>
+        <div className="flex w-[100%] justify-center items-center relative h-[104px] md:w-[200px]">
+          <Line data={data} options={options}></Line>
+        </div>
       </div>
       {isOptionOpen && (
         <div className="bg-white flex flex-col absolute top-6 right-2 border-[1px] rounded-md shadow-sm">

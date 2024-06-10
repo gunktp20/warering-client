@@ -365,7 +365,7 @@ function DeviceList() {
               className={`overflow-auto rounded-lg shadow block sm:shadow-none ${devices.length === 0 && "hidden"
                 }`}
             >
-              <table className="w-full">
+              <table className="w-ful overflow-clip">
                 <thead className="border-b-2 border-gray-200 sm:hidden">
                   <tr>
                     <th className=" w-[10%]  text-center text-sm font-semibold tracking-wide ">

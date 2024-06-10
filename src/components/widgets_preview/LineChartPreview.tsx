@@ -10,12 +10,15 @@ import { ILineChartPreviewProp } from "../../types/widget_preview";
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
 function calculatePercentage(percent: number, baseNumber: number) {
-  const result = (percent / 100) * baseNumber;
+  const result = (percent / 60) * baseNumber;
   return result;
 }
 
 function LineChartPreview({ label, min, max }: ILineChartPreviewProp) {
+
+  max = 60
   const data = {
+    label: "Sales of the Week",
     labels: ["5", "15", "20", "21", "22", "25", "26"],
     datasets: [
       {
@@ -48,14 +51,19 @@ function LineChartPreview({ label, min, max }: ILineChartPreviewProp) {
         max: Math.floor(max),
       },
     },
+    plugins: {
+      legend: {
+        display: false,
+      },
+    }
   };
 
   return (
-    <div id="line-chart-preview" className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center ">
+    <div id="line-chart-preview" className="h-[130px] w-[100%] bg-white pt-3 relative rounded-md shadow-md flex justify-center items-center ">
       <div className="absolute left-2 top-2 text-[#1d4469] text-sm">
         {label}
       </div>
-      <div className="flex h-[100%] ">
+      <div className="flex h-[90%]">
         <Line data={data} options={options} className="flex flex-grow"></Line>
       </div>
     </div>

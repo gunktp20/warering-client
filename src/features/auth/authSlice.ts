@@ -56,6 +56,7 @@ export const login = createAsyncThunk(
   async (userInfo: ILogin, thunkApi) => {
     try {
       const response = await api.post("/auth/login", userInfo);
+      console.log(response?.data)
       const { username } = userInfo;
       return {
         ...response.data,

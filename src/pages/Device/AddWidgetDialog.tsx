@@ -132,6 +132,17 @@ export default function AddWidgetDialog(props: IProps) {
       displayAlert({ msg: "min value must be < max value", type: "error" })
       return;
     }
+    if (
+      occupation === "LineChart" &&
+      (!label || !value || min === null || !max)
+    ) {
+      displayAlert({ msg: "Please provide all value", type: "error" })
+      return;
+    }
+    if (occupation === "LineChart" && min > max) {
+      displayAlert({ msg: "min value must be < max value", type: "error" })
+      return;
+    }
     switch (occupation) {
       case "Gauge":
         widgetInfo.label = values?.label;
