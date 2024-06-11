@@ -87,7 +87,6 @@ export default function CreateApiKeyDialog({ isCreateApiKeyOpen, setIsCreateApiK
       setCreatedSuccess(true)
       return
     } catch (err) {
-      console.log(err)
       const msg = await getAxiosErrorMessage(err)
       displayAlert({ msg, type: "error" })
     }
