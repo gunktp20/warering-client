@@ -11,6 +11,7 @@ import {
   ButtonControlPreview,
   ToggleSwitchPreview,
   RangeSliderPreview,
+  LineChartPreview,
 } from "../../components/widgets_preview";
 import { Button } from "@mui/material";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
@@ -34,6 +35,7 @@ interface IProps {
   setIsEditDisplayShow: (active: boolean) => void;
   fetchAllWidgets: () => void;
   setSelectedWidget: (_: string) => void;
+  hookEditSuccess: () => void
 }
 
 interface IConfigWidget {
@@ -175,6 +177,17 @@ export default function EditWidgetDialog(props: IProps) {
       });
       return;
     }
+    if (
+      occupation === "LineChart" &&
+      (!label || !value || min === null || !max)
+    ) {
+      displayAlert({ msg: "Please provide all value", type: "error" })
+      return;
+    }
+    if (occupation === "LineChart" && (min !== undefined ? min : 0) > (max !== undefined ? max : 0)) {
+      displayAlert({ msg: "min value must be < max value", type: "error" })
+      return;
+    }
     switch (occupation) {
       case "Gauge":
         widgetInfo.label = values?.label !== undefined ? values?.label : "";
@@ -259,6 +272,21 @@ export default function EditWidgetDialog(props: IProps) {
           });
           return;
         }
+      case "LineChart":
+        try {
+          widgetInfo.label = values?.label !== undefined ? values?.label : "";
+          widgetInfo.type = occupation;
+          widgetInfo.configWidget = {
+            value: values.value,
+            min: Number(values.min),
+            max: Number(values.max),
+          };
+          editWidget(widgetInfo);
+          return;
+        } catch (err: unknown) {
+          displayAlert({ msg: "Payload must be JSON format", type: "error" })
+          return;
+        }
     }
   };
 
@@ -271,6 +299,7 @@ export default function EditWidgetDialog(props: IProps) {
         type: "success",
       });
       props.fetchAllWidgets();
+      props.hookEditSuccess()
       props.setIsEditDisplayShow(false);
       props.setSelectedWidget("");
       setIsLoading(false);
@@ -367,6 +396,7 @@ export default function EditWidgetDialog(props: IProps) {
                 {(occupation === "Gauge" ||
                   occupation === "MessageBox" ||
                   occupation === "ToggleSwitch" ||
+                  occupation === "LineChart" ||
                   occupation === "RangeSlider") && (
                     <div className="w-[350px] sm:w-[100%] relative">
                       <FormRow
@@ -384,7 +414,7 @@ export default function EditWidgetDialog(props: IProps) {
 
             {occupation && (
               <div className="flex gap-10 mt-3 sm:flex-col sm:gap-0">
-                {(occupation === "Gauge" || occupation === "RangeSlider") && (
+                {(occupation === "Gauge" || occupation === "RangeSlider" || occupation === "LineChart") && (
                   <div className="w-[350px] sm:w-[100%]">
                     <FormRow
                       type="number"
@@ -396,7 +426,7 @@ export default function EditWidgetDialog(props: IProps) {
                     />
                   </div>
                 )}
-                {(occupation === "Gauge" || occupation === "RangeSlider") && (
+                {(occupation === "Gauge" || occupation === "RangeSlider" || occupation === "LineChart") && (
                   <div className="w-[350px] sm:w-[100%]">
                     <FormRow
                       type="number"
@@ -514,6 +544,15 @@ export default function EditWidgetDialog(props: IProps) {
               <div className="flex gap-10 mt-5 sm:flex-col sm:gap-0 w-[100%]">
                 <RangeSliderPreview
                   label={values.label !== undefined ? values.label : "label"}
+                />
+              </div>
+            )}
+            {occupation === "LineChart" && (
+              <div className="flex gap-10 mt-5 sm:flex-col sm:gap-0 w-[100%]">
+                <LineChartPreview
+                  label={values.label !== undefined ? values.label : "label"}
+                  min={0}
+                  max={1}
                 />
               </div>
             )}

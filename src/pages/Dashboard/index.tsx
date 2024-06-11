@@ -136,6 +136,12 @@ function KanbanBoard() {
       type: "error",
     });
   };
+  const onUpdateSuccess = () => {
+    displayAlert({
+      msg: "Your widget was updated",
+      type: "success",
+    });
+  };
 
   const onAddWidgetSuccess = async () => {
     await fetchDashboardById();
@@ -375,6 +381,7 @@ function KanbanBoard() {
           setIsEditDisplayShow={setIsEditDisplayShow}
           fetchAllWidgets={fetchWidgetsInDashboard}
           setSelectedWidget={setSelectedWidget}
+          hookEditSuccess={onUpdateSuccess}
         />
       )}
       <div className="flex h-[100%]">

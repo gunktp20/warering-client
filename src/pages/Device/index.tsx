@@ -16,6 +16,7 @@ import Wrapper from "../../assets/wrappers/Device";
 import { LuEye } from "react-icons/lu";
 import { LuEyeOff } from "react-icons/lu";
 import { MqttClient } from "mqtt";
+import { FaRegCopy } from "react-icons/fa";
 import {
   ButtonControl,
   Gauge,
@@ -46,6 +47,8 @@ import useAlert from "../../hooks/useAlert";
 import * as XLSX from "xlsx"
 import useTimeout from "../../hooks/useTimeout";
 import connectEMQX from "../../utils/connectEMQX";
+import copy from "copy-to-clipboard";
+import Tooltip from "../../components/ToolTip";
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
 interface IDevice {
@@ -82,9 +85,9 @@ function Device() {
   const axiosPrivate = useAxiosPrivate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isEditDisplayShow, setIsEditDisplayShow] = useState<boolean>(false);
-  const { showAlert, alertText, alertType } = useAppSelector((state) => state.widget)
   const { token } = useAppSelector((state) => state.auth)
-  const alert = useAlert()
+  const widgetState = useAppSelector((state) => state.widget)
+  const { showAlert, alertText, alertType, displayAlert } = useAlert()
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -121,7 +124,7 @@ function Device() {
       setIsLoading(false);
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err);
-      alert.displayAlert({ msg, type: "error" })
+      displayAlert({ msg, type: "error" })
       setIsLoading(false);
     }
   };
@@ -134,7 +137,7 @@ function Device() {
       setIsLoading(false);
     } catch (err) {
       const msg = await getAxiosErrorMessage(err);
-      alert.displayAlert({ msg, type: "error" })
+      displayAlert({ msg, type: "error" })
       setIsLoading(false);
     }
   };
@@ -235,6 +238,10 @@ function Device() {
     }
   }
 
+  const hookEditSuccess = () => {
+    displayAlert({ msg: "Your widget was updated", type: "success" })
+  }
+
   const exportJsonFile = async () => {
     try {
       const allPayload = await getAllPayload()
@@ -247,7 +254,7 @@ function Device() {
       document.body.removeChild(link);
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err)
-      alert.displayAlert({ msg, type: "error" })
+      displayAlert({ msg, type: "error" })
     }
   }
 
@@ -262,7 +269,7 @@ function Device() {
       XLSX.writeFile(wb, `${device_id}_${new Date()}.xlsx`)
     } catch (err) {
       const msg = await getAxiosErrorMessage(err)
-      alert.displayAlert({ msg, type: "error" })
+      displayAlert({ msg, type: "error" })
     }
   }
 
@@ -287,6 +294,7 @@ function Device() {
           setIsEditDisplayShow={setIsEditDisplayShow}
           fetchAllWidgets={fetchAllWidgets}
           setSelectedWidget={setSelectedWidget}
+          hookEditSuccess={hookEditSuccess}
         />
       )}
 
@@ -403,7 +411,20 @@ function Device() {
                 {deviceInfo?.qos}
               </div>
             </div>
-
+            {/* Domain */}
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="qos-info">
+              Mqtt-Domain
+              <div className="flex gap-3 font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
+                <Tooltip text="copy to clipboard">
+                  <FaRegCopy className="cursor-pointer hover:text-primary-500 transition-all" onClick={() => {
+                    copy(import.meta.env.VITE_EMQX_DOMAIN);
+                    displayAlert({ msg: "copied to clipboard", type: "success" })
+                  }} />
+                </Tooltip>
+                {import.meta.env.VITE_EMQX_DOMAIN}
+              </div>
+            </div>
+            {/* Retain */}
             <div className="flex flex-col">
               <label
                 htmlFor="retain-checkbox"
@@ -435,16 +456,17 @@ function Device() {
                 onClick={() => {
                   setIsTopicsShow(!isTopicsShow);
                 }}
-                className="text-[#0075ff] px-3 py-1 border-[1px] text-[12.4px] rounded-md border-[#0075ff] flex font-medium mt-2 "
+                className="text-[#0075ff] px-3 py-1 border-[1px] text-[12.4px] rounded-md border-[#0075ff] flex font-medium mt-2 hover:bg-[#0075ff] hover:text-[#fff] "
                 id="view-topics-btn"
               >
                 View Topics
               </button>
             </div>
+
           </div>
           {/* End Device info container */}
 
-          <div onClick={exportJsonFile} className="text-[#1d4469] text-[20px] mt-8 font-bold">
+          <div className="text-[#1d4469] text-[20px] mt-8 font-bold">
             JSON view
           </div>
           <div className="text-[#7a7a7a text-sm text-[13.2px]">
@@ -618,6 +640,16 @@ function Device() {
               severity={alertType}
               showSnackBar={showAlert}
               snackBarText={alertText}
+            />
+          </div>
+        )}
+        {widgetState.showAlert && (
+          <div className="block sm:hidden">
+            <SnackBar
+              id="device-state-snackbar"
+              severity={widgetState.alertType}
+              showSnackBar={widgetState.showAlert}
+              snackBarText={widgetState.alertText}
             />
           </div>
         )}

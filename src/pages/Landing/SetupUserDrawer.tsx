@@ -125,18 +125,15 @@ function SetupUserDrawer(props: IDrawer) {
       (!confirm_password && !isMember)
     ) {
       showDisplayAlert("error", "Please provide all value");
-
       return;
     }
     if (!isMember && confirm_password !== password) {
       showDisplayAlert("error", "Confirm password should be the same password");
-
       return;
     }
 
     if (!isMember && !isAcceptTerm) {
       showDisplayAlert("error", "You must accept term and condition before");
-
       return;
     }
 

@@ -5,6 +5,8 @@ import Slide from "@mui/material/Slide";
 import { TransitionProps } from "@mui/material/transitions";
 import { FaCopy } from "react-icons/fa";
 import copy from "copy-to-clipboard";
+import { SnackBar } from "../../components"
+import useAlert from "../../hooks/useAlert";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -25,6 +27,8 @@ export default function TopicsDialog(props: IProps) {
   const handleClose = () => {
     props.setTopicsDialogShow(false);
   };
+
+  const { showAlert, alertText, alertType, displayAlert } = useAlert()
 
   return (
     <React.Fragment>
@@ -48,11 +52,12 @@ export default function TopicsDialog(props: IProps) {
             <div className="flex flex-col mb-6 bg-[#f2f2f2] px-5 py-3 rounded-md">
               <div className="mb-[12px] text-[12.3px] justify-between flex items-center">
                 Publish
-                <div className="cursor-pointer">
+                <div className="cursor-pointer hover:text-primary-600 transition-all">
                   <FaCopy
                     id="clipboard-publish-topic"
                     onClick={() => {
                       copy(props.topics[0]);
+                      displayAlert({ msg: "copied to clipboard", type: "success" })
                     }}
                     className="text-[14.5px]"
                   />
@@ -65,11 +70,12 @@ export default function TopicsDialog(props: IProps) {
             <div className="flex flex-col mb-6 bg-[#f2f2f2] px-5 py-3 rounded-md">
               <div className="mb-[12px] text-[12.3px] justify-between flex items-center ">
                 Subscribe
-                <div className="cursor-pointer">
+                <div className="cursor-pointer hover:text-primary-600 transition-all">
                   <FaCopy
                     id="clipboard-subscribe-topic"
                     onClick={() => {
                       copy(props.topics[1]);
+                      displayAlert({ msg: "copied to clipboard", type: "success" })
                     }}
                     className="text-[14.5px]"
                   />
@@ -80,6 +86,16 @@ export default function TopicsDialog(props: IProps) {
               </div>
             </div>
           </div>
+          {showAlert && (
+            <div className="block sm:hidden">
+              <SnackBar
+                id="device-page-snackbar"
+                severity={alertType}
+                showSnackBar={showAlert}
+                snackBarText={alertText}
+              />
+            </div>
+          )}
         </DialogContentText>
       </Dialog>
     </React.Fragment>

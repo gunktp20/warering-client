@@ -34,6 +34,7 @@ interface IProps {
   isEditDisplayShow: boolean;
   setIsEditDisplayShow: (active: boolean) => void;
   fetchAllWidgets: () => void;
+  hookEditSuccess: () => void
   setSelectedWidget: (_: string) => void;
 }
 
@@ -170,6 +171,17 @@ export default function EditWidgetDialog(props: IProps) {
       });
       return;
     }
+    if (
+      occupation === "LineChart" &&
+      (!label || !value || min === null || !max)
+    ) {
+      displayAlert({ msg: "Please provide all value", type: "error" })
+      return;
+    }
+    if (occupation === "LineChart" && min > max) {
+      displayAlert({ msg: "min value must be < max value", type: "error" })
+      return;
+    }
     switch (occupation) {
       case "Gauge":
         widgetInfo.label = values?.label;
@@ -251,6 +263,21 @@ export default function EditWidgetDialog(props: IProps) {
           });
           return;
         }
+      case "LineChart":
+        try {
+          widgetInfo.label = values?.label;
+          widgetInfo.type = occupation;
+          widgetInfo.configWidget = {
+            value: values.value,
+            min: Number(values.min),
+            max: Number(values.max),
+          };
+          editWidget(widgetInfo);
+          return;
+        } catch (err: unknown) {
+          displayAlert({ msg: "Payload must be JSON format", type: "error" })
+          return;
+        }
     }
   };
 
@@ -265,6 +292,7 @@ export default function EditWidgetDialog(props: IProps) {
       props.fetchAllWidgets();
       props.setIsEditDisplayShow(false);
       props.setSelectedWidget("");
+      props.hookEditSuccess()
       setIsLoading(false);
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err);
@@ -476,6 +504,7 @@ export default function EditWidgetDialog(props: IProps) {
                 />
               </div>
             )}
+
             {occupation === "MessageBox" && (
               <div className="flex gap-10 mt-5 sm:flex-col sm:gap-0 w-[100%]">
                 <MessageBoxPreview

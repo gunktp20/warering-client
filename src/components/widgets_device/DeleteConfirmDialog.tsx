@@ -54,7 +54,7 @@ function DeleteConfirmDialog({
       setIsLoading(false);
       setIsDeleteConfirmOpen(false);
       fetchAllWidgets();
-      dispatch(displayWidgetAlert({ msg: "Deleted your widget", type: "error" }))
+      dispatch(displayWidgetAlert({ msg: "Your widget was deleted", type: "error" }))
       clearWidgetAlert()
     } catch (err) {
       const msg = await getAxiosErrorMessage(err)
