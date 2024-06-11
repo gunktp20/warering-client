@@ -10,17 +10,11 @@ import {
   forgetPassword,
   clearAlert,
   displayAlert,
-  setAuthLoading,
-  setProfileImg
 } from "../../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { Link, useNavigate } from "react-router-dom";
 import { FormRow } from "../../components";
 import { Alert, Button } from "@mui/material";
-import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
-import { AccessTokenPayload } from "../../features/auth/types";
-import { jwtDecode } from "jwt-decode";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -68,25 +62,7 @@ export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsM
   const [values, setValues] = useState<IValue>(initialState);
   const [isForgetPassword, setIsForgetPassword] = useState<boolean>(false);
   const [isAcceptTerm, setIsAcceptTerm] = useState<boolean>(false);
-  const axiosPrivate = useAxiosPrivate()
   const dispatch = useAppDispatch();
-
-  const getUserProfile = async (token: string) => {
-    const decoded: AccessTokenPayload | undefined = token
-      ? jwtDecode(token)
-      : undefined;
-
-    dispatch(setAuthLoading(true));
-    try {
-      const { data } = await axiosPrivate.get(`/users/${decoded?.sub}`);
-      dispatch(setProfileImg(data?.profileUrl));
-      dispatch(setAuthLoading(false));
-    } catch (err: unknown) {
-      const msg = await getAxiosErrorMessage(err);
-      showDisplayAlert("error", msg);
-      dispatch(setAuthLoading(false));
-    }
-  };
 
   const showDisplayAlert = (
     alertType: "warning" | "error" | "info" | "success",
@@ -154,7 +130,6 @@ export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsM
     if (isMember) {
       const responseLogin = await dispatch(login(values));
       if (responseLogin.meta.requestStatus === "fulfilled") {
-        getUserProfile(responseLogin.payload.access_token)
         navigate("/");
         return;
       }
