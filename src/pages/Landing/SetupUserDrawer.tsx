@@ -281,21 +281,7 @@ function SetupUserDrawer(props: IDrawer) {
                   </div>
                 )}
                 {isMember && (
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center">
-                      <input
-                        id="remember-user-drawer-checkbox"
-                        type="checkbox"
-                        value=""
-                        className="w-[13px] h-[13px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#ffffff00] focus:ring-2"
-                      />
-                      <label
-                        htmlFor="link-checkbox"
-                        className="ms-2 text-[11.5px] font-medium text-gray-900 "
-                      >
-                        Remember me
-                      </label>
-                    </div>
+                  <div className="flex justify-end items-center">
                     <div className="flex items-center">
                       <button
                         onClick={() => {
