@@ -167,7 +167,6 @@ function SetupUserDrawer(props: IDrawer) {
                   value={values.email_forget_password}
                   handleChange={handleChange}
                 />
-
                 <Button
                   onClick={() => {
                     onSubmit();
@@ -199,7 +198,6 @@ function SetupUserDrawer(props: IDrawer) {
                 <h3 className="text-left text-[27px] mt-1 font-bold mb-3 text-[#1D4469]" id="setup-user-drawer-title">
                   {isMember ? "Sign In" : "Sign Up"}
                 </h3>
-
                 {showAlert && alertType && (
                   <Alert
                     severity={alertType}
@@ -209,14 +207,12 @@ function SetupUserDrawer(props: IDrawer) {
                     {alertText}
                   </Alert>
                 )}
-
                 <FormRow
                   type="text"
                   name="username"
                   value={values.username}
                   handleChange={handleChange}
                 />
-
                 {!isMember && (
                   <FormRow
                     type="text"
@@ -244,14 +240,12 @@ function SetupUserDrawer(props: IDrawer) {
                     handleChange={handleChange}
                   />
                 )}
-
                 <FormRow
                   type="password"
                   name="password"
                   value={values.password}
                   handleChange={handleChange}
                 />
-
                 {!isMember && (
                   <FormRow
                     type="password"
@@ -261,7 +255,6 @@ function SetupUserDrawer(props: IDrawer) {
                     handleChange={handleChange}
                   />
                 )}
-
                 {!isMember && (
                   <div className="flex items-center">
                     <input
@@ -287,7 +280,6 @@ function SetupUserDrawer(props: IDrawer) {
                     </label>
                   </div>
                 )}
-
                 {isMember && (
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
@@ -318,7 +310,6 @@ function SetupUserDrawer(props: IDrawer) {
                     </div>
                   </div>
                 )}
-
                 <Button
                   onClick={() => {
                     onSubmit();
@@ -328,7 +319,6 @@ function SetupUserDrawer(props: IDrawer) {
                     width: "100%",
                     height: "39px",
                     marginTop: "1.5rem",
-
                   }}
                   sx={{
                     bgcolor: "#1966fb",
