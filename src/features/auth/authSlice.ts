@@ -17,7 +17,7 @@ const token = localStorage.getItem("token");
 
 const initialState: IAuthState = {
   user: user ? JSON.parse(user) : null,
-  profileImg: "",
+  profileImg: user ? JSON.parse(user).profileUrl : "",
   token: token || null,
   isLoading: false,
   showAlert: false,
@@ -53,16 +53,14 @@ export const register = createAsyncThunk(
 
 export const login = createAsyncThunk(
   "auth/login",
-  async (userInfo: ILogin, thunkApi) => {
+  async (userLoginInfo: ILogin, thunkApi) => {
     try {
-      const response = await api.post("/auth/login", userInfo);
-      console.log(response?.data)
-      const { username } = userInfo;
+      const { data } = await api.post("/auth/login", userLoginInfo);
+      const { userInfo, access_token } = data;
+      const { username } = userLoginInfo;
       return {
-        ...response.data,
-        user: {
-          username,
-        },
+        access_token,
+        user: { ...userInfo, username },
       };
     } catch (err: any) {
       const msg = await getAxiosErrorMessage(err);
@@ -221,8 +219,9 @@ const AuthSlice = createSlice({
         const roles = decoded?.roles || [];
         user.roles = roles;
         state.isLoading = false;
-        state.user = { ...user, roles: undefined };
+        state.user = { ...user };
         state.token = access_token;
+        state.profileImg = user.profileUrl;
         addUserToLocalStorage(user, access_token);
       }),
       builder.addCase(login.rejected, (state, action) => {

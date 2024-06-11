@@ -25,7 +25,6 @@ function Overview() {
   const fetchDeviceOverview = async () => {
     try {
       const response = await axiosPrivate.get(`/api/overview`);
-      console.log(response)
       dispatch(setDeviceOverview(response?.data));
     } catch (err: unknown) {
       console.log(err)

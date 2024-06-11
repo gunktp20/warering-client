@@ -25,7 +25,6 @@ const useAxiosPrivate = () => {
       (response) => response,
       async (error) => {
         const pervRequest = error?.config;
-        console.log("AxiosPrivate || ", error)
         if (error?.response?.status === 403 && !pervRequest._retry) {
           pervRequest._retry = true;
 
