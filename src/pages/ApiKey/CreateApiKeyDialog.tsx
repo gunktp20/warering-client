@@ -127,16 +127,21 @@ export default function CreateApiKeyDialog({ isCreateApiKeyOpen, setIsCreateApiK
 
   const onSubmit = async () => {
     const { name, description, expireIn } = values
-    if (!name || !description || !expireIn) {
-      displayAlert({ msg: "Please provide all value", type: "error" })
+    if (!name || !description) {
+      displayAlert({ msg: "Please provide name and description", type: "error" })
       return
     }
+
+    if (expireIn === "") {
+      await createApiKey()
+      return
+    }
+
     const isItEarlierThanToDay = await !isDateTodayOrFuture(expireIn)
     if (isItEarlierThanToDay) {
       displayAlert({ msg: "The expiration date must be from today onwards ", type: "error" })
       return
     }
-    await createApiKey()
   }
 
 

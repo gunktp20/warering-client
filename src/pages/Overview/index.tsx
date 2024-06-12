@@ -1,4 +1,4 @@
-import { BigNavbar, NavLinkSidebar, AccountUserDrawer } from "../../components";
+import { BigNavbar, NavLinkSidebar, AccountUserDrawer, SnackBar } from "../../components";
 import Wrapper from "../../assets/wrappers/Overview";
 import { GoCpu } from "react-icons/go";
 import { NavDialog } from "../../components/";
@@ -10,6 +10,8 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { HiOutlineStatusOnline } from "react-icons/hi";
 import { MdOutlineWifiOff } from "react-icons/md";
 import { IoBan } from "react-icons/io5";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import useAlert from "../../hooks/useAlert";
 
 function Overview() {
 
@@ -18,6 +20,7 @@ function Overview() {
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
   const { deviceOffline, deviceOnline, totalDevice, totalDeviceDeny } =
     useAppSelector((state) => state.device);
+  const { showAlert, alertText, alertType, displayAlert } = useAlert()
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
@@ -27,16 +30,21 @@ function Overview() {
       const response = await axiosPrivate.get(`/api/overview`);
       dispatch(setDeviceOverview(response?.data));
     } catch (err: unknown) {
-      console.log(err)
+      const msg = await getAxiosErrorMessage(err)
+      displayAlert({ msg, type: "error" })
     }
   };
 
   const intervalIdRef = useRef<number | null>(null);
 
   useEffect(() => {
+    fetchDeviceOverview();
+  }, [])
+
+  useEffect(() => {
     const intervalId = window.setInterval(() => {
       fetchDeviceOverview();
-    }, 25000);
+    }, 5000);
 
     intervalIdRef.current = intervalId;
 
@@ -156,6 +164,16 @@ function Overview() {
           </div>
         </div>
       </div>
+      {showAlert && (
+        <div className="block sm:hidden">
+          <SnackBar
+            id="overview-snackbar"
+            severity={alertType}
+            showSnackBar={showAlert}
+            snackBarText={alertText}
+          />
+        </div>
+      )}
     </Wrapper>
   );
 }

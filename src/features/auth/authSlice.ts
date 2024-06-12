@@ -23,6 +23,13 @@ const initialState: IAuthState = {
   showAlert: false,
   alertText: "",
   alertType: "",
+  username: "",
+  firstName: "",
+  lastName: "",
+  email: "",
+  password: "",
+  confirm_password: "",
+  email_forget_password: "",
 };
 
 const addUserToLocalStorage: AddUserFunc = (user, token) => {
@@ -130,6 +137,13 @@ const AuthSlice = createSlice({
   name: "auth",
   initialState: initialState,
   reducers: {
+    handleChange: (state, action) => {
+      const { name, value } = action.payload.target;
+      return {
+        ...state,
+        [name]: value,
+      };
+    },
     clearAlert: (state) => {
       return {
         ...state,
@@ -298,6 +312,7 @@ const AuthSlice = createSlice({
 
 export const {
   logout,
+  handleChange,
   clearAlert,
   displayAlert,
   setCredential,

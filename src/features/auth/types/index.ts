@@ -5,6 +5,13 @@ export interface IAuthState {
     lastname: string;
     email: string;
   } | null;
+  username: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirm_password: string;
+  email_forget_password: string;
   profileImg: string;
   token: string | null;
   isLoading: boolean;

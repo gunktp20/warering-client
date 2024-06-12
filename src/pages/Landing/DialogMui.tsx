@@ -15,6 +15,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { Link, useNavigate } from "react-router-dom";
 import { FormRow } from "../../components";
 import { Alert, Button } from "@mui/material";
+import { handleChange } from "../../features/auth/authSlice";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -32,35 +33,14 @@ interface IDrawer {
   isMember: boolean;
 }
 
-interface IValue {
-  username: string;
-  firstName: string | undefined;
-  lastName: string | undefined;
-  email: string | undefined;
-  password: string;
-  confirm_password: string | undefined;
-  email_forget_password: string | undefined;
-}
-
-const initialState: IValue = {
-  username: "",
-  firstName: "",
-  lastName: "",
-  email: "",
-  password: "",
-  confirm_password: "",
-  email_forget_password: "",
-};
-
 export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsMember, isMember }: IDrawer) {
   const { isLoading, showAlert, alertText, alertType } = useAppSelector(
     (state) => state.auth
   );
 
   const navigate = useNavigate();
-
-  const [values, setValues] = useState<IValue>(initialState);
   const [isForgetPassword, setIsForgetPassword] = useState<boolean>(false);
+  const { username, firstName, lastName, email, password, confirm_password, email_forget_password } = useAppSelector((state) => state.auth)
   const [isAcceptTerm, setIsAcceptTerm] = useState<boolean>(false);
   const dispatch = useAppDispatch();
 
@@ -79,20 +59,7 @@ export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsM
     }, 4000);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValues({ ...values, [e.target.name]: e.target.value });
-  };
-
   const onSubmit = async () => {
-    const {
-      username,
-      firstName,
-      lastName,
-      email,
-      password,
-      confirm_password,
-      email_forget_password,
-    } = values;
 
     if (isForgetPassword) {
       if (!email_forget_password) {
@@ -128,17 +95,21 @@ export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsM
     }
 
     if (isMember) {
-      const responseLogin = await dispatch(login(values));
+      const responseLogin = await dispatch(login({ username, password }));
       if (responseLogin.meta.requestStatus === "fulfilled") {
         navigate("/");
         return;
       }
       return;
     } else {
-      await dispatch(register(values));
+      await dispatch(register({ username, firstName, lastName, email, password, confirm_password }));
       return;
     }
   };
+
+  const authHandleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(handleChange(event))
+  }
 
   const handleClose = () => {
     setIsDrawerOpen(false);
@@ -191,9 +162,10 @@ export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsM
 
                 <FormRow
                   type="text"
+                  id="email_forget_password_dialog"
                   name="email_forget_password"
                   labelText="Email"
-                  value={values.email_forget_password}
+                  value={email_forget_password}
                   handleChange={handleChange}
                 />
 
@@ -225,7 +197,7 @@ export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsM
               </div>
             ) : (
               <div>
-                <h3 id="endpoint-set-up-user-title" className="text-left text-[27px] mt-1 font-bold mb-3 text-[#1D4469]">
+                <h3 id="endpoint-set-up-user-title-dialog" className="text-left text-[27px] mt-1 font-bold mb-3 text-[#1D4469]">
                   {isMember ? "Sign In" : "Sign Up"}
                 </h3>
 
@@ -241,52 +213,58 @@ export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsM
                 <FormRow
                   type="text"
                   name="username"
-                  value={values.username}
-                  handleChange={handleChange}
+                  id="username_dialog"
+                  value={username}
+                  handleChange={authHandleChange}
                 />
 
                 {!isMember && (
                   <FormRow
                     type="text"
                     name="firstName"
+                    id="firstName_dialog"
                     labelText="firstname"
-                    value={values.firstName}
-                    handleChange={handleChange}
+                    value={firstName}
+                    handleChange={authHandleChange}
                   />
                 )}
                 {!isMember && (
                   <FormRow
                     type="text"
                     name="lastName"
+                    id="lastName_dialog"
                     labelText="lastname"
-                    value={values.lastName}
-                    handleChange={handleChange}
+                    value={lastName}
+                    handleChange={authHandleChange}
                   />
                 )}
                 {!isMember && (
                   <FormRow
                     type="text"
                     name="email"
+                    id="email_dialog"
                     labelText="email"
-                    value={values.email}
-                    handleChange={handleChange}
+                    value={email}
+                    handleChange={authHandleChange}
                   />
                 )}
 
                 <FormRow
                   type="password"
                   name="password"
-                  value={values.password}
-                  handleChange={handleChange}
+                  id="password_dialog"
+                  value={password}
+                  handleChange={authHandleChange}
                 />
 
                 {!isMember && (
                   <FormRow
                     type="password"
                     name="confirm_password"
+                    id="confirm_password_dialog"
                     labelText="confirm password"
-                    value={values.confirm_password}
-                    handleChange={handleChange}
+                    value={confirm_password}
+                    handleChange={authHandleChange}
                   />
                 )}
 
