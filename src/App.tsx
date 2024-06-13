@@ -21,7 +21,7 @@ import ApiKeys from "./pages/ApiKey";
 import ApiKeyInformation from "./pages/ApiKey/ApiKeyInformation";
 
 function App() {
-  console.log(import.meta.env);
+  console.log(import.meta.env.VITE_EMQX_DOMAIN);
   console.log("process.env ",process.env)
   return (
     <BrowserRouter>
