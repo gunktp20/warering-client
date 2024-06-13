@@ -8,6 +8,10 @@ const initialState: IDeviceState = {
   totalDevice: 0,
   totalDeviceDeny: 0,
   devices: [],
+  selectedDevice: "",
+  alertType: "error",
+  alertText: "",
+  showAlert: false,
 };
 
 const DeviceSlice = createSlice({
@@ -31,9 +35,38 @@ const DeviceSlice = createSlice({
         devices: action.payload,
       };
     },
+    setSelectedDevice: (state, action) => {
+      return {
+        ...state,
+        selectedDevice: action.payload,
+      };
+    },
+    displayAlert: (state, action) => {
+      const { msg, type } = action.payload;
+      return {
+        ...state,
+        alertText: msg,
+        alertType: type,
+        showAlert: true,
+      };
+    },
+    clearAlert: (state) => {
+      return {
+        ...state,
+        alertText: "",
+        alertType: "error",
+        showAlert: false,
+      };
+    },
   },
 });
 
-export const { setDeviceOverview , setDevices} = DeviceSlice.actions;
+export const {
+  setDeviceOverview,
+  setDevices,
+  setSelectedDevice,
+  displayAlert,
+  clearAlert
+} = DeviceSlice.actions;
 
 export default DeviceSlice.reducer;

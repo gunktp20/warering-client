@@ -7,10 +7,10 @@ const NotFound = () => {
         <Wrapper>
             <div>
                 <img src={img} alt='not found' className='w-[400px] h-[400px]' />
-                <div className='text-[#303030] mb-3 text-[20px]'>Ohh! page not found</div>
-                <div className='text-[#838383]'>we can't seem to find the page you are looking for</div>
+                <div id="page-not-found-title" className='text-[#303030] mb-3 text-[20px]'>Ohh! page not found</div>
+                <div id="page-not-found-detail" className='text-[#838383]'>we can't seem to find the page you are looking for</div>
                 <div className='text-[#45a2f9] mt-8'>
-                    <Link to='/home' className="px-9 py-2 rounded-md text-white border-[#45a2f9] border-[2px] hover:bg-[#45a2f9] hover:text-white">back home</Link>
+                    <Link to='/home' id="back-to-home-btn" className="px-9 py-2 rounded-md text-white border-[#45a2f9] border-[2px] hover:bg-[#45a2f9] hover:text-white">back home</Link>
                 </div>
             </div>
         </Wrapper>

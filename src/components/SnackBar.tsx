@@ -2,11 +2,10 @@ import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 
 interface IProp {
-  id:string
+  id: string;
   severity: "error" | "success" | "warning" | "info";
   showSnackBar: boolean;
   snackBarText: string;
-  setShowSnackBar: (active: boolean) => void;
 }
 
 export default function SnackBar({
@@ -33,8 +32,8 @@ export default function SnackBar({
             fontSize: "12px",
             alignItems: "center",
             paddingX: "2rem",
-            border:severity === "error" ? 1:0,
-            borderColor:severity === "error" ? "#d7414128":null,
+            border: severity === "error" ? 1 : 0,
+            borderColor: severity === "error" ? "#d7414128" : null,
           }}
         >
           {snackBarText}

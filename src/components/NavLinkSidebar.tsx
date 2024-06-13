@@ -4,21 +4,25 @@ import { VscGraph } from "react-icons/vsc";
 import { NavLink } from "react-router-dom";
 
 interface IProp {
-  isSidebarShow:boolean,
+  isSidebarShow: boolean;
 }
 
-const NavLinks = (props:IProp) => {
-  
+const NavLinkSidebar = (props: IProp) => {
   return (
-    <div className={`bg-[#fff] h-[100v%] w-[300px] shadow-md pt-5 w-sm flex flex-col sm:hidden transition-all ${!props.isSidebarShow && "ml-[-17.8rem]"}`}>
+    <div
+      id="nav-links-side-bar"
+      className={`bg-[#fff] w-[300px] shadow-md pt-5 w-sm flex flex-col sm:hidden transition-all ${
+        !props.isSidebarShow && "ml-[-17.8rem]"
+      }`}
+    >
       <div className="flex flex-col">
         <NavLink
           to="/"
-          id="overview-navlink-sidebar"
+          id="overview-nav-link-sidebar"
           key={1}
           onClick={() => {}}
           className={({ isActive }) =>
-            `flex pl-10 p-5 items-center text-[14px] ${
+            `flex pl-10 p-5 items-center text-[14px] font-semibold ${
               isActive ? "text-[#1966fb]" : "text-[#1d4469]"
             }`
           }
@@ -28,11 +32,11 @@ const NavLinks = (props:IProp) => {
         </NavLink>
         <NavLink
           to="/dashboard-list"
-          id="dashboard-navlink-sidebar"
+          id="dashboard-nav-link-sidebar"
           key={2}
           onClick={() => {}}
           className={({ isActive }) =>
-            `flex pl-10 p-5 items-center text-[14px] ${
+            `flex pl-10 p-5 items-center text-[14px] font-semibold ${
               isActive ? "text-[#1966fb]" : "text-[#1d4469]"
             }`
           }
@@ -44,10 +48,10 @@ const NavLinks = (props:IProp) => {
         <NavLink
           to="/device-list"
           key={3}
-          id="device-navlink-sidebar"
+          id="devices-nav-link-sidebar"
           onClick={() => {}}
           className={({ isActive }) =>
-            `flex pl-10 p-5 items-center text-[14px] ${
+            `flex pl-10 p-5 items-center text-[14px] font-semibold ${
               isActive ? "text-[#1966fb]" : "text-[#1d4469]"
             }`
           }
@@ -60,4 +64,4 @@ const NavLinks = (props:IProp) => {
   );
 };
 
-export default NavLinks;
+export default NavLinkSidebar;

@@ -1,10 +1,12 @@
-import { useAppSelector } from "../app/hooks";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { setCredential } from "../features/auth/authSlice";
 import { axiosPrivate } from "../services/api";
 import useRefreshToken from "./useRefreshToken";
 import { useEffect } from "react";
 
 const useAxiosPrivate = () => {
   const refresh = useRefreshToken();
+  const dispatch = useAppDispatch();
   const { token } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
@@ -22,17 +24,16 @@ const useAxiosPrivate = () => {
     const responseIntercept = axiosPrivate.interceptors.response.use(
       (response) => response,
       async (error) => {
-        console.log("Error axios in AxiosPrivate",error)
         const pervRequest = error?.config;
-
-        if (error?.response?.status === 403 && !pervRequest?.sent) {
-          pervRequest.sent = true;
+        if (error?.response?.status === 403 && !pervRequest._retry) {
+          pervRequest._retry = true;
 
           const newAccessToken = await refresh();
-
-          pervRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-
-          return axiosPrivate(pervRequest);
+          if (newAccessToken) {
+            dispatch(setCredential(newAccessToken))
+            pervRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+            return axiosPrivate(pervRequest);
+          }
         }
         return Promise.reject(error);
       }
@@ -42,7 +43,7 @@ const useAxiosPrivate = () => {
       axiosPrivate.interceptors.request.eject(requestIntercept);
       axiosPrivate.interceptors.response.eject(responseIntercept);
     };
-  }, []);
+  }, [token]);
 
   return axiosPrivate;
 };

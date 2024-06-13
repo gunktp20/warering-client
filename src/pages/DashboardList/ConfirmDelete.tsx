@@ -1,52 +1,107 @@
-import * as React from 'react';
-import Dialog from '@mui/material/Dialog';
-import DialogContentText from '@mui/material/DialogContentText';
-import Slide from '@mui/material/Slide';
-import { TransitionProps } from '@mui/material/transitions';
+import React, { useState } from "react";
+import Dialog from "@mui/material/Dialog";
+import DialogContentText from "@mui/material/DialogContentText";
+import Slide from "@mui/material/Slide";
+import { TransitionProps } from "@mui/material/transitions";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { useAppSelector } from "../../app/hooks";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import useAlert from "../../hooks/useAlert";
+import { SnackBar } from "../../components";
 
 const Transition = React.forwardRef(function Transition(
-    props: TransitionProps & {
-        children: React.ReactElement<any, any>;
-    },
-    ref: React.Ref<unknown>,
+  props: TransitionProps & {
+    children: React.ReactElement;
+  },
+  ref: React.Ref<unknown>
 ) {
-    return <Slide direction="up" ref={ref} {...props} />;
+  return <Slide direction="up" ref={ref} {...props} />;
 });
 
 interface IProps {
-    isDeleteConfirmOpen: boolean,
-    setIsDeleteConfirmOpen: (active: boolean) => void
+  isDeleteConfirmOpen: boolean;
+  setIsDeleteConfirmOpen: (active: boolean) => void;
+  hookDeleteSuccess: () => void;
 }
 
-export default function ConfirmDelete(props: IProps) {
+export default function ConfirmDelete({ isDeleteConfirmOpen, setIsDeleteConfirmOpen, hookDeleteSuccess }: IProps) {
 
-    const handleClose = () => {
-        props.setIsDeleteConfirmOpen(false);
-    };
+  const axiosPrivate = useAxiosPrivate();
+  const { showAlert, alertText, alertType, displayAlert } = useAlert()
+  const { selectedDashboard } = useAppSelector((state) => state.dashboard)
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    return (
-        <React.Fragment>
-            <Dialog
-                open={props.isDeleteConfirmOpen}
-                TransitionComponent={Transition}
-                keepMounted
-                onClose={handleClose}
-                aria-describedby="alert-dialog-slide-description"
+  const deleteDevice = async () => {
+    setIsLoading(true);
+    try {
+      await axiosPrivate.delete(`/dashboards/${selectedDashboard}`);
+      setIsLoading(false);
+      setIsDeleteConfirmOpen(false);
+      hookDeleteSuccess();
+    } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err)
+      setIsLoading(false);
+      displayAlert({ msg, type: "error" })
+    }
+  };
+
+  const handleClose = () => {
+    if (isLoading) {
+      return;
+    }
+    setIsDeleteConfirmOpen(false);
+  };
+
+  return (
+    <React.Fragment>
+      <Dialog
+        open={isDeleteConfirmOpen}
+        TransitionComponent={Transition}
+        keepMounted
+        onClose={handleClose}
+        id="confirm-delete-dashboard-dialog"
+      >
+        <DialogContentText
+          id="confirm-delete-dashboard-dialog-content"
+          className="py-7 px-11"
+          component={"div"}
+          variant={"body2"}
+        >
+          <div className="text-[#dc3546] text-[15.5px] text-center">
+            Are you sure you want to delete?
+          </div>
+          <div className="mt-4 flex justify-center gap-3 w-[100%]">
+            <button
+              onClick={handleClose}
+              disabled={isLoading}
+              id="cancel-delete-dashboard-btn"
+              className="text-black text-[12.5px] border-[1px] border-[#000] rounded-sm px-10 py-[0.4rem]"
             >
-                <DialogContentText
-                    id="confirm-delete-dashboard-dialog"
-                    className="py-7 px-11"
-                    component={"div"}
-                    variant={"body2"}>
-                    <div className='text-[#dc3546] text-[15.5px] text-center'>
-                        Are you sure you want to delete?
-                    </div>
-                    <div className='mt-4 flex justify-center gap-3 w-[100%]'>
-                        <button onClick={handleClose} className='text-black text-[12.5px] border-[1px] border-[#000] rounded-sm px-10 py-[0.4rem]'>Cancel</button>
-                        <button className='bg-[#dc3546] text-[12.5px] text-white px-10 py-[0.4rem] rounded-sm'>Delete</button>
-                    </div>
-                </DialogContentText>
-            </Dialog>
-        </React.Fragment>
-    );
+              Cancel
+            </button>
+            <button
+              onClick={() => {
+                deleteDevice();
+              }}
+              id="confirm-delete-dashboard-btn"
+              disabled={isLoading}
+              className="bg-[#dc3546] text-[12.5px] text-white px-10 py-[0.4rem] rounded-sm"
+            >
+              Delete
+            </button>
+          </div>
+          {showAlert && (
+            <div className="block sm:hidden">
+              <SnackBar
+                id="confirm-delete-dashboard-snack-bar"
+                severity={alertType}
+                showSnackBar={showAlert}
+                snackBarText={alertText}
+              />
+            </div>
+          )}
+        </DialogContentText>
+      </Dialog>
+    </React.Fragment>
+  );
 }

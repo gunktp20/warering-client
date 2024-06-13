@@ -10,23 +10,36 @@ import {
   AddUserFunc,
   AccessTokenPayload,
 } from "./types";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 
 const user = localStorage.getItem("user");
 const token = localStorage.getItem("token");
 
 const initialState: IAuthState = {
   user: user ? JSON.parse(user) : null,
+  profileImg: user ? JSON.parse(user).profileUrl : "",
   token: token || null,
   isLoading: false,
   showAlert: false,
   alertText: "",
   alertType: "",
+  username: "",
+  firstName: "",
+  lastName: "",
+  email: "",
+  password: "",
+  confirm_password: "",
+  email_forget_password: "",
 };
 
 const addUserToLocalStorage: AddUserFunc = (user, token) => {
   localStorage.setItem("user", JSON.stringify(user));
   localStorage.setItem("token", token);
 };
+const addTokenToLocalStorage = (token: string) => {
+  localStorage.setItem("token", token);
+};
+
 export const removeUserFromLocalStorage = () => {
   localStorage.removeItem("user");
   localStorage.removeItem("token");
@@ -39,10 +52,7 @@ export const register = createAsyncThunk(
       const response = await api.post("/auth/register", userInfo);
       return response.data;
     } catch (err: any) {
-      const msg =
-        typeof err?.response?.data?.message === "object"
-          ? err?.response?.data?.message[0]
-          : err?.response?.data?.message;
+      const msg = await getAxiosErrorMessage(err);
       return thunkApi.rejectWithValue(msg);
     }
   }
@@ -50,21 +60,17 @@ export const register = createAsyncThunk(
 
 export const login = createAsyncThunk(
   "auth/login",
-  async (userInfo: ILogin, thunkApi) => {
+  async (userLoginInfo: ILogin, thunkApi) => {
     try {
-      const response = await api.post("/auth/login", userInfo);
-      const { username } = userInfo;
+      const { data } = await api.post("/auth/login", userLoginInfo);
+      const { userInfo, access_token } = data;
+      const { username } = userLoginInfo;
       return {
-        ...response.data,
-        user: {
-          username,
-        },
+        access_token,
+        user: { ...userInfo, username },
       };
     } catch (err: any) {
-      const msg =
-        typeof err?.response?.data?.message === "object"
-          ? err?.response?.data?.message[0]
-          : err?.response?.data?.message;
+      const msg = await getAxiosErrorMessage(err);
       return thunkApi.rejectWithValue(msg);
     }
   }
@@ -77,10 +83,7 @@ export const forgetPassword = createAsyncThunk(
       const response = await api.get(`/auth/forget-password/${email}`);
       return response.data;
     } catch (err: any) {
-      const msg =
-        typeof err?.response?.data?.msg === "object"
-          ? err?.response?.data?.msg[0]
-          : err?.response?.data?.msg;
+      const msg = await getAxiosErrorMessage(err);
       return thunkApi.rejectWithValue(msg);
     }
   }
@@ -96,10 +99,7 @@ export const resetPassword = createAsyncThunk(
       });
       return response.data;
     } catch (err: any) {
-      const msg =
-        typeof err?.response?.data?.message === "object"
-          ? err?.response?.data?.message[0]
-          : err?.response?.data?.message;
+      const msg = await getAxiosErrorMessage(err);
       return thunkApi.rejectWithValue(msg);
     }
   }
@@ -112,10 +112,7 @@ export const refreshToken = createAsyncThunk(
       const response = await api.get(`/auth/refresh`);
       return response.data;
     } catch (err: any) {
-      const msg =
-        typeof err?.response?.data?.message === "object"
-          ? err?.response?.data?.message[0]
-          : err?.response?.data?.message;
+      const msg = await getAxiosErrorMessage(err);
       return thunkApi.rejectWithValue(msg);
     }
   }
@@ -130,10 +127,7 @@ export const requestVerifyEmail = createAsyncThunk(
         ...data,
       };
     } catch (err: any) {
-      const msg =
-        typeof err?.response?.data?.message === "object"
-          ? err?.response?.data?.message[0]
-          : err?.response?.data?.message;
+      const msg = await getAxiosErrorMessage(err);
       return thunkApi.rejectWithValue(msg);
     }
   }
@@ -143,6 +137,13 @@ const AuthSlice = createSlice({
   name: "auth",
   initialState: initialState,
   reducers: {
+    handleChange: (state, action) => {
+      const { name, value } = action.payload.target;
+      return {
+        ...state,
+        [name]: value,
+      };
+    },
     clearAlert: (state) => {
       return {
         ...state,
@@ -170,6 +171,7 @@ const AuthSlice = createSlice({
       };
     },
     setCredential: (state, action) => {
+      addTokenToLocalStorage(action.payload);
       return {
         ...state,
         token: action.payload,
@@ -186,6 +188,18 @@ const AuthSlice = createSlice({
           roles: ["user"],
         },
         token: "demo_app",
+      };
+    },
+    setProfileImg: (state, action) => {
+      return {
+        ...state,
+        profileImg: action.payload,
+      };
+    },
+    setAuthLoading: (state, action) => {
+      return {
+        ...state,
+        isLoading: action.payload,
       };
     },
   },
@@ -219,8 +233,9 @@ const AuthSlice = createSlice({
         const roles = decoded?.roles || [];
         user.roles = roles;
         state.isLoading = false;
-        state.user = user;
+        state.user = { ...user };
         state.token = access_token;
+        state.profileImg = user.profileUrl;
         addUserToLocalStorage(user, access_token);
       }),
       builder.addCase(login.rejected, (state, action) => {
@@ -276,9 +291,9 @@ const AuthSlice = createSlice({
         state.alertText = action.payload as string;
         state.alertType = "error";
       });
-      builder.addCase(requestVerifyEmail.pending, (state) => {
-        state.isLoading = true;
-      }),
+    builder.addCase(requestVerifyEmail.pending, (state) => {
+      state.isLoading = true;
+    }),
       builder.addCase(requestVerifyEmail.fulfilled, (state, action) => {
         state.isLoading = false;
         state.showAlert = true;
@@ -295,7 +310,15 @@ const AuthSlice = createSlice({
   },
 });
 
-export const { logout, clearAlert, displayAlert, setCredential, demoAuth } =
-  AuthSlice.actions;
+export const {
+  logout,
+  handleChange,
+  clearAlert,
+  displayAlert,
+  setCredential,
+  demoAuth,
+  setProfileImg,
+  setAuthLoading,
+} = AuthSlice.actions;
 
 export default AuthSlice.reducer;

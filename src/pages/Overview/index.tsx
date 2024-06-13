@@ -1,49 +1,57 @@
-import { BigNavbar, NavLinkSidebar, AccountUserDrawer } from "../../components";
+import { BigNavbar, NavLinkSidebar, AccountUserDrawer, SnackBar } from "../../components";
 import Wrapper from "../../assets/wrappers/Overview";
 import { GoCpu } from "react-icons/go";
 import { NavDialog } from "../../components/";
 import { RiMenu2Fill } from "react-icons/ri";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { setDeviceOverview } from "../../features/device/deviceSlice";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { HiOutlineStatusOnline } from "react-icons/hi";
 import { MdOutlineWifiOff } from "react-icons/md";
 import { IoBan } from "react-icons/io5";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import useAlert from "../../hooks/useAlert";
 
 function Overview() {
+
   const dispatch = useAppDispatch();
   const axiosPrivate = useAxiosPrivate();
-  // const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
   const { deviceOffline, deviceOnline, totalDevice, totalDeviceDeny } =
     useAppSelector((state) => state.device);
+  const { showAlert, alertText, alertType, displayAlert } = useAlert()
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
 
   const fetchDeviceOverview = async () => {
-    // setIsLoading(true);
     try {
-      const { data } = await axiosPrivate.get(`/api/overview`);
-      dispatch(setDeviceOverview(data));
-      // setIsLoading(false);
-    } catch (err: any) {
-      // setIsLoading(false);
+      const response = await axiosPrivate.get(`/api/overview`);
+      dispatch(setDeviceOverview(response?.data));
+    } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err)
+      displayAlert({ msg, type: "error" })
     }
   };
 
-  useEffect(() => {
-    fetchDeviceOverview();
-  }, []);
+  const intervalIdRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const timeoutID = setInterval(() => {
+    fetchDeviceOverview();
+  }, [])
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
       fetchDeviceOverview();
     }, 5000);
 
+    intervalIdRef.current = intervalId;
+
     return () => {
-      clearInterval(timeoutID);
+      if (intervalIdRef.current !== null) {
+        clearInterval(intervalIdRef.current);
+      }
     };
   }, []);
 
@@ -71,11 +79,10 @@ function Overview() {
               setIsDrawerOpen(true);
             }}
             className="hidden p-1 w-fit h-fit relative sm:block text-[#8f8f8f] mb-6"
-            id="small-open-sidebar-btn"
+            id="toggle-nav-links-dialog-btn"
           >
             <RiMenu2Fill className="text-[23px]" />
           </button>
-
           <div
             id="title-outlet"
             className="text-[23px] text-[#1d4469] font-bold mb-10"
@@ -84,13 +91,14 @@ function Overview() {
           </div>
 
           <div className="grid w-[100%] gap-[3rem] grid-cols-2 lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 ">
-            <div className="w-[100%] device-status border-solid border-t-[4px] border-[#45a2f9] h-fit p-3 pl-5 bg-[#fff] shadow-md">
-              <div className="mb-2 text-[#1966fb]">All Device</div>
+            {/* All Device */}
+            <div id="all-devices-card" className="w-[100%] device-status border-solid border-t-[4px] border-[#45a2f9] h-fit p-3 pl-5 bg-[#fff] shadow-md">
+              <div id="all-devices-title" className="mb-2 text-[#1966fb]">All Device</div>
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <div
-                    id="total-device-val"
-                    className="text-[30px] text-[#1966fb]"
+                    id="all-devices-number"
+                    className="text-[30.5px] text-[#1966fb]"
                   >
                     {totalDevice ? totalDevice : "0"}
                   </div>
@@ -98,14 +106,13 @@ function Overview() {
                     <GoCpu className="text-[25px] text-[#45a2f9]" />
                   </div>
                 </div>
-                <div className="text-[13px] text-[#7a7a7a]">
-                  SN: Device0001 - 2024-01-07 12:57:46
+                <div className="text-[13px] text-[#7a7a7a] w-[100%] h-[10px]">
                 </div>
               </div>
             </div>
-
-            <div className="w-[100%] device-status border-solid border-t-[4px] border-[#2e7d32] h-fit p-3 pl-5 bg-[#fff] shadow-md">
-              <div className="mb-2 text-[#2e7d32]">Online Device</div>
+            {/* Online Device */}
+            <div id="online-devices-card" className="w-[100%] device-status border-solid border-t-[4px] border-[#2e7d32] h-fit p-3 pl-5 bg-[#fff] shadow-md">
+              <div id="online-devices-title" className="mb-2 text-[#2e7d32]">Online Device</div>
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <div
@@ -118,18 +125,16 @@ function Overview() {
                     <HiOutlineStatusOnline className="text-[25px] text-[#2e7d32]" />
                   </div>
                 </div>
-                <div className="text-[13px] text-[#7a7a7a]">
-                  SN: Device0001 - 2024-01-07 12:57:46
-                </div>
               </div>
             </div>
-            <div className="w-[100%] device-status border-solid border-t-[4px] border-[#7a7a7a] h-fit p-3 pl-5 bg-[#fff] shadow-md">
-              <div className="mb-2 text-[#7a7a7a]">Offline Device</div>
+            {/* Offline Devices */}
+            <div id="offline-devices-card" className="w-[100%] device-status border-solid border-t-[4px] border-[#7a7a7a] h-fit p-3 pl-5 bg-[#fff] shadow-md">
+              <div id="offline-devices-title" className="mb-2 text-[#7a7a7a]">Offline Device</div>
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <div
-                    id="device-offline-val"
-                    className="text-[30px] text-[#7a7a7a]"
+                    id="offline-devices-number"
+                    className="text-[30.5px] text-[#7a7a7a]"
                   >
                     {deviceOffline ? deviceOffline : "0"}
                   </div>
@@ -137,19 +142,16 @@ function Overview() {
                     <MdOutlineWifiOff className="text-[25px] text-[#7a7a7a]" />
                   </div>
                 </div>
-                <div className="text-[13px] text-[#7a7a7a]">
-                  SN: Device0001 - 2024-01-07 12:57:46
-                </div>
               </div>
             </div>
-
-            <div className="w-[100%] device-status border-solid border-t-[4px] border-[#dc3546] h-fit p-3 pl-5 bg-[#fff] shadow-md">
-              <div className="mb-2 text-[#dc3546]">Denied Device</div>
+            {/* Denied Devices */}
+            <div id="denied-devices-card" className="w-[100%] device-status border-solid border-t-[4px] border-[#dc3546] h-fit p-3 pl-5 bg-[#fff] shadow-md">
+              <div id="denied-devices-title" className="mb-2 text-[#dc3546]">Denied Device</div>
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <div
-                    id="total-device-val"
-                    className="text-[30px] text-[#dc3546]"
+                    id="denied-devices-number"
+                    className="text-[30.5px] text-[#dc3546]"
                   >
                     {totalDeviceDeny ? totalDeviceDeny : "0"}
                   </div>
@@ -157,15 +159,21 @@ function Overview() {
                     <IoBan className="text-[25px] text-[#dc3546]" />
                   </div>
                 </div>
-                <div className="text-[13px] text-[#7a7a7a]">
-                  SN: Device0001 - 2024-01-07 12:57:46
-                </div>
               </div>
             </div>
-            <div className="box"></div>
           </div>
         </div>
       </div>
+      {showAlert && (
+        <div className="block sm:hidden">
+          <SnackBar
+            id="overview-snackbar"
+            severity={alertType}
+            showSnackBar={showAlert}
+            snackBarText={alertText}
+          />
+        </div>
+      )}
     </Wrapper>
   );
 }

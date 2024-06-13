@@ -3,19 +3,20 @@ import {
   NavLinkSidebar,
   NavDialog,
   AccountUserDrawer,
+  SnackBar,
 } from "../../components";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { IoMdCheckmark } from "react-icons/io";
 import { RiMenu2Fill } from "react-icons/ri";
 import { IoArrowBackSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { SiMicrosoftexcel } from "react-icons/si";
 import { BsFiletypeJson } from "react-icons/bs";
-// import { FaClipboardList } from "react-icons/fa";
 import Wrapper from "../../assets/wrappers/Device";
-import mqtt, { MqttClient } from "mqtt";
 import { LuEye } from "react-icons/lu";
 import { LuEyeOff } from "react-icons/lu";
+import { MqttClient } from "mqtt";
+import { FaRegCopy } from "react-icons/fa";
 import {
   ButtonControl,
   Gauge,
@@ -32,11 +33,28 @@ import moment from "moment";
 import TopicsDialog from "./TopicsDialog";
 import AddWidgetDialog from "./AddWidgetDialog";
 import EditWidgetDialog from "./EditWidgetDialog";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import {
+  Chart as ChartJS,
+  LineElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+} from "chart.js";
+import LineChart from "../../components/widgets_device/LineChart";
+import { useAppSelector } from "../../app/hooks";
+import useAlert from "../../hooks/useAlert";
+import * as XLSX from "xlsx"
+import useTimeout from "../../hooks/useTimeout";
+import connectEMQX from "../../utils/connectEMQX";
+import copy from "copy-to-clipboard";
+import Tooltip from "../../components/ToolTip";
+ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
 interface IDevice {
   nameDevice: string;
-  qos: 0 | 1 | 2 | any;
-  topics: any[];
+  qos: 0 | 1 | 2;
+  topics: string[];
   description: string;
   createdAt: string;
   usernameDevice: string;
@@ -44,134 +62,219 @@ interface IDevice {
   retain: boolean;
 }
 
+interface IWidget {
+  id: string;
+  type: string;
+  label: string;
+  configWidget: IConfigWidget;
+}
+
+interface IConfigWidget {
+  value: string;
+  min: number;
+  max: number;
+  unit: string;
+  button_label: string;
+  payload: string;
+  on_payload: string;
+  off_payload: string;
+}
+
 function Device() {
   const navigate = useNavigate();
   const axiosPrivate = useAxiosPrivate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isEditDisplayShow, setIsEditDisplayShow] = useState<boolean>(false);
+  const { token } = useAppSelector((state) => state.auth)
+  const widgetState = useAppSelector((state) => state.widget)
+  const { showAlert, alertText, alertType, displayAlert } = useAlert()
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  let { device_id } = useParams();
+  const { device_id } = useParams();
+  // device information for connect mqtt server
+  const [publishTopic, setPublishTopic] = useState<string>("");
+  const [subScribeTopic, setSubScribeTopic] = useState<string>("");
+  const [qos, setQos] = useState<0 | 1 | 2>(0);
+  //
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
   const [deviceInfo, setDeviceInfo] = useState<IDevice>();
   const [client, setClient] = useState<MqttClient | null>(null);
-  const [connectStatus, setConnectStatus] = useState("Connect");
+  // const [connectStatus, setConnectStatus] = useState("Connect");
   const [payload, setPayload] = useState({});
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
   const [isTopicsShow, setIsTopicsShow] = useState<boolean>(false);
   const [isAddWidgetShow, setIsAddWidgetShow] = useState<boolean>(false);
-  const [selectedWidget, setSelectedWidget] = useState<any>(null);
-  const [widgets, setWidgets] = useState<any>(null);
-  const [configWidgetsDevice, setConfigWidgetsDevice] = useState<any>(null);
+  const [selectedWidget, setSelectedWidget] = useState<string>("");
+
+  const [widgets, setWidgets] = useState<IWidget[]>([]);
+  const [configWidgetsDevice, setConfigWidgetsDevice] = useState<{
+    [key: string]: string | number;
+  }>();
 
   const fetchDeviceById = async () => {
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(`/devices/${device_id}`);
       setDeviceInfo(data);
-      connectEMQX(data);
+      setPublishTopic(data?.topics[1]);
+      setSubScribeTopic(data?.topics[0]);
+      setQos(data?.qos);
+      connectMQTTServer(data);
       setIsLoading(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err);
+      displayAlert({ msg, type: "error" })
       setIsLoading(false);
     }
   };
+
   const fetchAllWidgets = async () => {
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(`/widgets/${device_id}`);
       setWidgets(data);
       setIsLoading(false);
-    } catch (err: any) {
+    } catch (err) {
+      const msg = await getAxiosErrorMessage(err);
+      displayAlert({ msg, type: "error" })
       setIsLoading(false);
     }
   };
-  const mqttPublish = (payload: any) => {
+
+  const mqttPublish = (payload: string) => {
     if (client) {
       client.publish(
-        deviceInfo?.topics[1],
+        publishTopic,
         payload,
         {
           qos: 0,
-          retain:true
+          retain: true,
         },
         (error) => {
           if (error) {
-            console.log("Publish error: ", error);
+            // console.log("Publish error: ", error);
           }
         }
       );
     }
   };
-  const connectEMQX = async (data: any) => {
-    const _mqtt = await mqtt.connect(import.meta.env.VITE_EMQX_DOMAIN, {
-      // protocol: "ws",
-      host: "localhost",
-      clientId: "emqx_react_" + Math.random().toString(16).substring(2, 8),
-      // port: 8083,
-      username: data?.usernameDevice,
-      password: data?.password,
-    });
-    setClient(_mqtt);
-  };
-  // const mqttDisconnect = () => {
-  //   if (client) {
-  //     client.end(() => {
-  //       setConnectStatus('Disconnected');
-  //     });
-  //   }
-  // };
-  useEffect(() => {
-    fetchDeviceById();
-    fetchAllWidgets();
-  }, []);
-  useEffect(() => {
-    if (client) {
-      client.on("connect", () => {
-        setConnectStatus("Connected");
-        // console.log("connection successful");
-        console.log(connectStatus);
-        if (client) {
-          client.subscribe(
-            deviceInfo?.topics[0],
-            {
-              qos: deviceInfo?.qos,
-            },
-            (err) => {
-              console.log("not sub", err);
-            }
-          );
-        }
-      });
-      // client.end(() => {
-      //   setConnectStatus('Disconnected');
-      // });
-      // client.on("error", (err) => {
-      //   console.error("Connection error: ", err);
-      //   client.end();
-      // });
-      client.on("reconnect", () => {
-        setConnectStatus("Reconnecting");
-      });
 
-      client.on("message", (topic, message) => {
-        const payload = { topic, message: message.toString() };
-        try {
-          const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
-          setConfigWidgetsDevice(payloadObject);
-          setPayload(payloadObject);
-        } catch (error) {
-          console.log(error);
-        }
+  const connectMQTTServer = useCallback(
+    async (data: { usernameDevice: string; password: string }) => {
+      const client = await connectEMQX(data.usernameDevice, data.password)
+      setClient(client);
+    },
+    []
+  );
+
+  const mqttDisconnect = () => {
+    if (client) {
+      client.end(() => {
+        // setConnectStatus("Disconnected");
       });
     }
+  };
+  useEffect(() => {
+    if (token) {
+      fetchDeviceById();
+      fetchAllWidgets();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (token) {
+      if (client) {
+        client.on("connect", () => {
+          // setConnectStatus("Connected");
+          // console.log(connectStatus);
+          if (client) {
+            client.subscribe(
+              subScribeTopic,
+              {
+                qos: qos,
+              },
+              (err) => {
+                if (err) {
+                  // console.log(err);
+                }
+              }
+            );
+          }
+        });
+        client.on("reconnect", () => {
+          // setConnectStatus("Reconnecting");
+        });
+
+        client.on("message", (topic, message) => {
+          const payload = { topic, message: message.toString() };
+          try {
+            const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
+            setConfigWidgetsDevice(payloadObject);
+            setPayload(payloadObject);
+          } catch (error) {
+            // console.log(error);
+          }
+        });
+      }
+    }
+
+    return () => {
+      mqttDisconnect();
+    };
   }, [client]);
 
-  const selectWidget = async (widgetID: any) => {
+  const selectWidget = async (widgetID: string) => {
     setSelectedWidget(widgetID);
-    console.log(widgetID);
     setIsEditDisplayShow(true);
   };
+
+  const getAllPayload = async () => {
+    try {
+      const { data } = await axiosPrivate.get(`export/${device_id}`)
+      return data
+    } catch (err: unknown) {
+      return err
+    }
+  }
+
+  const hookEditSuccess = () => {
+    displayAlert({ msg: "Your widget was updated", type: "success" })
+  }
+
+  const exportJsonFile = async () => {
+    try {
+      const allPayload = await getAllPayload()
+      const link = document.createElement("a")
+      const blob = new Blob([JSON.stringify(allPayload)], { type: "text/json" });
+      link.download = `${device_id}_${Date.now()}.json`;
+      link.href = URL.createObjectURL(blob)
+      document.body.appendChild(link)
+      link.click();
+      document.body.removeChild(link);
+    } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err)
+      displayAlert({ msg, type: "error" })
+    }
+  }
+
+  const exportExcelFile = async () => {
+    try {
+      const allPayload = await getAllPayload()
+      const wb = XLSX.utils.book_new()
+      const ws = XLSX.utils.json_to_sheet(allPayload)
+
+      XLSX.utils.book_append_sheet(wb, ws,)
+
+      XLSX.writeFile(wb, `${device_id}_${new Date()}.xlsx`)
+    } catch (err) {
+      const msg = await getAxiosErrorMessage(err)
+      displayAlert({ msg, type: "error" })
+    }
+  }
+
+  const { callHandler: callExportJsonFile } = useTimeout({ executeAction: exportJsonFile, duration: 1000 })
+  const { callHandler: callExportExcelFile } = useTimeout({ executeAction: exportExcelFile, duration: 1000 })
 
   return (
     <Wrapper>
@@ -191,6 +294,7 @@ function Device() {
           setIsEditDisplayShow={setIsEditDisplayShow}
           fetchAllWidgets={fetchAllWidgets}
           setSelectedWidget={setSelectedWidget}
+          hookEditSuccess={hookEditSuccess}
         />
       )}
 
@@ -226,7 +330,7 @@ function Device() {
                 setIsDrawerOpen(true);
               }}
               className="hidden p-1 w-fit h-fit relative sm:block text-[#8f8f8f] mb-6"
-              id="small-open-sidebar-btn"
+              id="toggle-nav-links-dialog-btn"
             >
               <RiMenu2Fill className="text-[23px]" />
             </button>
@@ -236,50 +340,36 @@ function Device() {
                 navigate("/device-list");
               }}
               className="flex cursor-pointer text-sm text-[#1D4469] font-bold items-center left-0 mb-10"
+              id="back-to-devices-list-btn"
             >
               <IoArrowBackSharp className="text-sm mr-2" />
               Back
             </button>
           </div>
           <div className="flex w-[100%] justify-between sm:hidden">
-            <div id="title-outlet" className="text-[22px] text-[#1d4469] font-bold mb-10">
+            <div
+              id="title-outlet"
+              className="text-[22px] text-[#1d4469] font-bold mb-10"
+            >
               {deviceInfo?.nameDevice}
             </div>
           </div>
 
-          <div className="absolute left-0 top-[-4rem] text-[21px] text-[#1d4469] font-bold">
-            {deviceInfo?.nameDevice}
-          </div>
-
-          {/* Back button */}
-
-          <button
-            onClick={() => {
-              navigate("/device-list");
-            }}
-            className="absolute top-[-6.5rem] flex cursor-pointer text-sm text-[#1D4469] font-bold items-center left-0 sm:left-[90%]"
-          >
-            <IoArrowBackSharp className="text-sm" />
-            Back
-          </button>
-
-          {/* Back button
-            
           {/* Start Device info container */}
           <div className="p-5 w-[100%] border-[1px] grid grid-cols-3 border-[#f1f1f1] rounded-md shadow-sm bg-white sm:grid-cols-2">
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="nameDevice-info">
               Device Name
               <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px] ">
                 {deviceInfo?.nameDevice}
               </div>
             </div>
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="description-info">
               Description
               <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
                 {deviceInfo?.description}
               </div>
             </div>
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="createdAt-info">
               CreatedAt
               <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
                 {moment(deviceInfo?.createdAt)
@@ -287,14 +377,14 @@ function Device() {
                   .format("DD/MM/YYYY h:mm")}
               </div>
             </div>
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="usernameDevice-info">
               Username Device
               <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
                 {deviceInfo?.usernameDevice}
               </div>
             </div>
 
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-8 ">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="passwordDevice-info">
               Password Device
               <div className="font-medium mt-2 text-[#7a7a7a] text-[13.3px] flex">
                 <button
@@ -302,6 +392,7 @@ function Device() {
                   onClick={() => {
                     setPasswordVisible(!passwordVisible);
                   }}
+                  id="toggle-device-password-visible-btn"
                 >
                   {passwordVisible ? <LuEye /> : <LuEyeOff />}
                 </button>
@@ -310,20 +401,35 @@ function Device() {
                   type={passwordVisible ? "text" : "password"}
                   readOnly={true}
                   value={deviceInfo?.password ? deviceInfo?.password : ""}
+                  id="device-password-info-text"
                 ></input>
               </div>
             </div>
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-8">
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="qos-info">
               Qos
               <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
                 {deviceInfo?.qos}
               </div>
             </div>
-
+            {/* Domain */}
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="qos-info">
+              Mqtt-Domain
+              <div className="flex gap-3 font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
+                <Tooltip text="copy to clipboard">
+                  <FaRegCopy className="cursor-pointer hover:text-primary-500 transition-all" onClick={() => {
+                    copy(import.meta.env.VITE_EMQX_DOMAIN);
+                    displayAlert({ msg: "copied to clipboard", type: "success" })
+                  }} />
+                </Tooltip>
+                {import.meta.env.VITE_EMQX_DOMAIN}
+              </div>
+            </div>
+            {/* Retain */}
             <div className="flex flex-col">
               <label
                 htmlFor="retain-checkbox"
                 className="ms-2 text-sm mr-2 font-medium text-[#1D4469]"
+                id="retain-viewer"
               >
                 Retain
               </label>
@@ -339,6 +445,7 @@ function Device() {
                 <div
                   className={`ml-2 bottom-[0px] relative ${deviceInfo?.retain ? "text-[#0075ff]" : "text-[#7a7a7a]"
                     } text-[13.4px]`}
+                  id="retain-text"
                 >
                   {deviceInfo?.retain.toString()}
                 </div>
@@ -349,12 +456,13 @@ function Device() {
                 onClick={() => {
                   setIsTopicsShow(!isTopicsShow);
                 }}
-                className="text-[#0075ff] px-3 py-1 border-[1px] text-[12.4px] rounded-md border-[#0075ff] flex font-medium mt-2 "
+                className="text-[#0075ff] px-3 py-1 border-[1px] text-[12.4px] rounded-md border-[#0075ff] flex font-medium mt-2 hover:bg-[#0075ff] hover:text-[#fff] "
                 id="view-topics-btn"
               >
                 View Topics
               </button>
             </div>
+
           </div>
           {/* End Device info container */}
 
@@ -375,25 +483,20 @@ function Device() {
           <div className="text-[#1d4469] text-[20px] mt-8 font-bold">
             Export
           </div>
-          <div className="gap-16 flex mt-4 p-5 border-t-[1px] border-b-[1px] border-[#dadada]">
-            <div className="flex flex-col justify-center items-center">
+          <div className="gap-16 flex mt-4 p-5 border-t-[1px] border-b-[1px] border-[#dadada]" >
+            <div className="flex flex-col justify-center items-center cursor-pointer text-nowrap" onClick={callExportExcelFile} id="excel-download">
               <SiMicrosoftexcel className="text-[#1d4469] text-[25px]" />
               <div className="text-[13px] mt-3 text-[#1d4469] font-bold">
                 Excel
               </div>
             </div>
-            <div className="flex flex-col justify-center items-center">
+            {/* Export JSON */}
+            <div className="flex flex-col justify-center items-center cursor-pointer text-nowrap" onClick={callExportJsonFile} id="json-dowload">
               <BsFiletypeJson className="text-[#1d4469] text-[25px]" />
-              <div className="text-[13px] mt-3 text-[#1d4469] font-bold">
+              <div className="text-[13px] mt-3 text-[#1d4469] font-bold text-nowrap">
                 JSON
               </div>
             </div>
-            {/* <div className="flex flex-col justify-center items-center">
-              <FaClipboardList className="text-[#1d4469] text-[25px]" />
-              <div className="text-[13px] mt-3 text-[#1d4469] font-bold">
-                Clip Board
-              </div>
-            </div> */}
           </div>
 
           <div className="w-[300px] mt-8 sm:w-[100%]">
@@ -418,7 +521,7 @@ function Device() {
                 },
               }}
               variant="outlined"
-              id="add-widget-btn"
+              id="toggle-add-widget-dialog-btn"
               disabled={isLoading}
             >
               Add widget
@@ -426,21 +529,20 @@ function Device() {
           </div>
 
           {/* start widget container */}
-
           <div className="grid grid-cols-3 gap-10 mt-8 md:grid-cols-2 sm:grid-cols-1">
             {widgets &&
-              widgets.map((widget: any, index: number) => {
-                // console.log(`${[widget.nameDevice]}`, widget);
-                // console.log(`unit`, widget?.configWidget?.unit);
-                // console.log(widget)
-                // console.log(widget?.configWidget);
+              widgets.map((widget: IWidget, index: number) => {
                 if (widget.type === "Gauge") {
                   return (
                     <Gauge
                       key={index}
                       widgetId={widget?.id}
                       label={widget?.label}
-                      value={configWidgetsDevice?.[widget?.configWidget?.value]}
+                      value={
+                        configWidgetsDevice !== undefined
+                          ? configWidgetsDevice?.[widget?.configWidget?.value]
+                          : null
+                      }
                       min={widget?.configWidget?.min}
                       max={widget?.configWidget?.max}
                       unit={widget?.configWidget?.unit}
@@ -455,7 +557,11 @@ function Device() {
                       key={index}
                       widgetId={widget?.id}
                       label={widget?.label}
-                      value={configWidgetsDevice?.[widget?.configWidget?.value]}
+                      value={
+                        configWidgetsDevice !== undefined
+                          ? configWidgetsDevice?.[widget?.configWidget?.value]
+                          : null
+                      }
                       unit={widget?.configWidget?.unit}
                       fetchAllWidgets={fetchAllWidgets}
                       selectWidget={selectWidget}
@@ -506,31 +612,47 @@ function Device() {
                     />
                   );
                 }
+                if (widget.type === "LineChart") {
+                  return (
+                    <LineChart
+                      key={index}
+                      widgetId={widget?.id}
+                      label={widget?.label}
+                      min={widget?.configWidget?.min}
+                      max={widget?.configWidget?.max}
+                      fetchAllWidgets={fetchAllWidgets}
+                      value={
+                        configWidgetsDevice !== undefined
+                          ? configWidgetsDevice?.[widget?.configWidget?.value]
+                          : null
+                      }
+                      selectWidget={selectWidget}
+                    />
+                  );
+                }
               })}
-            {/* <Gauge
-              isDeleteConfirmOpen={isDeleteConfirmOpen}
-              setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-            />
-            <MessageBox
-              isDeleteConfirmOpen={isDeleteConfirmOpen}
-              setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-            />
-            <RangeSlider
-              isDeleteConfirmOpen={isDeleteConfirmOpen}
-              setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-            />
-            <ToggleSwitch
-              isDeleteConfirmOpen={isDeleteConfirmOpen}
-              setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-            />
-            <ButtonControl
-              isDeleteConfirmOpen={isDeleteConfirmOpen}
-              setIsDeleteConfirmOpen={setIsDeleteConfirmOpen}
-            /> */}
           </div>
-          {/* end widget container */}
         </div>
-        {/* content container */}
+        {showAlert && (
+          <div className="block sm:hidden">
+            <SnackBar
+              id="device-page-snackbar"
+              severity={alertType}
+              showSnackBar={showAlert}
+              snackBarText={alertText}
+            />
+          </div>
+        )}
+        {widgetState.showAlert && (
+          <div className="block sm:hidden">
+            <SnackBar
+              id="device-state-snackbar"
+              severity={widgetState.alertType}
+              showSnackBar={widgetState.showAlert}
+              snackBarText={widgetState.alertText}
+            />
+          </div>
+        )}
       </div>
     </Wrapper>
   );

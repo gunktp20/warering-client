@@ -2,16 +2,20 @@ import React, { FunctionComponent, useState } from "react";
 import { TbEye, TbEyeOff } from "react-icons/tb";
 
 interface IFormRow {
+  id?: string;
   type: string;
   name: string;
-  value?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value?: any;
   handleChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   labelText?: string;
   width?: string;
   marginTop?: string;
+  placeHolderSize?: string
 }
 
 const FormRow: FunctionComponent<IFormRow> = ({
+  id,
   type,
   name,
   value,
@@ -19,14 +23,14 @@ const FormRow: FunctionComponent<IFormRow> = ({
   labelText,
   width,
   marginTop,
+  placeHolderSize,
 }: IFormRow): JSX.Element => {
   const [hide, setHide] = useState<boolean>(true);
 
   return (
     <div
-      className={`relative z-0 w-[${width ? width : "100%"}] mb-5 group ${
-        marginTop ? marginTop : " mt-7"
-      }`}
+      className={`relative z-0 w-[${width ? width : "100%"}] mb-5 group ${marginTop ? marginTop : " mt-7"
+        }`}
     >
       <input
         onChange={handleChange}
@@ -34,11 +38,13 @@ const FormRow: FunctionComponent<IFormRow> = ({
           type === "password" && hide
             ? "password"
             : type === "number"
-            ? "number"
-            : "value"
+              ? "number"
+              : type === "date" ? "date" : "text"
+
+
         }
         name={name}
-        id={name}
+        id={id ? id : name}
         className={`block py-2.5 px-0 w-full text-[13.5px] text-gray-900 bg-transparent border-0 border-b-[1.6px] border-gray-200 appearance-none focus:outline-none focus:ring-0 focus:border-second peer`}
         placeholder=" "
         required
@@ -46,7 +52,7 @@ const FormRow: FunctionComponent<IFormRow> = ({
       />
       <label
         htmlFor={name}
-        className="peer-focus:font-medium left-0 absolute text-[12.8px] text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-second peer-focus:dark:text-second peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 capitalize"
+        className={`${placeHolderSize ? `text-[${placeHolderSize}] ` : "text-[12.8px] "} left-0 absolute  text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 rtl:peer-focus:left-auto peer-focus:text-second peer-focus:dark:text-second peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 capitalize`}
       >
         {labelText ? labelText : name}
       </label>

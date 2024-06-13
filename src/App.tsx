@@ -5,7 +5,6 @@ import Landing from "./pages/Landing";
 import ResetPass from "./pages/ResetPass";
 import TermAndCondition from "./pages/TermAndCondition";
 import Overview from "./pages/Overview";
-import AdminDashboard from "./pages/AdminDashboard";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
 import DashboardList from "./pages/DashboardList";
@@ -17,7 +16,12 @@ import AddDevice from "./pages/AddDevice";
 import Account from "./pages/Account";
 import EditProfile from "./pages/EditProfile";
 import SendVerifyEmail from "./pages/SendVerifyEmail";
+import UserManagement from "./pages/UserManagement";
+import ApiKeys from "./pages/ApiKey";
+import ApiKeyInformation from "./pages/ApiKey/ApiKeyInformation";
+
 function App() {
+
   return (
     <BrowserRouter>
       <Routes>
@@ -27,6 +31,7 @@ function App() {
         <Route element={<RequireUser />}>
           <Route path="/" element={<Overview />} />
           <Route path="/dashboard-list" element={<DashboardList />} />
+          <Route path="/api-keys" element={<DashboardList />} />
           <Route path="/dashboard/:dashboard_id" element={<Dashboard />} />
           <Route path="/add-dashboard" element={<AddDashboard />} />
           <Route path="/device-list" element={<DeviceList />} />
@@ -35,8 +40,11 @@ function App() {
           <Route path="/account" element={<Account />} />
           <Route path="/edit-profile" element={<EditProfile />} />
         </Route>
-        <Route element={<RequireAdmin />}>
-          <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="admin" element={<RequireAdmin />}>
+          <Route index element={<UserManagement />} />
+          <Route path="user-management" element={<UserManagement />} />
+          <Route path="api-key/:api_key_id" element={<ApiKeyInformation />} />
+          <Route path="api-key/" element={<ApiKeys />} />
         </Route>
         <Route path="/unauthorized" element={<Unauthorized />} />
         <Route

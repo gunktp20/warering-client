@@ -1,18 +1,180 @@
-import { IoArrowBackSharp } from "react-icons/io5";
+import userAvatar from "../../assets/images/user-avatar.png";
+import Wrapper from "../../assets/wrappers/EditProfile";
+import { useEffect, useState } from "react";
+import { FormRow, SnackBar } from "../../components";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { AccessTokenPayload } from "../../features/auth/types";
+import { jwtDecode } from "jwt-decode";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import CroperDialog from "./CroperDialog";
 import { useNavigate } from "react-router-dom";
+import { IoArrowBackSharp } from "react-icons/io5";
+import useAlert from "../../hooks/useAlert";
+import ChangePasswordDialog from "./ChangePasswordDialog";
+import { setProfileImg } from "../../features/auth/authSlice";
 
 const EditProfile = () => {
-  const userData = {
-    img: "https://img.freepik.com/free-psd/3d-illustration-person-with-long-hair_23-2149436197.jpg?w=740&t=st=1708260597~exp=1708261197~hmac=6e04022c7ee16156ca21397efa80e383f0a513a6abc241afc626e3c6774b120d",
-    firstName: "Kruluz Utsman",
-    lastName: "KruluzUtsman",
-    password: "KruluzUtsman21wqq",
+  const { token } = useAppSelector((state) => state.auth);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isChanged, setIsChanged] = useState<boolean>(false);
+  const [showCropingProfile, setShowCropingProfile] = useState<boolean>(false);
+  const [showChangePassDialog, setShowChangePassDialog] = useState<boolean>(false);
+  const { showAlert, alertText, alertType, displayAlert } = useAlert();
+  const [currentUserInfo, setCurrentUserInfo] = useState<{
+    firstName: string;
+    lastName: string;
+    profileUrl?: string;
+  }>({
+    firstName: "",
+    lastName: "",
+    profileUrl: "",
+  });
+  const [values, setValues] = useState<{
+    firstName: string;
+    lastName: string;
+    profileUrl?: string;
+  }>({
+    firstName: "",
+    lastName: "",
+    profileUrl: "",
+  });
+
+  const [profileImage, setProfileImage] = useState<string>("");
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate();
+
+  const axiosPrivate = useAxiosPrivate();
+  const decoded: AccessTokenPayload | undefined = token
+    ? jwtDecode(token)
+    : undefined;
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValues({ ...values, [e.target.name]: e.target.value });
   };
 
-  const navigate = useNavigate()
+  const getUserInfo = async () => {
+    setIsLoading(true);
+    try {
+      const { data } = await axiosPrivate.get(`/users/${decoded?.sub}`);
+      setIsLoading(false);
+      setCurrentUserInfo({
+        firstName: data?.fname,
+        lastName: data?.lname,
+        profileUrl: data?.profileUrl,
+      });
+      setProfileImage(data?.profileUrl);
+      setValues({
+        firstName: data?.fname,
+        lastName: data?.lname,
+        profileUrl: data?.profileUrl,
+      });
+    } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err);
+      displayAlert({ msg, type: "error" })
+      setIsLoading(false);
+    }
+  };
+
+  const removeProfileImg = async () => {
+    setIsLoading(true);
+    try {
+      await axiosPrivate.delete("/users/profile");
+      setIsLoading(false);
+      getUserInfo();
+      dispatch(setProfileImg(""))
+      return displayAlert({
+        msg: "Removed your image profile",
+        type: "error",
+      });
+    } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err);
+      setIsChanged(false);
+      setIsLoading(false);
+      return displayAlert({
+        msg,
+        type: "error",
+      });
+    }
+  };
+
+  const onUploadProfileImageSuccess = () => {
+    displayAlert({
+      msg: "Your profile picture was uploaded",
+      type: "success",
+    });
+  };
+
+  const onUpdatedPasswordSuccess = () => {
+    displayAlert({
+      msg: "Updated your password",
+      type: "success"
+    })
+  }
+
+  const onUpdate = async () => {
+    setIsLoading(true);
+    const formData = new FormData();
+    formData.append("firstName", values?.firstName);
+    formData.append("lastName", values?.lastName);
+    try {
+      await axiosPrivate.put("/users/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setIsLoading(false);
+      getUserInfo();
+      return displayAlert({
+        msg: "Updated your information",
+        type: "success",
+      });
+    } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err);
+      setIsChanged(false);
+      setIsLoading(false);
+      return displayAlert({
+        msg,
+        type: "error",
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (token) {
+      getUserInfo();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (
+      currentUserInfo?.firstName !== values?.firstName ||
+      currentUserInfo?.lastName !== values?.lastName
+    ) {
+      setIsChanged(true);
+    } else {
+      setIsChanged(false);
+    }
+  }, [values]);
+
   return (
-    <div className="flex items-center justify-center h-screen">
-      <div className="w-[597px] h-[614px] relative bg-white rounded-lg border">
+    <Wrapper>
+      <CroperDialog
+        isCroperDialogOpen={showCropingProfile}
+        setIsCroperDialogOpen={setShowCropingProfile}
+        getUserInfo={getUserInfo}
+        onUploadProfileImageSuccess={onUploadProfileImageSuccess}
+      />
+      <ChangePasswordDialog onUpdatedPasswordSuccess={onUpdatedPasswordSuccess} isShowChangePassDialog={showChangePassDialog} setIsShowChangePassDialog={setShowChangePassDialog} />
+      {showAlert && (
+        <div id="add-device-snackbar" className="block sm:hidden">
+          <SnackBar
+            id="add-device-snackbar"
+            severity={alertType}
+            showSnackBar={showAlert}
+            snackBarText={alertText}
+          />
+        </div>
+      )}
+      <div className="bg-white py-[2rem] px-[3.1rem] h-fit w-[510px] border-[#f3f3f3] rounded-lg border-[1px] shadow-sm top-[10rem] relative sm:w-[100%] sm:mx-[1rem] sm:px-[2.7rem]">
         <button
           onClick={() => {
             navigate("/");
@@ -22,91 +184,88 @@ const EditProfile = () => {
           <IoArrowBackSharp className="text-sm" />
           Back
         </button>
-        <div className="left-[50px] top-[30px] absolute prompt-medium text-[24px]">
+        <div className="flex justify-start w-[100%] text-[22px] border-b-[1px] border-[#dfdfdf] text-[#1c1c1c] pb-5 font-semibold">
           Profile Information
         </div>
-        <div className="left-[51px] top-[95px] absolute prompt-regular text-gray-500">
-          Photo
+        <div className="text-[14px] mt-5 text-[#7a7a7a]">
+          <p>Photo</p>
         </div>
-        <img
-          className="w-[89px] h-[87px] left-[69px] top-[134px] absolute rounded-xl"
-          src={userData.img}
-          alt="User Photo"
-        />
-        <input type="file" id="fileInput" style={{ display: "none" }} />
-
-        <a
-          href="#"
-          className="left-[200px] top-[134px] absolute text-green-700 prompt-regular"
-          onClick={() => {
-
-          }}
-        >
-          Update
-        </a>
-
-        <a
-          href=""
-          className="left-[284px] top-[134px] absolute prompt-regular text-red-800"
-        >
-          Remove
-        </a>
-        <div className="w-[354px] left-[201px] top-[175px] absolute prompt-regular text-gray-500">
-          Recommended: Square JPG, PNG, or GIF, at least 1,000 pixels per side.
-        </div>
-        <div className="w-[487px] h-[68px] left-[55px] top-[275px] absolute">
-          <label htmlFor="firstName" className="left-0 top-0 absolute">
-            <span className="text-cyan-900 prompt-regular">First Name </span>
-            <span className="text-red-500 prompt-regular">*</span>
-          </label>
-        </div>
-        <div className="w-[487px] h-[68px] left-[55px] top-[315px] absolute">
-          <div className="">
-            <label id="firstName" className="text-black prompt-regular">
-              {userData.firstName}
-            </label>
-            <div className="self-stretch h-px relative box-border border-t-[1px] border-solid border-primary-gray" />
+        <div className="flex mt-4 justify-between">
+          <div className="flex ml-2 w-[80px] justify-center items-center">
+            <img
+              src={profileImage ? profileImage : userAvatar}
+              className={`w-[80px] h-[80px] text-[#dbdbdb] ${profileImage
+                ? "opacity-100 object-cover object-top rounded-xl"
+                : "opacity-60"
+                }`}
+            ></img>
           </div>
-          <div className="h-6 w-0 relative inline-block ml-[-487px]" />
-        </div>
-
-        <div className="w-[487px] h-[68px] left-[55px] top-[375px] absolute">
-          <label htmlFor="lastname" className="left-0 top-0 absolute">
-            <span className="text-cyan-900 prompt-regular">Last Name </span>
-            <span className="text-red-500 prompt-regular">*</span>
-          </label>
-        </div>
-        <div className="w-[487px] h-[68px] left-[55px] top-[415px] absolute">
-          <div className="">
-            <label id="lastName" className="text-black prompt-regular">
-              {userData.lastName}
-            </label>
-            <div className="self-stretch h-px relative box-border border-t-[1px] border-solid border-primary-gray" />
-          </div>
-          <div className="h-6 w-0 relative inline-block ml-[-487px]" />
-        </div>
-        <div className="w-[487px] h-[68px] left-[55px] top-[465px] absolute">
-          <label htmlFor="password" className="left-0 top-0 absolute">
-            <span className="text-cyan-900 prompt-regular">Password </span>
-            <span className="text-red-500 prompt-regular">*</span>
-          </label>
-        </div>
-        <div className="w-[487px] h-[68px] left-[55px] top-[500px] absolute">
-          <div className="">
-            <label id="password" className="text-black prompt-regular">
-              {userData.password}
-            </label>
-            <div className="self-stretch h-px relative box-border border-t-[1px] border-solid border-primary-gray" />
+          <div className="flex flex-col sm:ml-[10px]">
+            <div className="flex gap-8 mb-3">
+              <button
+                onClick={() => {
+                  setShowCropingProfile(true);
+                }}
+                className="text-[#2e7d32] text-sm cursor-pointer"
+              >
+                Update
+              </button>
+              <button
+                onClick={removeProfileImg}
+                className="text-[#dc3546] text-sm cursor-pointer"
+              >
+                Remove
+              </button>
+            </div>
+            <div className="text-[#7a7a7a] text-sm w-[270px]">
+              Recommended: Square JPG, PNG, or GIF, at least 250 pixels per
+              side.
+            </div>
           </div>
         </div>
-        <div className="w-[141px] h-11 p-2.5 left-[261px] top-[540px] absolute rounded border border-green-700 justify-center items-center gap-2.5 inline-flex">
-          <button className="text-green-800 prompt-regular">Cancel</button>
+
+        <div className="w-[100%] mt-11">
+          <FormRow
+            type="text"
+            name="firstName"
+            labelText="First name"
+            value={values.firstName}
+            handleChange={handleChange}
+            marginTop="mt-[0.2rem]"
+          />
         </div>
-        <div className="w-[141px] h-11 p-2.5 right-[30px] top-[540px] absolute bg-green-700 rounded justify-center items-center gap-2.5 inline-flex">
-          <button className="text-white prompt-regular">Save</button>
+        <div className="w-[100%]">
+          <FormRow
+            type="text"
+            name="lastName"
+            labelText="Last name"
+            value={values.lastName}
+            handleChange={handleChange}
+            marginTop="mt-[0.2rem] mb-0"
+          />
+        </div>
+        <div className="w-[100%] flex text-primary-300 mt-4 text-[12px] cursor-pointer hover:text-primary-400 transition-all">
+          <button onClick={() => {
+            setShowChangePassDialog((prevStatus) => {
+              return !prevStatus
+            })
+          }}>Change Password</button>
+        </div>
+        <div className="flex mt-5">
+          <button
+            onClick={onUpdate}
+            disabled={!isChanged || !values?.firstName || !values?.lastName}
+            className="flex justify-center items-center transition-all bg-primary-500 disabled:bg-primary-100 text-white rounded-md w-[220px] h-[36px]"
+          >
+            {isLoading ? (
+              <div className="loader w-[20px] h-[20px]"></div>
+            ) : (
+              "Save"
+            )}
+          </button>
         </div>
       </div>
-    </div>
+    </Wrapper>
   );
 };
 

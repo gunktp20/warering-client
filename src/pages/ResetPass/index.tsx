@@ -63,7 +63,7 @@ const ResetPass = () => {
     return (
         <Wrapper>
             <div className="relative top-[13rem] h-fit p-10 rounded-md w-[400px] bg-white shadow-lg">
-                <h3 className="text-left text-[27px] mt-1 font-bold mb-2 text-[#1D4469]">
+                <h3 className="text-left text-[27px] mt-1 font-bold mb-2 text-[#1D4469]" id="reset-password-title">
                     Reset your password
                 </h3>
                 <div className="text-[12px] text-[#0000009d] mb-2">
@@ -71,6 +71,7 @@ const ResetPass = () => {
                 </div>
                 {showAlert && alertType && (
                     <Alert
+                        id="alert-reset-password"
                         severity={alertType}
                         sx={{ fontSize: "11.8px", alignItems: "center" }}
                     >
@@ -87,14 +88,14 @@ const ResetPass = () => {
                 <button
                     className="btn btn-primary text-[12px]"
                     onClick={onSubmit}
-                    id="reset-password-submit"
+                    id="reset-password-submit-btn"
                 >
                     {isLoading ? "Loading..." : "Reset Password"}
                 </button>
                 <button
                     onClick={backHomePage}
                     className="transition-[0.2s] w-full h-[38px] rounded-md mt-5 text-[12px] border-[#1966fb] border-[1px] text-[#1966fb]"
-                    id="back-home-btn"
+                    id="back-to-home-btn"
                 >
                     Back to Home Page
                 </button>

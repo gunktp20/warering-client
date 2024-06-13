@@ -7,11 +7,14 @@ import { TransitionProps } from "@mui/material/transitions";
 import { FormRow, FormSelect, SnackBar } from "../../components";
 import { Button } from "@mui/material";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import { Alert } from "@mui/material"
+import { Alert } from "@mui/material";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import useAlert from "../../hooks/useAlert";
+import { useAppSelector } from "../../app/hooks";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
-    children: React.ReactElement<any, any>;
+    children: React.ReactElement;
   },
   ref: React.Ref<unknown>
 ) {
@@ -21,8 +24,7 @@ const Transition = React.forwardRef(function Transition(
 interface IDrawer {
   isEditDialogOpen: boolean;
   setEditDialogOpen: (active: boolean) => void;
-  selectedDevice: string;
-  hookEditSuccess: () => void
+  hookEditSuccess: () => void;
 }
 
 interface IValue {
@@ -45,22 +47,20 @@ const initialState: IValue = {
   isSaveData: true,
 };
 
-export default function EditDeviceDialog(props: IDrawer) {
-  const { setEditDialogOpen } = props;
+export default function EditDeviceDialog({ isEditDialogOpen, setEditDialogOpen, hookEditSuccess }: IDrawer) {
+
   const axiosPrivate = useAxiosPrivate();
+  const { selectedDevice } = useAppSelector((state) => state.device)
+  const { showAlert, alertText, alertType, displayAlert } = useAlert();
   const [values, setValues] = useState<IValue>(initialState);
-  const [timeoutIds, setTimeoutIds] = useState<any>([]);
-  const [showSnackBar, setShowSnackBar] = useState<boolean>(false);
-  const [snackBarText, setSnackBarText] = useState<string>("");
-  const [snackBarType, setSnackBarType] = useState<
-    "error" | "success" | "info" | "warning"
-  >("error");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const options = [0, 1, 2];
-  const [qos, setQos] = useState<number>(options[0]);
-  const [retain, setRetain] = useState<boolean>(true)
+  const [qos, setQos] = useState<number | string>(options[0]);
+  const [retain, setRetain] = useState<boolean>(true);
 
-  const [currentDeviceInfo, setCurrentDeviceInfo] = useState<any>()
+  const [currentDeviceInfo, setCurrentDeviceInfo] =
+    useState<IValue>(initialState);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
@@ -69,6 +69,7 @@ export default function EditDeviceDialog(props: IDrawer) {
     if (isLoading) {
       return;
     }
+    setValues(currentDeviceInfo);
     setEditDialogOpen(false);
   };
 
@@ -76,9 +77,8 @@ export default function EditDeviceDialog(props: IDrawer) {
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(
-        `/devices/${props.selectedDevice}`
+        `/devices/${selectedDevice}`
       );
-      console.log(data)
       const {
         nameDevice,
         usernameDevice,
@@ -95,7 +95,7 @@ export default function EditDeviceDialog(props: IDrawer) {
         usernameDevice,
         description,
         password,
-        topics: topics[0].split('/')[1],
+        topics: topics[0].split("/")[1],
         isSaveData,
       });
       setCurrentDeviceInfo({
@@ -103,26 +103,22 @@ export default function EditDeviceDialog(props: IDrawer) {
         usernameDevice,
         description,
         password,
-        topics: topics[0].split('/')[1],
+        topics: topics[0].split("/")[1],
         qos,
         retain,
         isSaveData,
-      })
+      });
       setQos(qos);
-      setRetain(retain)
+      setRetain(retain);
       setIsLoading(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setIsLoading(false);
     }
   };
+
   const onSubmit = async () => {
-    const {
-      nameDevice,
-      usernameDevice,
-      password,
-      description,
-      topics,
-    } = values;
+    const { nameDevice, usernameDevice, password, description, topics } =
+      values;
     if (
       !nameDevice ||
       !usernameDevice ||
@@ -130,77 +126,66 @@ export default function EditDeviceDialog(props: IDrawer) {
       !password ||
       !topics
     ) {
-      setShowSnackBar(true);
-      setSnackBarType("error");
-      setSnackBarText("Please provide all value!");
-      clearAlert();
+      displayAlert({
+        msg: "Please provide all value!",
+        type: "error",
+      });
       return;
     }
     const deviceInfo = {
       ...values,
-      nameDevice: nameDevice === currentDeviceInfo.nameDevice ? undefined : nameDevice,
-      usernameDevice: usernameDevice === currentDeviceInfo.usernameDevice ? undefined : usernameDevice,
+      nameDevice:
+        nameDevice === currentDeviceInfo.nameDevice ? undefined : nameDevice,
+      usernameDevice:
+        usernameDevice === currentDeviceInfo.usernameDevice
+          ? undefined
+          : usernameDevice,
       password: password === "" ? undefined : password,
-      description: description === currentDeviceInfo.description ? undefined : description,
+      description,
       topics: topics === currentDeviceInfo.topics ? undefined : topics,
       retain: retain === currentDeviceInfo.retain ? undefined : retain,
-      qos: Number(qos)
-    }
-    await editDevice(deviceInfo)
-  }
-  const editDevice = async (deviceInfo: any) => {
+      qos: Number(qos),
+    };
+    await editDevice(deviceInfo);
+  };
+  const editDevice = async (deviceInfo: unknown) => {
     setIsLoading(true);
     try {
-      const { data } = await axiosPrivate.put(`/devices/${props.selectedDevice}`, deviceInfo);
+      await axiosPrivate.put(`/devices/${selectedDevice}`, deviceInfo);
       setIsLoading(false);
-      setShowSnackBar(true);
-      setSnackBarType("success");
-      setSnackBarText("Your device information has been edited successfully");
-      clearAlert();
-      setIsLoading(false);
-      console.log(data)
-      props.hookEditSuccess()
-    } catch (err: any) {
-      setValues(currentDeviceInfo)
-      const msg =
-        typeof err?.response?.data?.message === "object"
-          ? err?.response?.data?.message[0]
-          : err?.response?.data?.message;
-      setShowSnackBar(true);
-      setSnackBarType("error");
-      setSnackBarText(msg);
-      clearAlert();
+      setEditDialogOpen(false)
+      hookEditSuccess();
+
+    } catch (err: unknown) {
+      setValues(currentDeviceInfo);
+      const msg = await getAxiosErrorMessage(err);
+      displayAlert({
+        msg,
+        type: "error",
+      });
       setIsLoading(false);
     }
   };
-  const clearAllTimeouts = () => {
-    timeoutIds.forEach((timeoutId: any) => clearTimeout(timeoutId));
-    setTimeoutIds([]);
-  };
-  const clearAlert = () => {
-    clearAllTimeouts();
-    const newTimeoutId = setTimeout(() => {
-      setShowSnackBar(false);
-    }, 3000);
-    setTimeoutIds([newTimeoutId]);
-  };
+
   useEffect(() => {
-    if (props.selectedDevice) {
+    if (selectedDevice) {
       fetchDeviceInfo();
     }
-  }, [props.selectedDevice]);
+  }, [selectedDevice]);
+
   return (
     <div>
       <Dialog
-        open={props.isEditDialogOpen}
+        open={isEditDialogOpen}
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
         aria-describedby="alert-dialog-slide-description"
+        id="edit-device-dialog"
       >
         <DialogContent>
           <DialogContentText
-            id="edit-device-dialog"
+            id="edit-device-dialog-content"
             className="p-3 "
             component={"div"}
             variant={"body2"}
@@ -208,25 +193,26 @@ export default function EditDeviceDialog(props: IDrawer) {
             <div className=" w-[100%] flex flex-col">
               <div
                 id="edit-device-title"
-                className="text-[17px] font-bold text-[#1D4469]">
+                className="text-[17px] font-bold text-[#1D4469]"
+              >
                 Edit Device
               </div>
               <div className="text-sm text-[#a4a4a4] mt-3">
                 Fill in the information to add a Dashboard from your device.
               </div>
             </div>
-            {showSnackBar && snackBarType && (
+            {showAlert && alertType && (
               <div className="hidden sm:block">
                 <Alert
-                  id="alert-edit-device"
-                  severity={snackBarType}
+                  id="edit-device-alert"
+                  severity={alertType}
                   sx={{
                     fontSize: "11.8px",
                     alignItems: "center",
                     marginTop: "2rem",
                   }}
                 >
-                  {snackBarText}
+                  {alertText}
                 </Alert>
               </div>
             )}
@@ -304,7 +290,7 @@ export default function EditDeviceDialog(props: IDrawer) {
             </div>
             <div className="flex items-center">
               <label
-                htmlFor="link-checkbox"
+                htmlFor="retain-edit-checkbox"
                 className="ms-2 text-sm mr-2 font-medium text-[#1D4469] dark:text-gray-300"
               >
                 Retain
@@ -314,7 +300,7 @@ export default function EditDeviceDialog(props: IDrawer) {
                 type="checkbox"
                 name="retain"
                 onChange={() => {
-                  setRetain(!retain)
+                  setRetain(!retain);
                 }}
                 checked={retain}
                 className=" w-[15px] h-[15px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#ffffff00] dark:focus:ring-[#2CB1BC] dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
@@ -348,40 +334,22 @@ export default function EditDeviceDialog(props: IDrawer) {
                 </Button>
               </div>
               <div className="w-[250px] sm:w-[100%]">
-                <Button
-                  onClick={() => {
-                    onSubmit();
-                  }}
-                  style={{
-                    textTransform: "none",
-                    width: "100%",
-                    height: "39px",
-                    marginTop: "1.5rem",
-                  }}
-                  sx={{
-                    bgcolor: "#1966fb",
-                    ":hover": {
-                      bgcolor: "#10269C",
-                    },
-                    ":disabled": {
-                      color: "#fff",
-                    },
-                  }}
-                  variant="contained"
-                  id="edit-device-submit-btn"
-                  disabled={isLoading}
+                <button
+                  id="submit-edit-dashboard-btn"
+                  onClick={onSubmit}
+                  disabled={isLoading || (values.nameDevice === currentDeviceInfo.nameDevice && values.usernameDevice === currentDeviceInfo.usernameDevice && values.password === currentDeviceInfo.password && values.description === currentDeviceInfo.password && values.topics === currentDeviceInfo.topics && qos === currentDeviceInfo.qos && retain === currentDeviceInfo.retain)}
+                  className="flex bg-[#1966fb] mt-[1.5rem] hover:bg-[#10269C] justify-center items-center transition-all disabled:bg-primary-100 text-white rounded-md w-[100%] h-[39px]"
                 >
                   Save
-                </Button>
+                </button>
               </div>
-              {showSnackBar && (
+              {showAlert && (
                 <div className="block sm:hidden">
                   <SnackBar
                     id="edit-widget-snackbar"
-                    severity={snackBarType}
-                    showSnackBar={showSnackBar}
-                    snackBarText={snackBarText}
-                    setShowSnackBar={setShowSnackBar}
+                    severity={alertType}
+                    showSnackBar={showAlert}
+                    snackBarText={alertText}
                   />
                 </div>
               )}

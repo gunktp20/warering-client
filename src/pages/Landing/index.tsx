@@ -16,6 +16,7 @@ function Landing() {
   const [isMember, setIsMember] = useState<boolean>(true);
   const { user } = useAppSelector((state) => state.auth);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] = useState<boolean>(false);
+
   
   return (
     <Wrapper>
@@ -23,9 +24,11 @@ function Landing() {
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
       />
-      <BigNavbar setIsMember={setIsMember} setIsDrawerOpen={setIsDrawerOpen} isAccountUserDrawerOpen={isAccountUserDrawerOpen} setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}/>
+      <BigNavbar setIsMember={setIsMember} setIsDrawerOpen={setIsDrawerOpen} isAccountUserDrawerOpen={isAccountUserDrawerOpen} setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen} />
       <SmallNavbar
         setIsMember={setIsMember}
+        isAccountUserDrawerOpen={isAccountUserDrawerOpen}
+        setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
         setIsDrawerOpen={setIsDrawerOpen}
       />
       {!user && (

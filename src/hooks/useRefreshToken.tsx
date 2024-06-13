@@ -1,28 +1,45 @@
+import { AxiosError } from "axios";
 import { useAppDispatch } from "../app/hooks";
-import { setCredential, logout } from "../features/auth/authSlice";
-import Cookies from "js-cookie";
+import { logout } from "../features/auth/authSlice";
 import api from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 const useRefreshToken = () => {
-    const dispatch = useAppDispatch()
-    const refresh = async () => {
-        try {
-            const response = await api.get("/auth/refresh", {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                withCredentials: true,
-            })
-            console.log('Refresh token is valid')
-            dispatch(setCredential(response.data?.access_token));
-            return response.data.access_token;
-        } catch (err: any) {
-            console.log('! Refresh token is not valid')
-            dispatch(logout())
-            Cookies.remove("refresh_token")
-        }
-    }
-    return refresh;
-}
 
-export default useRefreshToken
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate()
+
+  const refresh = async () => {
+    try {
+      const { data } = await api.get("/auth/refresh", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+      return data.access_token;
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        if (err.response?.status === 403) {
+          try {
+            await api.post("/auth/logout");
+            dispatch(logout())
+            navigate("/")
+          } catch (err) {
+            // In case request logout error 
+            dispatch(logout())
+            navigate("/")
+          }
+        }
+        if (err.response?.status === 429) {
+          // In case request is over limit
+          // ?EXPRESSION LATER
+        }
+      }
+      return null
+    }
+  };
+  return refresh;
+};
+
+export default useRefreshToken;

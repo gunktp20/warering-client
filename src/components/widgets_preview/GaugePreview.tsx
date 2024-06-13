@@ -1,15 +1,10 @@
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
-export type Id = string | number;
+import { IGaugePreviewProp } from "../../types/widget_preview";
+
 ChartJS.register(ArcElement, Tooltip, Legend);
-const options = {};
-interface IProp {
-  label: string;
-  value: number;
-  min: number;
-  max: number;
-}
-function GaugePreview({ label, value, min, max }: IProp) {
+
+function GaugePreview({ label, value, min, max }: IGaugePreviewProp) {
   const sum = Number(max) + Number(min);
   const newValue = Number(value) + Number(min);
   const result = Math.round((100 * newValue) / sum);
@@ -30,8 +25,9 @@ function GaugePreview({ label, value, min, max }: IProp) {
       },
     ],
   };
+  const options = {};
   return (
-    <div className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2  cursor-grab">
+    <div id="gauge-preview" className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2  cursor-grab">
       <div className="absolute left-2 top-2 text-[#1d4469] text-sm">
         {label}
       </div>

@@ -8,7 +8,7 @@ function TermAndCondition() {
     return (
         <Wrapper>
             <div className="bg-white p-[2rem] w-[700px]">
-                <div className="text-[#3173b1] font-bold text-[25px] mb-8">
+                <div className="text-[#3173b1] font-bold text-[25px] mb-8" id="term-and-conditions-title">
                     Terms and Conditions
                 </div>
                 <div className="bg-[#fcfcfc] p-5 overflow-y-auto h-[400px]">
@@ -56,6 +56,7 @@ function TermAndCondition() {
                     onClick={() => {
                         navigate("/");
                     }}
+                    id="back-to-home-btn"
                     className="border-blue-500 border-[2px] px-5 py-2 text-blue-500 mt-5 rounded-lg w-[100%]"
                 >
                     Back to Home Page

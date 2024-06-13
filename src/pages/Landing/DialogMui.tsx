@@ -10,16 +10,16 @@ import {
   forgetPassword,
   clearAlert,
   displayAlert,
-  demoAuth
 } from "../../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { Link, useNavigate } from "react-router-dom";
 import { FormRow } from "../../components";
 import { Alert, Button } from "@mui/material";
+import { handleChange } from "../../features/auth/authSlice";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
-    children: React.ReactElement<any, any>;
+    children: React.ReactElement;
   },
   ref: React.Ref<unknown>
 ) {
@@ -33,38 +33,15 @@ interface IDrawer {
   isMember: boolean;
 }
 
-interface IValue {
-  username: string;
-  firstName: string | undefined;
-  lastName: string | undefined;
-  email: string | undefined;
-  password: string;
-  confirm_password: string | undefined;
-  email_forget_password: string | undefined;
-}
-
-const initialState: IValue = {
-  username: "",
-  firstName: "",
-  lastName: "",
-  email: "",
-  password: "",
-  confirm_password: "",
-  email_forget_password: "",
-};
-
-export default function AlertDialogSlide(props: IDrawer) {
-  const { isDrawerOpen, setIsDrawerOpen, setIsMember, isMember } = props;
+export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsMember, isMember }: IDrawer) {
   const { isLoading, showAlert, alertText, alertType } = useAppSelector(
     (state) => state.auth
   );
 
   const navigate = useNavigate();
-
-  const [values, setValues] = useState<IValue>(initialState);
   const [isForgetPassword, setIsForgetPassword] = useState<boolean>(false);
+  const { username, firstName, lastName, email, password, confirm_password, email_forget_password } = useAppSelector((state) => state.auth)
   const [isAcceptTerm, setIsAcceptTerm] = useState<boolean>(false);
-
   const dispatch = useAppDispatch();
 
   const showDisplayAlert = (
@@ -82,20 +59,7 @@ export default function AlertDialogSlide(props: IDrawer) {
     }, 4000);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValues({ ...values, [e.target.name]: e.target.value });
-  };
-
   const onSubmit = async () => {
-    const {
-      username,
-      firstName,
-      lastName,
-      email,
-      password,
-      confirm_password,
-      email_forget_password,
-    } = values;
 
     if (isForgetPassword) {
       if (!email_forget_password) {
@@ -127,21 +91,25 @@ export default function AlertDialogSlide(props: IDrawer) {
 
     if (!isMember && !isAcceptTerm) {
       showDisplayAlert("error", "You must accept term and condition before");
-
       return;
     }
 
     if (isMember) {
-      const responseLogin = await dispatch(login(values));
+      const responseLogin = await dispatch(login({ username, password }));
       if (responseLogin.meta.requestStatus === "fulfilled") {
         navigate("/");
+        return;
       }
       return;
     } else {
-      await dispatch(register(values));
+      await dispatch(register({ username, firstName, lastName, email, password, confirm_password }));
       return;
     }
   };
+
+  const authHandleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    dispatch(handleChange(event))
+  }
 
   const handleClose = () => {
     setIsDrawerOpen(false);
@@ -158,10 +126,11 @@ export default function AlertDialogSlide(props: IDrawer) {
         aria-describedby="alert-dialog-slide-description"
         fullScreen
         className="m-5 hidden sm:block"
+        id="setup-user-landing-dialog"
       >
         <DialogContent>
           <DialogContentText
-            id="alert-dialog-slide-description"
+            id="setup-user-landing-dialog-content"
             className="p-3 "
             component={"div"}
             variant={"body2"}
@@ -169,12 +138,13 @@ export default function AlertDialogSlide(props: IDrawer) {
             <div
               onClick={handleClose}
               className="cursor-pointer absolute top-2 right-3 text-[21px]"
+              id="close-setup-user-dialog-btn"
             >
               X
             </div>
             {isForgetPassword ? (
               <div>
-                <h3 className="text-left text-[27px] mt-1 font-bold mb-2 text-[#1D4469]">
+                <h3 className="text-left text-[27px] mt-1 font-bold mb-2 text-[#1D4469]" id="forget-password-title">
                   Forget your password ?
                 </h3>
                 <div className="text-[12px] text-[#0000009d] mb-3">
@@ -192,9 +162,10 @@ export default function AlertDialogSlide(props: IDrawer) {
 
                 <FormRow
                   type="text"
+                  id="email_forget_password_dialog"
                   name="email_forget_password"
                   labelText="Email"
-                  value={values.email_forget_password}
+                  value={email_forget_password}
                   handleChange={handleChange}
                 />
 
@@ -226,7 +197,7 @@ export default function AlertDialogSlide(props: IDrawer) {
               </div>
             ) : (
               <div>
-                <h3 className="text-left text-[27px] mt-1 font-bold mb-3 text-[#1D4469]">
+                <h3 id="endpoint-set-up-user-title-dialog" className="text-left text-[27px] mt-1 font-bold mb-3 text-[#1D4469]">
                   {isMember ? "Sign In" : "Sign Up"}
                 </h3>
 
@@ -242,59 +213,65 @@ export default function AlertDialogSlide(props: IDrawer) {
                 <FormRow
                   type="text"
                   name="username"
-                  value={values.username}
-                  handleChange={handleChange}
+                  id="username_dialog"
+                  value={username}
+                  handleChange={authHandleChange}
                 />
 
                 {!isMember && (
                   <FormRow
                     type="text"
                     name="firstName"
+                    id="firstName_dialog"
                     labelText="firstname"
-                    value={values.firstName}
-                    handleChange={handleChange}
+                    value={firstName}
+                    handleChange={authHandleChange}
                   />
                 )}
                 {!isMember && (
                   <FormRow
                     type="text"
                     name="lastName"
+                    id="lastName_dialog"
                     labelText="lastname"
-                    value={values.lastName}
-                    handleChange={handleChange}
+                    value={lastName}
+                    handleChange={authHandleChange}
                   />
                 )}
                 {!isMember && (
                   <FormRow
                     type="text"
                     name="email"
+                    id="email_dialog"
                     labelText="email"
-                    value={values.email}
-                    handleChange={handleChange}
+                    value={email}
+                    handleChange={authHandleChange}
                   />
                 )}
 
                 <FormRow
                   type="password"
                   name="password"
-                  value={values.password}
-                  handleChange={handleChange}
+                  id="password_dialog"
+                  value={password}
+                  handleChange={authHandleChange}
                 />
 
                 {!isMember && (
                   <FormRow
                     type="password"
                     name="confirm_password"
+                    id="confirm_password_dialog"
                     labelText="confirm password"
-                    value={values.confirm_password}
-                    handleChange={handleChange}
+                    value={confirm_password}
+                    handleChange={authHandleChange}
                   />
                 )}
 
                 {!isMember && (
                   <div className="flex items-center">
                     <input
-                      id="link-checkbox"
+                      id="agree-terms-and-conditions-checkbox"
                       type="checkbox"
                       value=""
                       onClick={() => setIsAcceptTerm(!isAcceptTerm)}
@@ -320,7 +297,7 @@ export default function AlertDialogSlide(props: IDrawer) {
                   <div className="flex justify-between items-center">
                     <div className="flex items-center">
                       <input
-                        id="link-checkbox"
+                        id="remember-user-dialog-checkbox"
                         type="checkbox"
                         value=""
                         className="w-[13px] h-[13px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#ffffff00] dark:focus:ring-[#2CB1BC] dark:ring-offset-gray-800 focus:ring-2"
@@ -339,7 +316,7 @@ export default function AlertDialogSlide(props: IDrawer) {
                           dispatch(clearAlert());
                         }}
                         className="cursor-pointer ms-2 text-[11.5px] text-[#3173B1] font-bold"
-                        id="forget-pass-btn"
+                        id="toggle-forget-pass-dialog-btn"
                       >
                         Forget Password ?
                       </button>
@@ -368,16 +345,16 @@ export default function AlertDialogSlide(props: IDrawer) {
                   }}
                   variant="contained"
                   disabled={isLoading}
-                  id="setup-user-submit"
+                  id="endpoint-setup-user-submit-dialog-btn"
                 >
                   {isLoading ? "Loading..." : isMember ? "Sign In" : "Sign Up"}
                 </Button>
                 <div className="flex mt-4 justify-end pr-2">
-                  <p className="text-[12px] text-[#333]">
+                  <p className="text-[12px] text-[#333]" id="toggle-setup-user-note">
                     {isMember ? "Not a member yet?" : "Already a member?"}
                   </p>
                   <button
-                    id="toggle-endpoint"
+                    id="toggle-endpoint-setup-user-dialog-btn"
                     className="text-[12px] ml-2 text-[#3173B1] bg-none cursor-pointer"
                     onClick={() => {
                       setIsMember(!isMember);
@@ -387,31 +364,6 @@ export default function AlertDialogSlide(props: IDrawer) {
                     {isMember ? "SignUp" : "SignIn"}
                   </button>
                 </div>
-                <Button
-                  onClick={() => {
-                    dispatch(demoAuth());
-                  }}
-                  style={{
-                    textTransform: "none",
-                    width: "100%",
-                    height: "39px",
-                    marginTop: "1.5rem",
-                    fontSize: "13px",
-                  }}
-                  sx={{
-                    // bgcolor: "#1966fb",
-                    ":hover": {
-                      //   bgcolor: "#10269C",
-                    },
-                    ":disabled": {
-                      color: "#fff",
-                    },
-                  }}
-                  variant="outlined"
-                  id="demo-app"
-                >
-                  App Demo
-                </Button>
               </div>
             )}
           </DialogContentText>

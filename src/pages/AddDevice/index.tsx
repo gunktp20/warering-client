@@ -15,6 +15,10 @@ import { useNavigate } from "react-router-dom";
 import { SnackBar } from "../../components";
 import { Alert } from "@mui/material";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
+import useAlert from "../../hooks/useAlert";
+import { displayAlert as displayDevicesAlert } from "../../features/device/deviceSlice";
+import { useAppDispatch } from "../../app/hooks";
 
 interface IDeviceInfo {
   nameDevice: string;
@@ -29,58 +33,28 @@ interface IDeviceInfo {
 
 function AddDevice() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch()
   const axiosPrivate = useAxiosPrivate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { showAlert, alertType, alertText, displayAlert } = useAlert()
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
-  const [showSnackBar, setShowSnackBar] = useState<boolean>(false);
-  const [snackBarText, setSnackBarText] = useState<string>("");
-  const [snackBarType, setSnackBarType] = useState<
-    "error" | "success" | "info" | "warning"
-  >("error");
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
-
-  const [timeoutIds, setTimeoutIds] = useState<any>([]);
 
   const AddDevice = async (deviceInfo: IDeviceInfo) => {
     setIsLoading(true);
     try {
       await axiosPrivate.post(`/devices`, deviceInfo);
-      setIsLoading(false);
-      setShowSnackBar(true);
-      setSnackBarType("success");
-      setSnackBarText("Your device has been added");
-      clearAlert();
-      setIsLoading(false);
-      navigate('/device-list')
-    } catch (err: any) {
-      const msg =
-        typeof err?.response?.data?.message === "object"
-          ? err?.response?.data?.message[0]
-          : err?.response?.data?.message;
-      setShowSnackBar(true);
-      setSnackBarType("error");
-      setSnackBarText(msg);
-      clearAlert();
+      await dispatch(displayDevicesAlert({ msg: `Created your ${deviceInfo?.nameDevice} device`, type: "success" }))
+      navigate("/device-list");
+    } catch (err: unknown) {
+      const msg = await getAxiosErrorMessage(err);
+      displayAlert({ msg, type: "error" })
       setIsLoading(false);
     }
   };
 
-  // Function to clear all running timeouts
-  const clearAllTimeouts = () => {
-    timeoutIds.forEach((timeoutId: any) => clearTimeout(timeoutId));
-    setTimeoutIds([]); // Clear the timeout IDs from state
-  };
-  // Function to set a new timeout
-  const clearAlert = () => {
-    clearAllTimeouts(); // Clear existing timeouts before setting a new one
-    const newTimeoutId = setTimeout(() => {
-      // Your timeout function logic here
-      setShowSnackBar(false);
-    }, 3000);
-    setTimeoutIds([newTimeoutId]); // Store the new timeout ID in state
-  };
   const [values, setValues] = useState({
     nameDevice: "",
     usernameDevice: "",
@@ -88,9 +62,10 @@ function AddDevice() {
     description: "",
     topics: "",
   });
+
   const [retain, setRetain] = useState<boolean>(false);
   const options = [0, 1, 2];
-  const [qos, setQos] = useState<number>(options[0]);
+  const [qos, setQos] = useState<number | string>(options[0]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
@@ -103,13 +78,9 @@ function AddDevice() {
       !nameDevice ||
       !usernameDevice ||
       !password ||
-      !description ||
       !topics
     ) {
-      setShowSnackBar(true);
-      setSnackBarType("error");
-      setSnackBarText("Please provide all value");
-      clearAlert();
+      displayAlert({ msg: "Please provide all value", type: "error" })
       return;
     }
     const deviceInfo: IDeviceInfo = {
@@ -138,7 +109,7 @@ function AddDevice() {
         isSidebarShow={isSidebarShow}
       />
       <div className="flex h-[100vh]">
-        <NavLinkSidebar isSidebarShow={isSidebarShow}/>
+        <NavLinkSidebar isSidebarShow={isSidebarShow} />
         <NavDialog
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
@@ -150,7 +121,7 @@ function AddDevice() {
                 setIsDrawerOpen(true);
               }}
               className="hidden p-1 w-fit h-fit relative sm:block text-[#8f8f8f] mb-6"
-              id="small-open-sidebar-btn"
+              id="toggle-nav-links-dialog-btn"
             >
               <RiMenu2Fill className="text-[23px]" />
             </button>
@@ -160,7 +131,7 @@ function AddDevice() {
                 navigate("/device-list");
               }}
               className="flex cursor-pointer text-sm text-[#1D4469] font-bold items-center left-0 mb-10"
-              id="back-prev-btn"
+              id="back-to-devices-list-btn"
             >
               <IoArrowBackSharp className="text-sm mr-2" />
               Back
@@ -168,7 +139,10 @@ function AddDevice() {
           </div>
 
           <div className="flex w-[100%] justify-between sm:hidden">
-            <div id="title-outlet" className="text-[23px] text-[#1d4469] font-bold mb-10">
+            <div
+              id="title-outlet"
+              className="text-[23px] text-[#1d4469] font-bold mb-10"
+            >
               Add Device
             </div>
           </div>
@@ -182,17 +156,18 @@ function AddDevice() {
               </div>
             </div>
 
-            {showSnackBar && snackBarType && (
+            {showAlert && alertType && (
               <div className="hidden sm:block">
                 <Alert
-                  severity={snackBarType}
+                  severity={alertType}
                   sx={{
                     fontSize: "11.8px",
                     alignItems: "center",
                     marginTop: "2rem",
                   }}
+                  id="add-device-alert"
                 >
-                  {snackBarText}
+                  {alertText}
                 </Alert>
               </div>
             )}
@@ -276,7 +251,7 @@ function AddDevice() {
                 Retain
               </label>
               <input
-                id="link-checkbox"
+                id="retain-checkbox"
                 type="checkbox"
                 name="retain"
                 onChange={() => setRetain((prev) => !prev)}
@@ -308,17 +283,16 @@ function AddDevice() {
                 id="add-device-submit-btn"
                 disabled={isLoading}
               >
-                { isLoading ? <div className="loader"></div>: "Add Device"}
+                {isLoading ? <div className="loader"></div> : "Add Device"}
               </Button>
             </div>
-            {showSnackBar && (
+            {showAlert && (
               <div id="add-device-snackbar" className="block sm:hidden">
                 <SnackBar
                   id="add-device-snackbar"
-                  severity={snackBarType}
-                  showSnackBar={showSnackBar}
-                  snackBarText={snackBarText}
-                  setShowSnackBar={setShowSnackBar}
+                  severity={alertType}
+                  showSnackBar={showAlert}
+                  snackBarText={alertText}
                 />
               </div>
             )}
