@@ -12,14 +12,14 @@ COPY . .
 
 RUN npm run build
 
-FROM nginx:alpine
+# FROM nginx:alpine
 
-COPY --from=build /usr/src/app/dist /usr/share/nginx/html
+# COPY --from=build /usr/src/app/dist /usr/share/nginx/html
 
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 # เปิดพอร์ต 80
 EXPOSE 80
 
 # เริ่ม nginx
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["npm", "run", "preview"]
