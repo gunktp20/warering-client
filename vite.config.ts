@@ -8,6 +8,6 @@ export default defineConfig({
     VITE_EMQX_DOMAIN: process.env.VITE_EMQX_DOMAIN,
     VITE_API_DOMAIN: process.env.VITE_API_DOMAIN,
     VITE_EMQX_PROTOCAL: process.env.VITE_EMQX_PROTOCAL,
-    VITE_EMQX_HOST: process.env.VITE_EMQX_HOST,
+    VITE_EMQX_HOST: process.env.VITE_EMQX_HOST
   },
 });
