@@ -8,8 +8,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: install dependencies
-        run: npm install
       - name: checkout repository
         uses: actions/checkout@v2
       - name: build image
