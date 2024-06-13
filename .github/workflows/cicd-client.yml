@@ -2,7 +2,7 @@ name: CD/CD-client
 on:
   push:
     branches:
-      - main
+      - master
 jobs:
   build:
     runs-on: ubuntu-latest
