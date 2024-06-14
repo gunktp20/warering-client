@@ -13,10 +13,10 @@ jobs:
       # - name: 'Create env file'
       #   run: |
       #     touch .env
-      #     echo VITE_EMQX_DOMAIN=${{ vars.VITE_EMQX_DOMAIN }} >> .env
-      #     echo VITE_API_DOMAIN=${{ vars.VITE_API_DOMAIN }} >> .env
-      #     echo VITE_EMQX_PROTOCAL=${{ vars.VITE_EMQX_PROTOCAL }} >> .env
-      #     echo VITE_EMQX_HOST=${{ vars.VITE_EMQX_HOST }} >> .env
+      #     echo VITE_EMQX_DOMAIN="$VITE_EMQX_DOMAIN" >> .env
+      #     echo VITE_API_DOMAIN="$VITE_API_DOMAIN">> .env
+      #     echo VITE_EMQX_PROTOCAL=$VITE_EMQX_PROTOCAL>> .env
+      #     echo VITE_EMQX_HOST="$VITE_EMQX_HOST" >> .env
       #     cat .env
       - name: build image
         run: docker build -t sekkarin/warering-client .
