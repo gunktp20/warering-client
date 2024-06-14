@@ -5,10 +5,7 @@ import react from "@vitejs/plugin-react";
 
 export default ({ mode }) => {
   // Load app-level env vars to node-level env vars.
-  process.env = { ...process.env, ...loadEnv(mode, process.cwd(), "") };
-  console.log(process.env);
-  
-  
+  process.env = { ...process.env, ...loadEnv(mode, process.cwd(), "") }; 
   if (mode === "production") {
     return defineConfig({
       plugins: [react()],

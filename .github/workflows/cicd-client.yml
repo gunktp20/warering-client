@@ -2,7 +2,7 @@ name: CD/CD-client
 on:
   push:
     branches:
-      - feature/fix-ci-cd
+      - mester
 jobs:
   build:
     runs-on: ubuntu-latest
