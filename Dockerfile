@@ -22,7 +22,7 @@ RUN npm install
 COPY . .
 
 RUN npm run build
-CMD [ "npm","run","preview" ]
+CMD ["sh","-c", "npm","run","preview" ]
 
 # FROM nginx:alpine
 
