@@ -1,6 +1,6 @@
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { DEV, BROWSER } from 'esm-env';
+import { DEV, BROWSER } from "esm-env";
 
 import { RequireAdmin, RequireUser } from "./components";
 import Landing from "./pages/Landing";
@@ -23,10 +23,6 @@ import ApiKeys from "./pages/ApiKey";
 import ApiKeyInformation from "./pages/ApiKey/ApiKeyInformation";
 
 function App() {
-  console.log(import.meta.glob);
-  console.log("process.env ",process.env["VITE_API_DOMAIN"])
-  
-  
   return (
     <BrowserRouter>
       <Routes>
