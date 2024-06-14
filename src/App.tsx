@@ -1,5 +1,6 @@
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { loadEnv } from "vite";
 
 import { RequireAdmin, RequireUser } from "./components";
 import Landing from "./pages/Landing";
@@ -23,6 +24,9 @@ import ApiKeyInformation from "./pages/ApiKey/ApiKeyInformation";
 
 function App() {
   console.log(import.meta.env)
+  const env = loadEnv("production", process.cwd(), "");
+  console.log("env ",env);
+  
   return (
     <BrowserRouter>
       <Routes>
