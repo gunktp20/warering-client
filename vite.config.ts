@@ -10,7 +10,7 @@ export default defineConfig(({ command, mode }) => {
     plugins: [react()],
     define: {
       "import.meta.env.VITE_API_DOMAIN": JSON.stringify(
-        env.TEST
+        'ken'
       ),
     },
   };
