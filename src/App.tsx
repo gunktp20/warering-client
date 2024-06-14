@@ -21,8 +21,6 @@ import ApiKeys from "./pages/ApiKey";
 import ApiKeyInformation from "./pages/ApiKey/ApiKeyInformation";
 
 function App() {
-  console.log("hello");
-  console.log("process.env ",process.env)
   console.log("import ",import.meta.env)
   
   return (
