@@ -1,6 +1,5 @@
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { DEV, BROWSER } from "esm-env";
 
 import { RequireAdmin, RequireUser } from "./components";
 import Landing from "./pages/Landing";
