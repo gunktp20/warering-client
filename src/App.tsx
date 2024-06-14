@@ -21,7 +21,8 @@ import ApiKeys from "./pages/ApiKey";
 import ApiKeyInformation from "./pages/ApiKey/ApiKeyInformation";
 
 function App() {
-
+  console.log("hello");
+  
   return (
     <BrowserRouter>
       <Routes>
