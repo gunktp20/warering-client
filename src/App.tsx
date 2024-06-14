@@ -21,6 +21,10 @@ import ApiKeys from "./pages/ApiKey";
 import ApiKeyInformation from "./pages/ApiKey/ApiKeyInformation";
 
 function App() {
+  console.log("hello");
+  console.log("process.env ",process.env.TZ)
+  console.log("import ",import.meta.env)
+  
   return (
     <BrowserRouter>
       <Routes>
