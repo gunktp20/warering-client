@@ -2,7 +2,7 @@ name: CD/CD-client
 on:
   push:
     branches:
-      - master
+      - mester
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,12 +10,15 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v2
+      - name: 'Create env file'
+        run: |
+          touch .env
+          echo VITE_EMQX_DOMAIN="${{ secrets.VITE_EMQX_DOMAIN }}" >> .env
+          echo VITE_API_DOMAIN="${{ secrets.VITE_API_DOMAIN }}" >> .env
+          echo VITE_EMQX_PROTOCAL="${{ secrets.VITE_EMQX_PROTOCAL }}" >> .env
+          echo VITE_EMQX_HOST="${{ secrets.VITE_EMQX_HOST }}" >> .env
+      #     cat .env
       - name: build image
-        env:
-          VITE_EMQX_DOMAIN: ${{secrets.VITE_EMQX_DOMAIN}}
-          VITE_API_DOMAIN: ${{secrets.VITE_API_DOMAIN}}
-          VITE_EMQX_PROTOCAL: ${{secrets.VITE_EMQX_PROTOCAL}}
-          VITE_EMQX_HOST: ${{secrets.VITE_EMQX_HOST}}
         run: docker build -t sekkarin/warering-client .
       - name: login to docker registry
         uses: docker/login-action@v3
@@ -29,5 +32,5 @@ jobs:
         with:
           token: ${{secrets.DIGITALOCEAN_TOKEN}}
       - name: rollout client deployment
-        run: doctl kubernetes cluster kubeconfig save k8s-1-30-1-do-0-sgp1-1718101032317 && kubectl rollout restart deployment client-depl
+        run: doctl kubernetes cluster kubeconfig save warering && kubectl rollout restart deployment client-depl
     

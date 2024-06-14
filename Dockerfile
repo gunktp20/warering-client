@@ -1,18 +1,7 @@
 
 ARG NODE_VERSION=21.5.0
-ARG VITE_EMQX_DOMAIN
-ARG VITE_API_DOMAIN
-ARG VITE_EMQX_PROTOCAL
-ARG VITE_EMQX_HOST
-
-
 # Set working directory for all build stages.
 FROM node:${NODE_VERSION}-alpine as build
-
-ENV VITE_EMQX_DOMAIN  = $VITE_EMQX_DOMAIN
-ENV VITE_API_DOMAIN = $VITE_API_DOMAIN
-ENV VITE_EMQX_PROTOCAL = $VITE_EMQX_PROTOCAL
-ENV VITE_EMQX_HOST = $VITE_EMQX_HOST
 
 WORKDIR /usr/src/app
 COPY package*.json ./
@@ -20,7 +9,6 @@ COPY package*.json ./
 RUN npm install
 
 COPY . .
-
 
 RUN npm run build
 
