@@ -11,17 +11,17 @@ export default ({ mode }) => {
     plugins: [react()],
     define: {
       "import.meta.env.VITE_EMQX_DOMAIN": JSON.stringify(
-        process.env.VITE_EMQX_DOMAIN
+        process.env.VITE_EMQX_DOMAIN || "http://13.229.135.29:8083/mqtt"
       ),
 
       "import.meta.env.VITE_API_DOMAIN": JSON.stringify(
-        process.env.VITE_API_DOMAIN
+        process.env.VITE_API_DOMAIN || "http://www.warering.online/api/"
       ),
       "import.meta.env.VITE_EMQX_PROTOCAL": JSON.stringify(
-        process.env.VITE_API_DOMAIN
+        process.env.VITE_API_DOMAIN || "ws"
       ),
       "import.meta.env.VITE_EMQX_HOST": JSON.stringify(
-        process.env.VITE_API_DOMAIN
+        process.env.VITE_API_DOMAIN || "13.229.135.29"
       ),
     },
   });
