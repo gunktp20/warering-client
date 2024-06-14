@@ -9,18 +9,19 @@ export default defineConfig(({ command, mode }) => {
   return {
     plugins: [react()],
     define: {
-      "import.meta.env.VITE_EMQX_DOMAIN": JSON.stringify(
-        env.VITE_API_DOMAIN as string | "http://13.229.135.29:8083/mqtt"
-      ),
-      "import.meta.env.VITE_API_DOMAIN": JSON.stringify(
-        env.VITE_API_DOMAIN as string | "http://www.warering.online/api/"
-      ),
-      "import.meta.env.VITE_EMQX_PROTOCAL": JSON.stringify(
-        env.VITE_API_DOMAIN as string | "ws"
-      ),
-      "import.meta.env.VITE_EMQX_HOST": JSON.stringify(
-        env.VITE_API_DOMAIN as string | "13.229.135.29"
-      ),
+      "import.meta.env.VITE_EMQX_DOMAIN": env.VITE_EMQX_DOMAIN
+        ? JSON.stringify(env.VITE_EMQX_DOMAIN)
+        : "http://13.229.135.29:8083/mqtt",
+
+      "import.meta.env.VITE_API_DOMAIN": env.VITE_API_DOMAIN
+        ? JSON.stringify(env.VITE_API_DOMAIN)
+        : "http://www.warering.online/api/",
+      "import.meta.env.VITE_EMQX_PROTOCAL": env.VITE_API_DOMAIN
+        ? JSON.stringify(env.VITE_API_DOMAIN)
+        : "ws",
+      "import.meta.env.VITE_EMQX_HOST": env.VITE_API_DOMAIN
+        ? JSON.stringify(env.VITE_API_DOMAIN)
+        : "13.229.135.29",
     },
   };
 });
