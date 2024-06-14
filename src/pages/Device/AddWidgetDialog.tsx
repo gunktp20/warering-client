@@ -242,7 +242,7 @@ export default function AddWidgetDialog(props: IProps) {
       dispatch(displayWidgetAlert({ msg: "Created your widget successfully", type: "success" }))
       callClearWidgetAlert();
       setIsLoading(false);
-      props.setIsAddWidgetShow(false);
+      handleClose();
       props.fetchAllWidgets();
       setValues(initialState);
     } catch (err: unknown) {

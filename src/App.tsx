@@ -3,7 +3,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { RequireAdmin, RequireUser } from "./components";
 import Landing from "./pages/Landing";
 import ResetPass from "./pages/ResetPass";
-import TermAndCondition from "./pages/TermAndCondition";
 import Overview from "./pages/Overview";
 import Unauthorized from "./pages/Unauthorized";
 import NotFound from "./pages/NotFound";
@@ -19,6 +18,7 @@ import SendVerifyEmail from "./pages/SendVerifyEmail";
 import UserManagement from "./pages/UserManagement";
 import ApiKeys from "./pages/ApiKey";
 import ApiKeyInformation from "./pages/ApiKey/ApiKeyInformation";
+import SessionExpired from "./pages/SessionExpired";
 
 function App() {
   return (
@@ -26,7 +26,6 @@ function App() {
       <Routes>
         <Route path="/home" element={<Landing />} />
         <Route path="/reset-password/:token" element={<ResetPass />} />
-        <Route path="/term-condition" element={<TermAndCondition />} />
         <Route element={<RequireUser />}>
           <Route path="/" element={<Overview />} />
           <Route path="/dashboard-list" element={<DashboardList />} />
@@ -46,6 +45,7 @@ function App() {
           <Route path="api-key/" element={<ApiKeys />} />
         </Route>
         <Route path="/unauthorized" element={<Unauthorized />} />
+        <Route path="/session-expired" element={<SessionExpired />} />
         <Route
           path="/request-verify-email/:token"
           element={<SendVerifyEmail />}

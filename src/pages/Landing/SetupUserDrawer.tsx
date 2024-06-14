@@ -3,15 +3,16 @@ import { FormRow } from "../../components";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { handleChange } from "../../features/auth/authSlice";
 import {
+  handleChange,
   displayAlert,
   clearAlert,
   register,
   login,
   forgetPassword,
+  toggleTermActive
 } from "../../features/auth/authSlice";
-import { Link } from "react-router-dom";
+import { IoArrowBackSharp } from "react-icons/io5";
 
 interface IDrawer {
   isDrawerOpen: boolean;
@@ -113,6 +114,11 @@ function SetupUserDrawer(props: IDrawer) {
           <Typography variant="h6" component="div" className="p-5 pb-0">
             {isForgetPassword ? (
               <div>
+                <div onClick={() => {
+                  setIsForgetPassword(false)
+                }} className="text-[10px] cursor-pointer flex text-primary-900 mb-6" id="forget-pass-back-btn">
+                  <IoArrowBackSharp className="text-sm mr-2" />
+                  Back</div>
                 <h3 className="text-left text-[27px] mt-1 font-bold mb-2 text-[#1D4469]" id="forget-password-drawer-title">
                   Forget your password ?
                 </h3>
@@ -237,16 +243,18 @@ function SetupUserDrawer(props: IDrawer) {
                     />
                     <label
                       htmlFor="link-checkbox"
-                      className="ms-2 text-[11.5px] font-medium text-gray-900 dark:text-gray-300"
+                      className="flex ms-2 text-[11.5px] font-medium text-gray-900 dark:text-gray-300"
                     >
                       I agree with the{" "}
-                      <Link
-                        to="/term-condition"
+                      <div
                         id="terms-and-conditions-btn"
-                        className="text-[#3173B1] dark:text-[#3173B1] hover:underline"
+                        onClick={() => {
+                          dispatch(toggleTermActive())
+                        }}
+                        className="ml-[0.35rem] text-[#3173B1] dark:text-[#3173B1] hover:underline cursor-pointer"
                       >
                         terms and conditions
-                      </Link>
+                      </div>
                     </label>
                   </div>
                 )}

@@ -14,7 +14,7 @@ const NavLinkSidebarAdmin = (props: IProp) => {
     >
       <div className="flex flex-col">
         <NavLink
-          to="/admin/"
+          to="/admin"
           id="user-list-nav-link-sidebar"
           key={1}
           onClick={() => { }}

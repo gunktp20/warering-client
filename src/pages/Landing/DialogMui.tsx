@@ -10,12 +10,14 @@ import {
   forgetPassword,
   clearAlert,
   displayAlert,
+  toggleTermActive,
 } from "../../features/auth/authSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { FormRow } from "../../components";
 import { Alert, Button } from "@mui/material";
 import { handleChange } from "../../features/auth/authSlice";
+import { IoArrowBackSharp } from "react-icons/io5";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -33,7 +35,7 @@ interface IDrawer {
   isMember: boolean;
 }
 
-export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsMember, isMember }: IDrawer) {
+export default function DialogMui({ isDrawerOpen, setIsDrawerOpen, setIsMember, isMember }: IDrawer) {
   const { isLoading, showAlert, alertText, alertType } = useAppSelector(
     (state) => state.auth
   );
@@ -127,6 +129,9 @@ export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsM
         fullScreen
         className="m-5 hidden sm:block"
         id="setup-user-landing-dialog"
+        sx={{
+          zIndex: "200"
+        }}
       >
         <DialogContent>
           <DialogContentText
@@ -144,6 +149,11 @@ export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsM
             </div>
             {isForgetPassword ? (
               <div>
+                <div onClick={() => {
+                  setIsForgetPassword(false)
+                }} className="text-[10px] cursor-pointer flex text-primary-900 mb-6" id="forget-pass-back-btn">
+                  <IoArrowBackSharp className="text-sm mr-2" />
+                  Back</div>
                 <h3 className="text-left text-[27px] mt-1 font-bold mb-2 text-[#1D4469]" id="forget-password-title">
                   Forget your password ?
                 </h3>
@@ -280,35 +290,24 @@ export default function AlertDialogSlide({ isDrawerOpen, setIsDrawerOpen, setIsM
                     />
                     <label
                       htmlFor="link-checkbox"
-                      className="ms-2 text-[11.5px] font-medium text-gray-900 dark:text-gray-300"
+                      className="flex ms-2 text-[11.5px] font-medium text-gray-900 dark:text-gray-300"
                     >
                       I agree with the{" "}
-                      <Link
-                        to="/term-condition"
-                        className="text-[#3173B1] hover:underline"
+                      <div
+                        onClick={() => {
+                          dispatch(toggleTermActive())
+                        }}
+                        className="ml-[0.35rem] text-[#3173B1] hover:underline cursor-pointer"
+                        id="toggle-terms-conditions-dialog-btn"
                       >
                         terms and conditions
-                      </Link>
+                      </div>
                     </label>
                   </div>
                 )}
 
                 {isMember && (
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center">
-                      <input
-                        id="remember-user-dialog-checkbox"
-                        type="checkbox"
-                        value=""
-                        className="w-[13px] h-[13px] text-[#2CB1BC] bg-gray-100 border-gray-300 rounded focus:ring-[#ffffff00] dark:focus:ring-[#2CB1BC] dark:ring-offset-gray-800 focus:ring-2"
-                      />
-                      <label
-                        htmlFor="link-checkbox"
-                        className="ms-2 text-[11.5px] font-medium text-gray-900"
-                      >
-                        Remember me
-                      </label>
-                    </div>
+                  <div className="flex justify-end items-center">
                     <div className="flex items-center">
                       <button
                         onClick={() => {
