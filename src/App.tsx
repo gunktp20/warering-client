@@ -23,9 +23,9 @@ import ApiKeys from "./pages/ApiKey";
 import ApiKeyInformation from "./pages/ApiKey/ApiKeyInformation";
 
 function App() {
-  console.log(import.meta.env);
+  console.log(import.meta.glob);
   console.log("process.env ",process.env["VITE_API_DOMAIN"])
-  console.log(DEV, BROWSER)
+  
   
   return (
     <BrowserRouter>
