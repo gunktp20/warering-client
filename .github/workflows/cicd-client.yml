@@ -7,7 +7,7 @@ env:
 on:
   push:
     branches:
-      - mester
+      - master
 jobs:
   build:
     runs-on: ubuntu-latest
