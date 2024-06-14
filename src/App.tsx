@@ -1,5 +1,7 @@
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { DEV, BROWSER } from 'esm-env';
+
 import { RequireAdmin, RequireUser } from "./components";
 import Landing from "./pages/Landing";
 import ResetPass from "./pages/ResetPass";
@@ -23,7 +25,7 @@ import ApiKeyInformation from "./pages/ApiKey/ApiKeyInformation";
 function App() {
   console.log(import.meta.env);
   console.log("process.env ",process.env["VITE_API_DOMAIN"])
-  console.log(process.cwd())
+  console.log(DEV, BROWSER)
   
   return (
     <BrowserRouter>
