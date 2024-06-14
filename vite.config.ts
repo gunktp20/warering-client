@@ -5,7 +5,7 @@ import react from "@vitejs/plugin-react";
 
 export default ({ mode }) => {
   // Load app-level env vars to node-level env vars.
-  process.env = { ...process.env, ...loadEnv(mode, process.cwd(),'VITE_') };
+  process.env = { ...process.env, ...loadEnv(mode, process.cwd(), "VITE_") };
 
   return defineConfig({
     plugins: [react()],
@@ -23,6 +23,11 @@ export default ({ mode }) => {
       "import.meta.env.VITE_EMQX_HOST": JSON.stringify(
         process.env.VITE_API_DOMAIN || "13.229.135.29"
       ),
+    },
+    preview: {
+      host: true,
+      port: 80,
+      strictPort: true,
     },
   });
 };
