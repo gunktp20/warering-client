@@ -1,8 +1,13 @@
 name: CD/CD-client
+env:
+  VITE_EMQX_DOMAIN: ${{vars.VITE_EMQX_DOMAIN}}
+  VITE_API_DOMAIN: ${{vars.VITE_API_DOMAIN}}
+  VITE_EMQX_PROTOCAL: ${{vars.VITE_EMQX_PROTOCAL}}
+  VITE_EMQX_HOST: ${{vars.VITE_EMQX_HOST}}
 on:
   push:
     branches:
-      - mester
+      - master
 jobs:
   build:
     runs-on: ubuntu-latest

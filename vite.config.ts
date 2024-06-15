@@ -28,5 +28,6 @@ export default ({ mode }) => {
   }
   return defineConfig({
     plugins: [react()],
+    // To access env vars here use process.env.TEST_VAR
   });
-};
+}
