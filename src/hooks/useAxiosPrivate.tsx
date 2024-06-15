@@ -34,6 +34,7 @@ const useAxiosPrivate = () => {
             pervRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
             return axiosPrivate(pervRequest);
           }
+          return;
         }
         return Promise.reject(error);
       }

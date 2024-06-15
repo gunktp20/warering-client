@@ -156,7 +156,7 @@ function ApiKeys() {
                         onClick={() => {
                             setIsDrawerOpen(true);
                         }}
-                        className="hidden p-1 w-fit h-fit relative sm:block text-[#8f8f8f] mb-6"
+                        className="hidden p-1 w-fit h-fit relative md:block sm:block text-[#8f8f8f] mb-6"
                         id="small-open-sidebar-btn"
                     >
                         <RiMenu2Fill className="text-[23px]" />

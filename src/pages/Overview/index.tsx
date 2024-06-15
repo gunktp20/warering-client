@@ -10,7 +10,6 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { HiOutlineStatusOnline } from "react-icons/hi";
 import { MdOutlineWifiOff } from "react-icons/md";
 import { IoBan } from "react-icons/io5";
-import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 import useAlert from "../../hooks/useAlert";
 
 function Overview() {
@@ -20,7 +19,9 @@ function Overview() {
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
   const { deviceOffline, deviceOnline, totalDevice, totalDeviceDeny } =
     useAppSelector((state) => state.device);
-  const { showAlert, alertText, alertType, displayAlert } = useAlert()
+  const { token } =
+    useAppSelector((state) => state.auth);
+  const { showAlert, alertText, alertType } = useAlert()
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
     useState<boolean>(false);
@@ -30,15 +31,16 @@ function Overview() {
       const response = await axiosPrivate.get(`/api/overview`);
       dispatch(setDeviceOverview(response?.data));
     } catch (err: unknown) {
-      const msg = await getAxiosErrorMessage(err)
-      displayAlert({ msg, type: "error" })
+      // console.log(err)
     }
   };
 
   const intervalIdRef = useRef<number | null>(null);
 
   useEffect(() => {
-    fetchDeviceOverview();
+    if (token) {
+      fetchDeviceOverview();
+    }
   }, [])
 
   useEffect(() => {

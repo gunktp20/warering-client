@@ -30,6 +30,7 @@ const initialState: IAuthState = {
   password: "",
   confirm_password: "",
   email_forget_password: "",
+  isTermActive: false,
 };
 
 const addUserToLocalStorage: AddUserFunc = (user, token) => {
@@ -151,6 +152,12 @@ const AuthSlice = createSlice({
         showAlert: false,
         alertText: "",
         alertType: "",
+      };
+    },
+    toggleTermActive: (state) => {
+      return {
+        ...state,
+        isTermActive: !state.isTermActive,
       };
     },
     displayAlert: (state, action) => {
@@ -319,6 +326,7 @@ export const {
   demoAuth,
   setProfileImg,
   setAuthLoading,
+  toggleTermActive,
 } = AuthSlice.actions;
 
 export default AuthSlice.reducer;

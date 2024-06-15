@@ -5,11 +5,12 @@ import WeDoItem from "./WeDoItem";
 import Footer from "./Footer";
 import SetupUserDrawer from "./SetupUserDrawer";
 import SmallNavbar from "./SmallNavbar";
-import AlertDialogSlide from "./DialogMui";
+import SetupUserDialog from "./DialogMui";
 import Wrapper from "../../assets/wrappers/Landing/Landing";
 import whatWeDo from "../../utils/whatWeDo";
 import { useAppSelector } from "../../app/hooks";
 import { AccountUserDrawer } from "../../components";
+import TermAndCondition from "./TermAndConditions";
 
 function Landing() {
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
@@ -17,9 +18,9 @@ function Landing() {
   const { user } = useAppSelector((state) => state.auth);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] = useState<boolean>(false);
 
-  
   return (
     <Wrapper>
+      <TermAndCondition />
       <AccountUserDrawer
         isAccountUserDrawerOpen={isAccountUserDrawerOpen}
         setIsAccountUserDrawerOpen={setIsAccountUserDrawerOpen}
@@ -32,7 +33,7 @@ function Landing() {
         setIsDrawerOpen={setIsDrawerOpen}
       />
       {!user && (
-        <AlertDialogSlide
+        <SetupUserDialog
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
           setIsMember={setIsMember}

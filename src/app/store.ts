@@ -15,6 +15,12 @@ export const store = configureStore({
     apiKey: apiKeyReducer,
     users: usersReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ["auth/handleChange"],
+      },
+    }),
   devTools: true,
 });
 

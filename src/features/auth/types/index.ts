@@ -18,6 +18,7 @@ export interface IAuthState {
   showAlert: boolean;
   alertText: string;
   alertType: "error" | "success" | "info" | "warning" | "";
+  isTermActive: boolean;
 }
 
 export interface IRegister {

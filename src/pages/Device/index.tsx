@@ -359,19 +359,19 @@ function Device() {
           <div className="p-5 w-[100%] border-[1px] grid grid-cols-3 border-[#f1f1f1] rounded-md shadow-sm bg-white sm:grid-cols-2">
             <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="nameDevice-info">
               Device Name
-              <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px] ">
+              <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px] sm:text-[12px]">
                 {deviceInfo?.nameDevice}
               </div>
             </div>
             <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="description-info">
               Description
-              <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
+              <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px] sm:text-[12px]">
                 {deviceInfo?.description}
               </div>
             </div>
             <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="createdAt-info">
               CreatedAt
-              <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
+              <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px] sm:text-[12px]">
                 {moment(deviceInfo?.createdAt)
                   .add(543, "year")
                   .format("DD/MM/YYYY h:mm")}
@@ -379,14 +379,14 @@ function Device() {
             </div>
             <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="usernameDevice-info">
               Username Device
-              <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
+              <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px] sm:text-[12px]">
                 {deviceInfo?.usernameDevice}
               </div>
             </div>
 
             <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="passwordDevice-info">
               Password Device
-              <div className="font-medium mt-2 text-[#7a7a7a] text-[13.3px] flex">
+              <div className="font-medium mt-2 text-[#7a7a7a] text-[13.3px] sm:text-[12px] flex">
                 <button
                   className=""
                   onClick={() => {
@@ -405,23 +405,25 @@ function Device() {
                 ></input>
               </div>
             </div>
-            <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="qos-info">
-              Qos
-              <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
-                {deviceInfo?.qos}
-              </div>
-            </div>
+
             {/* Domain */}
             <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="qos-info">
               Mqtt-Domain
-              <div className="flex gap-3 font-medium mt-2 text-[#7a7a7a] text-[13.3px]">
+              <div className="flex gap-3 font-medium mt-2 text-[#7a7a7a] text-[13.3px] sm:text-[12px]">
                 <Tooltip text="copy to clipboard">
                   <FaRegCopy className="cursor-pointer hover:text-primary-500 transition-all" onClick={() => {
-                    copy(import.meta.env.VITE_EMQX_DOMAIN);
+                    copy(import.meta.env.VITE_MQTT_DOMAIN);
                     displayAlert({ msg: "copied to clipboard", type: "success" })
                   }} />
                 </Tooltip>
                 {import.meta.env.VITE_EMQX_DOMAIN}
+              </div>
+            </div>
+            {/* Qos */}
+            <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="qos-info">
+              Qos
+              <div className="dd font-medium mt-2 text-[#7a7a7a] text-[13.3px] sm:text-[12px]">
+                {deviceInfo?.qos}
               </div>
             </div>
             {/* Retain */}
@@ -483,15 +485,15 @@ function Device() {
           <div className="text-[#1d4469] text-[20px] mt-8 font-bold">
             Export
           </div>
-          <div className="gap-16 flex mt-4 p-5 border-t-[1px] border-b-[1px] border-[#dadada]" >
-            <div className="flex flex-col justify-center items-center cursor-pointer text-nowrap" onClick={callExportExcelFile} id="excel-download">
+          <div className="mb-1 flex mt-4 px-5 py-4 border-t-[1px] border-b-[1px] border-[#dadada] " >
+            <div className="w-[80px] h-[80px] rounded-md hover:border-[2px] hover:border-primary-100 transition-all flex flex-col justify-center items-center cursor-pointer text-nowrap mr-5" onClick={callExportExcelFile} id="excel-download">
               <SiMicrosoftexcel className="text-[#1d4469] text-[25px]" />
               <div className="text-[13px] mt-3 text-[#1d4469] font-bold">
                 Excel
               </div>
             </div>
             {/* Export JSON */}
-            <div className="flex flex-col justify-center items-center cursor-pointer text-nowrap" onClick={callExportJsonFile} id="json-dowload">
+            <div className="w-[80px] h-[80px] rounded-md hover:border-[2px] hover:border-primary-100 transition-all flex flex-col justify-center items-center cursor-pointer text-nowrap" onClick={callExportJsonFile} id="json-dowload">
               <BsFiletypeJson className="text-[#1d4469] text-[25px]" />
               <div className="text-[13px] mt-3 text-[#1d4469] font-bold text-nowrap">
                 JSON
