@@ -41,7 +41,7 @@ export default function TermAndConditions() {
                     variant={"body2"}
                     id="term-and-conditions-dialog-content"
                 >
-                    <div className="bg-white p-[2rem] w-[100%] sm:p-[1rem] sm:pt-[1.5rem]">
+                    <div className="bg-white p-[2rem] w-[100%] sm:p-[1rem] sm:pt-[1.5rem] pb-[3rem]">
                         <div className="text-[#3173b1] font-bold text-[25px] mb-8 sm:text-[20px]" id="term-and-conditions-title">
                             Terms and Conditions
                         </div>
@@ -86,15 +86,15 @@ export default function TermAndConditions() {
                                 velit?
                             </p>
                         </div>
-                        <button
+                        {/* <button
                             onClick={() => {
                                 dispatch(toggleTermActive())
                             }}
                             id="back-to-home-btn"
                             className="border-blue-500 border-[2px] px-5 py-2 text-blue-500 mt-5 rounded-lg w-[100%] hover:bg-blue-500 hover:text-white transition-all"
                         >
-                            Back to Home Page
-                        </button>
+                            Back
+                        </button> */}
                     </div>
 
                 </DialogContentText>

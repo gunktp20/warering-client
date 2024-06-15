@@ -3,6 +3,7 @@ import { useAppDispatch } from "../app/hooks";
 import { logout } from "../features/auth/authSlice";
 import api from "../services/api";
 import { useNavigate } from 'react-router-dom';
+import Cookies from "js-cookie"
 
 const useRefreshToken = () => {
 
@@ -22,6 +23,7 @@ const useRefreshToken = () => {
 
       if (err instanceof AxiosError) {
         dispatch(logout())
+        await Cookies.remove("refreshToken")
         navigate("/session-expired")
       }
       return null

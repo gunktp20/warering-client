@@ -19,6 +19,8 @@ function Overview() {
   const [isSidebarShow, setIsSidebarShow] = useState<boolean>(true);
   const { deviceOffline, deviceOnline, totalDevice, totalDeviceDeny } =
     useAppSelector((state) => state.device);
+  const { token } =
+    useAppSelector((state) => state.auth);
   const { showAlert, alertText, alertType } = useAlert()
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isAccountUserDrawerOpen, setIsAccountUserDrawerOpen] =
@@ -36,7 +38,9 @@ function Overview() {
   const intervalIdRef = useRef<number | null>(null);
 
   useEffect(() => {
-    fetchDeviceOverview();
+    if (token) {
+      fetchDeviceOverview();
+    }
   }, [])
 
   useEffect(() => {
