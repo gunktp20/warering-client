@@ -23,6 +23,9 @@ export default ({ mode }) => {
         "import.meta.env.VITE_EMQX_HOST": JSON.stringify(
           process.env.VITE_API_DOMAIN || "13.229.135.29"
         ),
+        "import.meta.env.VITE_MQTT_DOMAIN": JSON.stringify(
+          process.env.VITE_MQTT_DOMAIN || "http://13.229.135.29"
+        ),
       },
     });
   }
