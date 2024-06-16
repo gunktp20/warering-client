@@ -38,6 +38,23 @@ interface IProps {
   setSelectedWidget: (_: string) => void;
 }
 
+
+interface IWidget {
+  type?: string;
+  label?: string;
+  configWidget?: IConfigWidget;
+}
+interface IConfigWidget {
+  value?: string;
+  min?: number;
+  max?: number;
+  unit?: string;
+  button_label?: string;
+  payload?: string;
+  on_payload?: string | number;
+  off_payload?: string | number;
+}
+
 const initialState = {
   label: "",
   value: "",
@@ -281,10 +298,11 @@ export default function EditWidgetDialog(props: IProps) {
     }
   };
 
-  const editWidget = async (widgetInfo: unknown) => {
+  const editWidget = async (widgetInfo: IWidget) => {
+    const { configWidget } = widgetInfo
     setIsLoading(true);
     try {
-      await axiosPrivate.patch(`/widgets/${props.widget_id}`, widgetInfo);
+      await axiosPrivate.patch(`/widgets/${props.widget_id}`, { ...widgetInfo, configWidget: { ...configWidget, value: configWidget?.value?.trim() } });
       displayAlert({
         msg: "Edited your widget successfully",
         type: "success",

@@ -25,7 +25,7 @@ function MessageBox({
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
   return (
-    <div id={widgetId} className="h-[130px] w-[100%] bg-white relative shadow-md flex justify-center items-center rounded-md hover:ring-2 overflow-hidden">
+    <div id={widgetId} className="h-[150px] w-[100%] bg-white relative shadow-md flex justify-center items-center rounded-md hover:ring-2 overflow-hidden">
       {!value && (
         <div className=" bg-white z-10 flex absolute justify-center items-center font-bold text-[#0075ff]">
           IDLE

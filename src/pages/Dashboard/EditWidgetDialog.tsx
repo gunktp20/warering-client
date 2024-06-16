@@ -290,10 +290,11 @@ export default function EditWidgetDialog(props: IProps) {
     }
   };
 
-  const editWidget = async (widgetInfo: unknown) => {
+  const editWidget = async (widgetInfo: IWidgetInfo) => {
     setIsLoading(true);
+    const { configWidget } = widgetInfo
     try {
-      await axiosPrivate.patch(`/widgets/${props.widget_id}`, widgetInfo);
+      await axiosPrivate.patch(`/widgets/${props.widget_id}`, { ...widgetInfo, configWidget: { ...configWidget, value: configWidget?.value?.trim() } });
       displayAlert({
         msg: "Edited your widget successfully",
         type: "success",

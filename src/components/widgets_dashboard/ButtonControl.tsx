@@ -51,7 +51,7 @@ function ButtonControl({
         style={style}
         className="
           opacity-30
-        bg-mainBackgroundColor p-2.5 h-[130px] min-h-[100px] items-center flex text-left rounded-xl border-2 border-[#1966fb] cursor-grab relative
+        bg-mainBackgroundColor p-2.5 h-[150px] min-h-[100px] items-center flex text-left rounded-xl border-2 border-[#1966fb] cursor-grab relative
         "
       />
     );
@@ -64,7 +64,7 @@ function ButtonControl({
       {...attributes}
       {...(editMode ? listeners : {})}
       id={widgetId}
-      className="h-[130px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 transition-all"
+      className="h-[150px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 transition-all"
     >
       <div className="absolute left-2 top-2 text-[#1d4469] text-[12px]">
         {label}

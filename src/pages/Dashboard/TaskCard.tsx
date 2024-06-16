@@ -38,7 +38,7 @@ function TaskCard({ task }: Props) {
         style={style}
         className="
         opacity-100
-      bg-mainBackgroundColor p-2.5 h-[130px] min-h-[130px] items-center flex text-left rounded-xl border-2 border-[#1d4469] relative
+      bg-mainBackgroundColor p-2.5 h-[150px] min-h-[150px] items-center flex text-left rounded-xl border-2 border-[#1d4469] relative
       "
       />
     );
@@ -51,7 +51,7 @@ function TaskCard({ task }: Props) {
       {...attributes}
       {...listeners}
       className="opacity-30
-      bg-mainBackgroundColor p-2.5 h-[130px] min-h-[130px] items-center flex text-left rounded-xl border-2 border-[#1966fb] relative"
+      bg-mainBackgroundColor p-2.5 h-[150px] min-h-[150px] items-center flex text-left rounded-xl border-2 border-[#1966fb] relative"
     ></div>
   );
 }

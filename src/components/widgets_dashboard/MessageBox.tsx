@@ -55,7 +55,7 @@ function MessageBox({
         style={style}
         className="
           opacity-30
-        bg-mainBackgroundColor p-2.5 h-[130px] min-h-[100px] items-center flex text-left rounded-xl border-2 border-[#1966fb] cursor-grab relative
+        bg-mainBackgroundColor p-2.5 h-[150px] min-h-[100px] items-center flex text-left rounded-xl border-2 border-[#1966fb] cursor-grab relative
         "
       />
     );
@@ -68,7 +68,7 @@ function MessageBox({
       {...attributes}
       {...(editMode ? listeners : {})}
       id={widgetId}
-      className="h-[130px] w-[100%] bg-white relative shadow-md flex justify-center items-center rounded-md hover:ring-2 overflow-hidden"
+      className="h-[150px] w-[100%] bg-white relative shadow-md flex justify-center items-center rounded-md hover:ring-2 overflow-hidden"
     >
       {!value && (
         <div className="w-[100%] h-[100%] bg-white z-10 flex absolute justify-center items-center font-bold text-[#0075ff]">
@@ -110,11 +110,11 @@ function MessageBox({
       )}
       <div
         className={`text-[#1966fb] font-bold flex ${checkThaiLanguage(typeof value === "string" ? value : "")
-            ? "text-[12.8px] font-thin"
-            : "text-[19px]"
+          ? "text-[12.8px] font-thin"
+          : "text-[19px]"
           }`}
       >
-        {typeof value === "string" ? value : ""}
+        {(typeof value === "string" || typeof value === "number") ? value : ""}
         <div className="text-[11px] font-medium text-[#5353538a] text-right ml-2">
           {unit}
         </div>
