@@ -416,7 +416,7 @@ function Device() {
                     displayAlert({ msg: "copied to clipboard", type: "success" })
                   }} />
                 </Tooltip>
-                {import.meta.env.VITE_EMQX_DOMAIN}
+                {import.meta.env.VITE_MQTT_DOMAIN}
               </div>
             </div>
             {/* Qos */}
