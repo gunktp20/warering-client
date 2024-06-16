@@ -236,9 +236,10 @@ export default function AddWidgetDialog(props: IProps) {
   const { callHandler: callClearWidgetAlert } = useTimeout({ executeAction: () => dispatch(clearWidgetAlert()), duration: 3000 })
 
   const createWidget = async (widgetInfo: IWidget) => {
+    const { configWidget } = widgetInfo
     setIsLoading(true);
     try {
-      await axiosPrivate.post(`/widgets/${props.device_id}`, widgetInfo);
+      await axiosPrivate.post(`/widgets/${props.device_id}`, { ...widgetInfo, configWidget: { ...configWidget, value: configWidget?.value?.trim() } });
       dispatch(displayWidgetAlert({ msg: "Created your widget successfully", type: "success" }))
       callClearWidgetAlert();
       setIsLoading(false);

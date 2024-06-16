@@ -15,6 +15,7 @@ import { SortableContext, arrayMove } from "@dnd-kit/sortable";
 import { createPortal } from "react-dom";
 import TaskCard from "./TaskCard";
 import { MdSearchOff } from "react-icons/md";
+// import { SiSimpleanalytics } from "react-icons/si";
 import {
   AccountUserDrawer,
   BigNavbar,
@@ -471,6 +472,15 @@ function KanbanBoard() {
               >
                 Add Widget
               </Button>
+              {/* <button
+                onClick={() => {
+                  navigate("/analytic/")
+                }}
+                className="text-[14px] flex items-center gap-2 text-[#1D4469] h-[39px] bg-[#ebebeb] w-[39px] justify-center rounded-md border-[1px]"
+                id="switch-to-edit-mode-btn"
+              >
+                <SiSimpleanalytics className="text-[14px]" />
+              </button> */}
             </div>
           </div>
 
@@ -555,17 +565,19 @@ function KanbanBoard() {
           </DndContext>}
         </div>
       </div>
-      {showAlert && (
-        <div className="block sm:hidden">
-          <SnackBar
-            id="dashboard-snackbar"
-            severity={alertType}
-            showSnackBar={showAlert}
-            snackBarText={alertText}
-          />
-        </div>
-      )}
-    </Wrapper>
+      {
+        showAlert && (
+          <div className="block sm:hidden">
+            <SnackBar
+              id="dashboard-snackbar"
+              severity={alertType}
+              showSnackBar={showAlert}
+              snackBarText={alertText}
+            />
+          </div>
+        )
+      }
+    </Wrapper >
   );
 
   function onDragStart(event: DragStartEvent) {
