@@ -11,7 +11,7 @@ export default ({ mode }) => {
       plugins: [react()],
       define: {
         "import.meta.env.VITE_EMQX_DOMAIN": JSON.stringify(
-          process.env.VITE_EMQX_DOMAIN || "http://13.229.135.29:8083/mqtt"
+          process.env.VITE_EMQX_DOMAIN || "ws://13.229.135.29:8083/mqtt"
         ),
 
         "import.meta.env.VITE_API_DOMAIN": JSON.stringify(
