@@ -34,7 +34,7 @@ function App() {
           <Route path="/api-keys" element={<DashboardList />} />
           <Route path="/dashboard/:dashboard_id" element={<Dashboard />} />
           <Route path="/visualization/" element={<AnalyticBoard />} />
-          <Route path="/" element={<AddDashboard />} />
+          <Route path="/add-dashboard" element={<AddDashboard />} />
           <Route path="/device-list" element={<DeviceList />} />
           <Route path="/device/:device_id" element={<Device />} />
           <Route path="/add-device" element={<AddDevice />} />
