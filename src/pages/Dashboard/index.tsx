@@ -121,7 +121,6 @@ function KanbanBoard() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedWidget, setSelectedWidget] = useState<string>("");
   const dispatch = useAppDispatch();
-
   const axiosPrivate = useAxiosPrivate();
   const [isDrawerOpen, setIsDrawerOpen] = useState<boolean>(false);
   const [isEditDialogOpen, setEditDialogOpen] = useState<boolean>(false);
@@ -472,15 +471,7 @@ function KanbanBoard() {
               >
                 Add Widget
               </Button>
-              {/* <button
-                onClick={() => {
-                  navigate("/analytic/")
-                }}
-                className="text-[14px] flex items-center gap-2 text-[#1D4469] h-[39px] bg-[#ebebeb] w-[39px] justify-center rounded-md border-[1px]"
-                id="switch-to-edit-mode-btn"
-              >
-                <SiSimpleanalytics className="text-[14px]" />
-              </button> */}
+             
             </div>
           </div>
 

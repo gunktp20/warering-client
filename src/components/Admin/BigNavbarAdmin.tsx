@@ -13,7 +13,7 @@ interface IProps {
 
 function BigNavbarAdmin(props: IProps) {
   const navigate = useNavigate();
-  const { user, profileImg, isLoading } = useAppSelector((state) => state.auth);
+  const { user, isLoading } = useAppSelector((state) => state.auth);
 
   useEffect(() => { }, []);
 
@@ -58,7 +58,7 @@ function BigNavbarAdmin(props: IProps) {
           <div className="loader w-[23px] h-[23px]"></div>
         ) : (
           <img
-            src={profileImg ? profileImg : userAvatar}
+            src={userAvatar}
             onClick={() => {
               if (isLoading) {
                 return;
@@ -66,7 +66,7 @@ function BigNavbarAdmin(props: IProps) {
               props.setIsAccountUserDrawerOpen(!props.isAccountUserDrawerOpen);
             }}
             id="admin-profile-image"
-            className={`cursor-pointer ml-4 w-[42px] h-[42px]text-[#dbdbdb] rounded-[100%] ${profileImg ? "opacity-100 object-cover object-top" : "opacity-60"
+            className={`cursor-pointer ml-4 w-[42px] h-[42px]text-[#dbdbdb] rounded-[100%] "opacity-60"
               }`}
           ></img>
         )}
