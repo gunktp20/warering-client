@@ -165,9 +165,9 @@ const EditProfile = () => {
       />
       <ChangePasswordDialog onUpdatedPasswordSuccess={onUpdatedPasswordSuccess} isShowChangePassDialog={showChangePassDialog} setIsShowChangePassDialog={setShowChangePassDialog} />
       {showAlert && (
-        <div id="add-device-snackbar" className="block sm:hidden">
+        <div id="edit-profile-snackbar" className="block sm:hidden">
           <SnackBar
-            id="add-device-snackbar"
+            id="edit-profile-snackbar"
             severity={alertType}
             showSnackBar={showAlert}
             snackBarText={alertText}
@@ -180,6 +180,7 @@ const EditProfile = () => {
             navigate("/");
           }}
           className="absolute top-[-2.5rem] flex cursor-pointer text-sm text-[#1D4469] font-bold items-center left-0 "
+          id="back-to-prev-btn-edit-profile"
         >
           <IoArrowBackSharp className="text-sm" />
           Back
@@ -191,7 +192,7 @@ const EditProfile = () => {
           <p>Photo</p>
         </div>
         <div className="flex mt-4 justify-between">
-          <div className="flex ml-2 w-[80px] justify-center items-center">
+          <div className="flex ml-2 w-[80px] justify-center items-center sm:w-[60%] sm:mr-2 sm:justify-start">
             <img
               src={profileImage ? profileImage : userAvatar}
               className={`w-[80px] h-[80px] text-[#dbdbdb] ${profileImage
@@ -207,17 +208,19 @@ const EditProfile = () => {
                   setShowCropingProfile(true);
                 }}
                 className="text-[#2e7d32] text-sm cursor-pointer"
+                id="update-user-profile-btn"
               >
                 Update
               </button>
               <button
                 onClick={removeProfileImg}
                 className="text-[#dc3546] text-sm cursor-pointer"
+                id="remove-user-profile-btn"
               >
                 Remove
               </button>
             </div>
-            <div className="text-[#7a7a7a] text-sm w-[270px]">
+            <div className="text-[#7a7a7a] text-sm w-[270px] sm:w-[100%]">
               Recommended: Square JPG, PNG, or GIF, at least 250 pixels per
               side.
             </div>
@@ -245,15 +248,18 @@ const EditProfile = () => {
           />
         </div>
         <div className="w-[100%] flex text-primary-300 mt-4 text-[12px] cursor-pointer hover:text-primary-400 transition-all">
-          <button onClick={() => {
-            setShowChangePassDialog((prevStatus) => {
-              return !prevStatus
-            })
-          }}>Change Password</button>
+          <button
+            id="change-password-btn"
+            onClick={() => {
+              setShowChangePassDialog((prevStatus) => {
+                return !prevStatus
+              })
+            }}>Change Password</button>
         </div>
         <div className="flex mt-5">
           <button
             onClick={onUpdate}
+            id="save-update-new-user-info-btn"
             disabled={!isChanged || !values?.firstName || !values?.lastName}
             className="flex justify-center items-center transition-all bg-primary-500 disabled:bg-primary-100 text-white rounded-md w-[220px] h-[36px]"
           >
