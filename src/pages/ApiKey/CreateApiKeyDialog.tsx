@@ -142,6 +142,8 @@ export default function CreateApiKeyDialog({ isCreateApiKeyOpen, setIsCreateApiK
       displayAlert({ msg: "The expiration date must be from today onwards ", type: "error" })
       return
     }
+
+    await createApiKey()
   }
 
 
@@ -152,10 +154,10 @@ export default function CreateApiKeyDialog({ isCreateApiKeyOpen, setIsCreateApiK
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
-        id="confirm-delete-device-dialog"
+        id="create-api-key-dialog"
       >
         <DialogContentText
-          id="confirm-delete-device-dialog-content"
+          id="create-api-key-dialog-content"
           className="py-7 px-11"
           component={"div"}
           variant={"body2"}
@@ -188,7 +190,7 @@ export default function CreateApiKeyDialog({ isCreateApiKeyOpen, setIsCreateApiK
                   alignItems: "center",
                   marginTop: "2rem",
                 }}
-                id="add-device-alert"
+                id="create-api-key-alert"
               >
                 {alertText}
               </Alert>
@@ -230,14 +232,14 @@ export default function CreateApiKeyDialog({ isCreateApiKeyOpen, setIsCreateApiK
 
           {!createdSuccess && <div className="w-[450px] sm:w-[100%] flex gap-3">
             <button
-              id="submit-edit-dashboard-btn"
+              id="cancel-create-api-key-btn"
               onClick={handleClose}
               className="flex border-red-500 border-[1px] mt-[1.5rem] hover:bg-red-500 hover:text-white justify-center items-center transition-all disabled:bg-primary-100 text-red-500 rounded-md w-[100%] h-[42px]"
             >
               cancel
             </button>
             <button
-              id="submit-edit-dashboard-btn"
+              id="submit-create-api-key-btn"
               onClick={onSubmit}
               className="flex bg-[#1966fb] mt-[1.5rem] hover:bg-[#10269C] justify-center items-center transition-all disabled:bg-primary-100 text-white rounded-md w-[100%] h-[42px]"
             >
@@ -252,7 +254,7 @@ export default function CreateApiKeyDialog({ isCreateApiKeyOpen, setIsCreateApiK
 
             <div className="mt-3 flex flex-col justify-center items-start cursor-pointer text-nowrap" onClick={callExportJsonFile} id="json-download">
               <Tooltip text="Download API key information in JSON format">
-                <div className="flex justify-center items-center flex-col rounded-md border-[#1d4469] w-[75px] h-[75px] hover:border-[1px] ">
+                <div id="download-api-key-json-btn" className="flex justify-center items-center flex-col rounded-md border-[#1d4469] w-[75px] h-[75px] hover:border-[1px] ">
                   <BsFiletypeJson className="text-[#1d4469] text-[25px]" />
                   <div className="text-[13px] mt-2 text-[#1d4469] font-bold text-nowrap">
                     JSON
@@ -266,7 +268,7 @@ export default function CreateApiKeyDialog({ isCreateApiKeyOpen, setIsCreateApiK
           {showAlert && (
             <div className="block sm:hidden">
               <SnackBar
-                id="device-page-snackbar"
+                id="create-api-key-snackbar"
                 severity={alertType}
                 showSnackBar={showAlert}
                 snackBarText={alertText}

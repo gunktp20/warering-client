@@ -26,7 +26,7 @@ function RequireUser() {
     }
   }, []);
 
-  return <Outlet />;
+  return <Outlet/>;
 }
 
 export default RequireUser;

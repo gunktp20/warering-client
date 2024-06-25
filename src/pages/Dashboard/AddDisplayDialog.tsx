@@ -101,10 +101,6 @@ export default function AddDisplayDialog({
       await axiosPrivate.post(
         `/dashboards/${dashboard_id}/widget/${selectedWidget}`
       );
-      displayAlert({
-        msg: "Added your widget to dashboard",
-        type: "success",
-      });
       setEditDialogOpen(false);
       setIsLoading(false);
       return hookAddSuccess();

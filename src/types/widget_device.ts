@@ -43,9 +43,14 @@ export interface IGaugeDeviceProp extends IWidgetDisplayProp, IWidgetProp {
 }
 
 export interface ILineChartDeviceProp extends IWidgetDisplayProp, IWidgetProp {
-  value: string | number | null;
+  id?: string;
+  colors:string[];
   min: number;
   max: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  payload: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  keys: string[];
 }
 
 export interface IRangeSliderDeviceProp

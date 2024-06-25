@@ -320,7 +320,7 @@ function DashboardList() {
                           {dashboard?.description}
                         </td>
                         <td onClick={() => {
-                          navigate("/dashboard/" + dashboard.id);
+                          navigate("/dashboard-test/" + dashboard.id);
                         }} className="p-3 text-sm text-[#878787] whitespace-nowrap cursor-pointer text-center sm:text-start" id={`createdAt-${dashboard.id}`}>
                           <div className="font-bold hidden mr-3 sm:mb-2 sm:block text-gray-600">
                             CreatedAt

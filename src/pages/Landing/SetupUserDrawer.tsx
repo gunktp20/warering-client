@@ -136,6 +136,7 @@ function SetupUserDrawer(props: IDrawer) {
                   </Alert>
                 )}
 
+
                 <FormRow
                   type="text"
                   name="email_forget_password"
@@ -183,6 +184,13 @@ function SetupUserDrawer(props: IDrawer) {
                     {alertText}
                   </Alert>
                 )}
+                <Alert
+                  severity={"info"}
+                  sx={{ fontSize: "11.8px", alignItems: "center" }}
+                  id="alert-forget-password-drawer"
+                >
+                  Your account was created but is not verified .you want to <div className="underline"> Resend</div>
+                </Alert>
                 <FormRow
                   type="text"
                   name="username"

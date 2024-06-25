@@ -8,7 +8,6 @@ import { NavLink } from "react-router-dom";
 import { PiNotebookBold } from "react-icons/pi";
 import { VscGraph } from "react-icons/vsc";
 import { FiCpu } from "react-icons/fi";
-import { RiPieChartLine } from "react-icons/ri";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -99,19 +98,6 @@ export default function SmallNavLinks(props: INavDialog) {
               Devices
             </NavLink>
 
-            <NavLink
-              to="/visualization"
-              key={4}
-              id="visualization-nav-link-dialog"
-              onClick={() => { }}
-              className={({ isActive }) =>
-                `flex pl-10 p-5 items-center text-[14px] ${isActive ? "text-[#1966fb]" : "text-[#1d4469]"
-                }`
-              }
-            >
-              <RiPieChartLine className="mr-3 text-[16px]" />
-              Visualization
-            </NavLink>
           </DialogContentText>
         </DialogContent>
       </Dialog>

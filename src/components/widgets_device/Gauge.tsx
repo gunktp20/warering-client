@@ -1,27 +1,16 @@
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { useState } from "react";
-import { Doughnut } from "react-chartjs-2";
 import { RxDotsHorizontal } from "react-icons/rx";
 import { IGaugeDeviceProp } from "../../types/widget_device";
 import DeleteConfirmDialog from "./DeleteConfirmDialog";
 import { useAppDispatch } from "../../app/hooks";
 import { setSelectedWidgets } from "../../features/widget/widgetSlice";
+import canConvertToNumber from "../../utils/canConvertToNumber";
+import ProgressBar from "./ProgressBar";
 
 export type Id = string | number;
 
 ChartJS.register(ArcElement, Tooltip, Legend);
-
-const options = {
-  // Disable tooltips
-  tooltips: {
-    enabled: false // Disable tooltips
-  },
-  plugins: {
-    tooltip: {
-      enabled: false // Disable tooltips (for Chart.js v3 and above)
-    }
-  }
-};
 
 function Gauge({
   label,
@@ -37,29 +26,10 @@ function Gauge({
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
-  const sum = Number(max) + Number(min);
-  const newValue = Number(value) + Number(min);
-  const result = Math.round((100 * newValue) / sum);
-  const firstNum = result;
-  const secondNum = 100 - result;
-  const data = {
-    labels: [],
-    datasets: [
-      {
-        label: "doughnut",
-        data: [firstNum, secondNum],
-        backgroundColor: ["#1966fb", "#00000045"],
-        borderColor: ["#fff", "#fff"],
-        circumference: 180,
-        rotation: 270,
-        borderWidth: 0,
-        cutout: "84%",
-      },
-    ],
-  };
+
   return (
     <div id={widgetId} className="h-[150px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 overflow-hidden">
-      {!value && (
+      {((!value && value !== 0) || !canConvertToNumber(value)) && (
         <div className=" bg-white z-10 flex absolute justify-center items-center font-bold text-[#0075ff]">
           IDLE
         </div>
@@ -98,10 +68,10 @@ function Gauge({
           </button>
         </div>
       )}
-      {value && <div className="w-[100px]">
-        <Doughnut data={data} options={options}></Doughnut>
+      {(value || value === 0) && canConvertToNumber(value) && <div>
+        <ProgressBar id={widgetId} value={(typeof value === "number" || typeof value === "string") ? Number(value) : min} min={min} max={max} />
       </div>}
-      {value && <div className="w-[100px] text-[#1966fb] absolute text-center bottom-7 text-[12.8px]">
+      {(value || value === 0) && canConvertToNumber(value) && <div className="w-[100px] text-[#1966fb] absolute text-center top-[6rem] text-[12.8px]">
         {value} {unit}
       </div>}
       <DeleteConfirmDialog

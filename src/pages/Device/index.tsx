@@ -5,18 +5,20 @@ import {
   AccountUserDrawer,
   SnackBar,
 } from "../../components";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { IoMdCheckmark } from "react-icons/io";
 import { RiMenu2Fill } from "react-icons/ri";
 import { IoArrowBackSharp } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { SiMicrosoftexcel } from "react-icons/si";
 import { BsFiletypeJson } from "react-icons/bs";
-import Wrapper from "../../assets/wrappers/Device";
 import { LuEye } from "react-icons/lu";
 import { LuEyeOff } from "react-icons/lu";
 import { MqttClient } from "mqtt";
 import { FaRegCopy } from "react-icons/fa";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import {
   ButtonControl,
   Gauge,
@@ -78,6 +80,8 @@ interface IConfigWidget {
   payload: string;
   on_payload: string;
   off_payload: string;
+  keys: string[]
+  colors: string[]
 }
 
 function Device() {
@@ -106,11 +110,64 @@ function Device() {
   const [isTopicsShow, setIsTopicsShow] = useState<boolean>(false);
   const [isAddWidgetShow, setIsAddWidgetShow] = useState<boolean>(false);
   const [selectedWidget, setSelectedWidget] = useState<string>("");
-
   const [widgets, setWidgets] = useState<IWidget[]>([]);
   const [configWidgetsDevice, setConfigWidgetsDevice] = useState<{
     [key: string]: string | number;
   }>();
+  const [visualizationWidgets, setVisualizationWidgets] = useState<IWidget[]>([])
+  const sliderRef = useRef<Slider | null>(null);
+
+  // Function to handle mouse wheel
+  const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    if (e.deltaY < 0) {
+      sliderRef.current?.slickPrev(); // Use optional chaining
+    } else {
+      sliderRef.current?.slickNext();
+    }
+  };
+
+  // Function to disable scroll
+  const disableScroll = () => {
+    document.body.classList.add('no-scroll');
+  };
+
+  // Function to enable scroll
+  const enableScroll = () => {
+    callRefuteExe()
+    document.body.classList.remove('no-scroll');
+  };
+
+  const settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    responsive: [
+      {
+        breakpoint: 900,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 1150,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+      {
+        breakpoint: 1300,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+        },
+      },
+    ]
+  };
 
   const fetchDeviceById = async () => {
     setIsLoading(true);
@@ -133,7 +190,14 @@ function Device() {
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(`/widgets/${device_id}`);
-      setWidgets(data);
+      console.log(data)
+      setWidgets(data.filter((widget: { type: string; }) => widget.type !== "LineChart"));
+      // new update 
+      setVisualizationWidgets(data.filter((widget: IWidget) => {
+        if (widget.type === "LineChart") {
+          return widget;
+        }
+      }))
       setIsLoading(false);
     } catch (err) {
       const msg = await getAxiosErrorMessage(err);
@@ -252,11 +316,17 @@ function Device() {
       document.body.appendChild(link)
       link.click();
       document.body.removeChild(link);
+      displayAlert({ msg: "JSON file is downloading...", type: "success" })
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err)
       displayAlert({ msg, type: "error" })
     }
   }
+
+  const { callHandler: callDisableScroll, callRefuteExe } = useTimeout({
+    executeAction: disableScroll,
+    duration: 250,
+  });
 
   const exportExcelFile = async () => {
     try {
@@ -267,6 +337,7 @@ function Device() {
       XLSX.utils.book_append_sheet(wb, ws,)
 
       XLSX.writeFile(wb, `${device_id}_${new Date()}.xlsx`)
+      displayAlert({ msg: "Excel file is downloading...", type: "success" })
     } catch (err) {
       const msg = await getAxiosErrorMessage(err)
       displayAlert({ msg, type: "error" })
@@ -277,7 +348,7 @@ function Device() {
   const { callHandler: callExportExcelFile } = useTimeout({ executeAction: exportExcelFile, duration: 1000 })
 
   return (
-    <Wrapper>
+    <div className='flex-col flex '>
       {deviceInfo?.nameDevice && (
         <AddWidgetDialog
           device_id={device_id}
@@ -315,19 +386,21 @@ function Device() {
         setIsSidebarShow={setIsSidebarShow}
         isSidebarShow={isSidebarShow}
       />
-
-      <div className="flex h-[100%]">
+      {/* Container content and sidebar*/}
+      <div className='flex'>
+        {/*  sidebar*/}
         <NavLinkSidebar isSidebarShow={isSidebarShow} />
         <NavDialog
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
         />
-        {/* content container */}
-        <div className="m-[3rem] top-[5rem] min-h-vh w-[100%] flex flex-col rounded-md sm:m-[1rem] sm:mt-[2.5rem]">
+        {/* Content Y axis */}
+        <div className='m-[3rem] top-[4rem] w-[100%] flex h-fit flex-col sm:m-0 sm:my-[3rem] sm:mx-[1rem]'>
+          {/* menu top content container */}
           <div className="flex justify-between">
             <button
               onClick={() => {
-                setIsDrawerOpen(true);
+                // setIsDrawerOpen(true);
               }}
               className="hidden p-1 w-fit h-fit relative sm:block text-[#8f8f8f] mb-6"
               id="toggle-nav-links-dialog-btn"
@@ -345,6 +418,8 @@ function Device() {
               <IoArrowBackSharp className="text-sm mr-2" />
               Back
             </button>
+            {/* name device */}
+
           </div>
           <div className="flex w-[100%] justify-between sm:hidden">
             <div
@@ -354,7 +429,6 @@ function Device() {
               {deviceInfo?.nameDevice}
             </div>
           </div>
-
           {/* Start Device info container */}
           <div className="p-5 w-[100%] border-[1px] grid grid-cols-3 border-[#f1f1f1] rounded-md shadow-sm bg-white sm:grid-cols-2">
             <div className=" w-[100%] text-[#1D4469] font-bold mb-8" id="nameDevice-info">
@@ -464,10 +538,9 @@ function Device() {
                 View Topics
               </button>
             </div>
-
           </div>
           {/* End Device info container */}
-
+          {/* Start JSON viewer */}
           <div className="text-[#1d4469] text-[20px] mt-8 font-bold">
             JSON view
           </div>
@@ -481,7 +554,8 @@ function Device() {
               style={defaultStyles}
             />
           </div>
-
+          {/* End JSON viewer */}
+          {/* Exports alternatives */}
           <div className="text-[#1d4469] text-[20px] mt-8 font-bold">
             Export
           </div>
@@ -500,7 +574,8 @@ function Device() {
               </div>
             </div>
           </div>
-
+          {/* Exports alternatives End */}
+          {/* Widget menu options start */}
           <div className="w-[300px] mt-8 sm:w-[100%]">
             <Button
               onClick={() => {
@@ -529,9 +604,23 @@ function Device() {
               Add widget
             </Button>
           </div>
+          {/* {/* Widget menu options */}
+
+
+          {/* {widgets.length <= 0 && (
+            <div className="flex justify-center items-center w-[100%] py-4 pt-12 text-[#c0c0c0] ">
+
+              <MdSearchOff className="text-[30px] mr-4" />
+
+              <div className="text-sm">
+                your have not any widget
+              </div>
+            </div>
+          )} */}
 
           {/* start widget container */}
-          <div className="grid grid-cols-3 gap-10 mt-8 md:grid-cols-2 sm:grid-cols-1">
+          {widgets.length > 0 && <div className="border-b-[#1d446931] mt-5 border-b-[1px] pb-3 text-[14px] font-bold text-[#1d4469]">widgets</div>}
+          <div className="grid grid-cols-3 gap-5 mt-8 md:grid-cols-2 sm:grid-cols-1">
             {widgets &&
               widgets.map((widget: IWidget, index: number) => {
                 if (widget.type === "Gauge") {
@@ -614,50 +703,81 @@ function Device() {
                     />
                   );
                 }
-                if (widget.type === "LineChart") {
-                  return (
-                    <LineChart
-                      key={index}
-                      widgetId={widget?.id}
-                      label={widget?.label}
-                      min={widget?.configWidget?.min}
-                      max={widget?.configWidget?.max}
-                      fetchAllWidgets={fetchAllWidgets}
-                      value={
-                        configWidgetsDevice !== undefined
-                          ? configWidgetsDevice?.[widget?.configWidget?.value]
-                          : null
-                      }
-                      selectWidget={selectWidget}
-                    />
-                  );
-                }
               })}
           </div>
+          {/* Widgets container end */}
+
+          {/* widget visualization container */}
+          {visualizationWidgets.length >= 1 && <div className="border-b-[#1d446931] mt-9 border-b-[1px] pb-3 text-[14px] font-bold text-[#1d4469]">visualization</div>}
+          {visualizationWidgets.length > 1 && <div className="w-[100%] flex justify-center relative h-[70vh]">
+            <div
+              onMouseEnter={callDisableScroll}
+              onMouseLeave={enableScroll}
+              onWheel={handleWheel}
+              className="w-[100%] shadow-md rounded-md mt-8 absolute">
+              <Slider ref={sliderRef} {...settings}>
+                {visualizationWidgets.length > 1 && visualizationWidgets.map((widget, index) => {
+                  return <LineChart
+                    key={index}
+                    widgetId={widget?.id}
+                    label={widget?.label}
+                    min={widget?.configWidget?.min}
+                    max={widget?.configWidget?.max}
+                    fetchAllWidgets={fetchAllWidgets}
+                    keys={widget.configWidget.keys}
+                    colors={widget.configWidget.colors}
+                    payload={configWidgetsDevice !== undefined ? configWidgetsDevice : null}
+                    selectWidget={selectWidget}
+                  />
+                })}
+              </Slider>
+            </div>
+          </div>}
+          {/* if length is 1 */}
+          {visualizationWidgets.length === 1 && visualizationWidgets.map((widget, index) => {
+            return (<div className="w-[100%] shadow-md rounded-md mt-8">
+              <LineChart
+                key={index + 1}
+                widgetId={widget?.id}
+                id={widget?.id + "single"}
+                label={widget?.label}
+                min={widget?.configWidget?.min}
+                max={widget?.configWidget?.max}
+                fetchAllWidgets={fetchAllWidgets}
+                keys={widget.configWidget.keys}
+                colors={widget.configWidget.colors}
+                payload={configWidgetsDevice !== undefined ? configWidgetsDevice : null}
+                selectWidget={selectWidget}
+              />
+            </div>)
+          })}
+          {/* widget visualization container end */}
         </div>
-        {showAlert && (
-          <div className="block sm:hidden">
-            <SnackBar
-              id="device-page-snackbar"
-              severity={alertType}
-              showSnackBar={showAlert}
-              snackBarText={alertText}
-            />
-          </div>
-        )}
-        {widgetState.showAlert && (
-          <div className="block sm:hidden">
-            <SnackBar
-              id="device-state-snackbar"
-              severity={widgetState.alertType}
-              showSnackBar={widgetState.showAlert}
-              snackBarText={widgetState.alertText}
-            />
-          </div>
-        )}
       </div>
-    </Wrapper>
-  );
+      {/* Container content and sidebar*/}
+      {showAlert && (
+        <div className="block sm:hidden">
+          <SnackBar
+            id="device-page-snackbar"
+            severity={alertType}
+            showSnackBar={showAlert}
+            snackBarText={alertText}
+          />
+        </div>
+      )}
+      {widgetState.showAlert && (
+        <div className="block sm:hidden">
+          <SnackBar
+            id="device-state-snackbar"
+            severity={widgetState.alertType}
+            showSnackBar={widgetState.showAlert}
+            snackBarText={widgetState.alertText}
+          />
+        </div>
+      )}
+
+    </div >
+  )
 }
 
-export default Device;
+export default Device

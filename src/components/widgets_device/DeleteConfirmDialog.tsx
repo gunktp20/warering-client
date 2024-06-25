@@ -55,6 +55,7 @@ function DeleteConfirmDialog({
       setIsDeleteConfirmOpen(false);
       fetchAllWidgets();
       dispatch(displayWidgetAlert({ msg: "Your widget was deleted", type: "error" }))
+      document.body.classList.remove('no-scroll');
       clearWidgetAlert()
     } catch (err) {
       const msg = await getAxiosErrorMessage(err)

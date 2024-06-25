@@ -59,10 +59,10 @@ export default function ConfirmDelete({ isDeleteConfirmOpen, setIsDeleteConfirmO
         TransitionComponent={Transition}
         keepMounted
         onClose={handleClose}
-        id="confirm-delete-device-dialog"
+        id="confirm-delete-api-key-dialog"
       >
         <DialogContentText
-          id="confirm-delete-device-dialog-content"
+          id="confirm-delete-api-key-dialog-content"
           className="py-7 px-11"
           component={"div"}
           variant={"body2"}
@@ -74,7 +74,7 @@ export default function ConfirmDelete({ isDeleteConfirmOpen, setIsDeleteConfirmO
             <button
               onClick={handleClose}
               disabled={isLoading}
-              id="cancel-delete-device"
+              id="cancel-delete-api-key"
               className="text-black text-[12.5px] border-[1px] border-[#000] rounded-sm px-10 py-[0.4rem]"
             >
               Cancel
@@ -82,7 +82,7 @@ export default function ConfirmDelete({ isDeleteConfirmOpen, setIsDeleteConfirmO
             <button onClick={() => {
               deleteApiKey()
             }}
-              id="confirm-delete-device"
+              id="confirm-delete-api-key"
               disabled={isLoading} className="bg-[#dc3546] text-[12.5px] text-white px-10 py-[0.4rem] rounded-sm">
               Delete
             </button>
@@ -90,7 +90,7 @@ export default function ConfirmDelete({ isDeleteConfirmOpen, setIsDeleteConfirmO
           {showAlert && (
             <div className="block sm:hidden">
               <SnackBar
-                id="confirm-delete-snackbar"
+                id="confirm-delete-key"
                 severity={alertType}
                 showSnackBar={showAlert}
                 snackBarText={alertText}

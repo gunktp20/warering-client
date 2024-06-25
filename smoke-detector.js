@@ -19,13 +19,14 @@ client.on("connect", function () {
   console.log("เชื่อมต่อ mqtt สำเร็จ");
   console.log(`ส่งข้อมูลจากอุปกรณ์ ไปยัง server แล้ว ✔️ `);
   setInterval(() => {
-    let smoke_val = (Math.random() * 100).toFixed(2);
-    smoke_val = map(smoke_val, 0, 100, 23, 26).toFixed(2);
-    
+    const tem_val = Math.floor(Math.random() * 1001);
+    const speed_val = Math.floor(Math.random() * 5001);
+
     client.publish(
       "665e1d8d8c80d27112e47fa8/smoke-detector/publish",
       JSON.stringify({
-        smoke_val,
+        tem_val : String(tem_val),
+        speed_val : String(speed_val),
       }),
       {
         qos: 0,

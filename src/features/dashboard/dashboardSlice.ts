@@ -2,6 +2,29 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { MqttClient } from "mqtt";
 
+export interface IConfigWidget {
+  value: string;
+  min: number;
+  max: number;
+  unit: string;
+  button_label: string;
+  payload: string;
+  on_payload: string;
+  off_payload: string;
+}
+
+export interface IWidgetDashboard {
+  id: string;
+  _id: string;
+  deviceId: string;
+  label: string;
+  type: string;
+  configWidget: IConfigWidget;
+  createdAt: string;
+  updatedAt: string;
+  column: "column-1" | "column-2" | "column-3" | string;
+}
+
 interface IDashboard {
   id: string;
   nameDashboard: string;
@@ -17,6 +40,7 @@ interface IDashboardState {
   showAlert: boolean;
   alertType: "error" | "success" | "info" | "warning";
   alertText: string;
+  widgets: IWidgetDashboard[];
 }
 
 const initialState: IDashboardState = {
@@ -27,6 +51,7 @@ const initialState: IDashboardState = {
   showAlert: false,
   alertType: "error",
   alertText: "",
+  widgets: [],
 };
 
 const DashboardSlice = createSlice({
@@ -37,6 +62,12 @@ const DashboardSlice = createSlice({
       return {
         ...state,
         editMode: !state.editMode,
+      };
+    },
+    setWidgets: (state, action) => {
+      return {
+        ...state,
+        widgets: action.payload,
       };
     },
     setDashboards: (state, action) => {
@@ -82,6 +113,7 @@ export const {
   pushClientMqtt,
   setDashboards,
   setSelectedDashboard,
+  setWidgets,
   clearAlert,
   displayAlert,
 } = DashboardSlice.actions;
