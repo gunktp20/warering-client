@@ -90,7 +90,6 @@ function MessageBox({
             {unit}
           </div>
         </div>}
-
         <ConfirmDelete
           widgetId={widgetId}
           isDeleteConfirmOpen={isDeleteConfirmOpen}
