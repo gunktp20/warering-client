@@ -24,7 +24,6 @@ client.on("connect", function () {
     let brightness_val = (Math.random() * 10000).toFixed(0);
     brightness_val = map(brightness_val, 0, 10000, 500, 1200).toFixed(0);
 
-    console.log("tem_val", tem_val);
 
     client.publish(
       "665e1d8d8c80d27112e47fa8/tem-mqtt-1/publish",
@@ -65,10 +64,10 @@ client.on("connect", function () {
 client.on("message", function (topic, message) {
   const payload = JSON.parse(message.toString());
   console.log(payload);
-  if (payload.led === 1) {
+  if (payload.led === 0) {
     console.log("ไฟกลางห้องถูกเปิด ✔️");
   }
-  if (payload.led === 0) {
+  if (payload.led === 1) {
     console.log("ไฟกลางห้องถูกปิด ❌");
   }
   if (payload["brightness-bedroom"] > 0) {

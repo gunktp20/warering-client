@@ -19,14 +19,12 @@ client.on("connect", function () {
   console.log("เชื่อมต่อ mqtt สำเร็จ");
   console.log(`ส่งข้อมูลจากอุปกรณ์ ไปยัง server แล้ว ✔️ `);
   setInterval(() => {
-    const tem_val = Math.floor(Math.random() * 1001);
-    const speed_val = Math.floor(Math.random() * 5001);
+    const smoke_val = Math.floor(Math.random() * 5001);
 
     client.publish(
       "665e1d8d8c80d27112e47fa8/smoke-detector/publish",
       JSON.stringify({
-        tem_val : String(tem_val),
-        speed_val : String(speed_val),
+        smoke_val: Number(smoke_val),
       }),
       {
         qos: 0,
@@ -61,19 +59,12 @@ const test = {
 client.on("message", function (topic, message) {
   const payload = JSON.parse(message.toString());
   console.log(payload);
-  if (payload.led === 1) {
-    console.log("ไฟกลางห้องถูกเปิด ✔️");
+  if (payload.water === 0) {
+    console.log("ฉีดน้ำ ✔️");
   }
-  if (payload.led === 0) {
-    console.log("ไฟกลางห้องถูกปิด ❌");
+  if (payload.water === 1) {
+    console.log("ปิดน้ำ ❌");
   }
-  if (payload["brightness-bedroom"] > 0) {
-    console.log("ความสว่างไฟหัวเตียง ", payload["brightness-bedroom"], "%");
-  }
-  if (payload["brightness-bedroom"] < 1) {
-    console.log("ความสว่างในห้อง 0 %");
-  }
-  console.log("--------------------------------");
 });
 
 client.on("disconnect", function (topic, message) {
