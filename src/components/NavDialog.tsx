@@ -60,10 +60,9 @@ export default function SmallNavLinks(props: INavDialog) {
               to="/"
               key={1}
               id="overview-nav-link-dialog"
-              onClick={() => {}}
+              onClick={() => { }}
               className={({ isActive }) =>
-                `flex pl-10 p-5 items-center text-[14px] ${
-                  isActive ? "text-[#1966fb]" : "text-[#1d4469]"
+                `flex pl-10 p-5 items-center text-[14px] ${isActive ? "text-[#1966fb]" : "text-[#1d4469]"
                 }`
               }
             >
@@ -75,10 +74,9 @@ export default function SmallNavLinks(props: INavDialog) {
               to="/dashboard-list"
               key={2}
               id="dashboard-nav-link-dialog"
-              onClick={() => {}}
+              onClick={() => { }}
               className={({ isActive }) =>
-                `flex pl-10 p-5 items-center text-[14px] ${
-                  isActive ? "text-[#1966fb]" : "text-[#1d4469]"
+                `flex pl-10 p-5 items-center text-[14px] ${isActive ? "text-[#1966fb]" : "text-[#1d4469]"
                 }`
               }
             >
@@ -90,16 +88,16 @@ export default function SmallNavLinks(props: INavDialog) {
               to="/device-list"
               key={3}
               id="device-nav-link-dialog"
-              onClick={() => {}}
+              onClick={() => { }}
               className={({ isActive }) =>
-                `flex pl-10 p-5 items-center text-[14px] ${
-                  isActive ? "text-[#1966fb]" : "text-[#1d4469]"
+                `flex pl-10 p-5 items-center text-[14px] ${isActive ? "text-[#1966fb]" : "text-[#1d4469]"
                 }`
               }
             >
               <FiCpu className="mr-3 text-[16px]" />
               Devices
             </NavLink>
+
           </DialogContentText>
         </DialogContent>
       </Dialog>

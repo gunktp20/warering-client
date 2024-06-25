@@ -17,4 +17,5 @@ export interface IWidget {
   configWidget: IConfigWidget;
   createdAt: string;
   updatedAt: string;
+  
 }

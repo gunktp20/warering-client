@@ -4,6 +4,7 @@ interface IProp {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   executeAction: (...args: any) => any;
   duration?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }
 
 function useTimeout({ executeAction, duration }: IProp) {
@@ -26,11 +27,16 @@ function useTimeout({ executeAction, duration }: IProp) {
     setTimeoutIds([newTimeoutId]);
   };
 
+  const callRefuteExe = () => {
+    clearAllTimeouts();
+  }
+
   return {
     timeoutIds,
     setTimeoutIds,
     clearAllTimeouts,
     callHandler,
+    callRefuteExe
   };
 }
 

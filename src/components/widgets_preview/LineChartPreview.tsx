@@ -14,9 +14,9 @@ function calculatePercentage(percent: number, baseNumber: number) {
   return result;
 }
 
-function LineChartPreview({ label, min, max }: ILineChartPreviewProp) {
-
-  max = 60
+function LineChartPreview({ label }: ILineChartPreviewProp) {
+  const min = 0
+  const max = 60
   const data = {
     label: "Sales of the Week",
     labels: ["5", "15", "20", "21", "22", "25", "26"],

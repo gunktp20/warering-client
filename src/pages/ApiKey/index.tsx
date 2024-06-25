@@ -15,7 +15,7 @@ import { IoMdCloseCircle } from "react-icons/io";
 import useAlert from "../../hooks/useAlert";
 import moment from "moment";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import ConfirmDelete from "./ConfirmDeleteDevice";
+import ConfirmDelete from "./ConfirmDeleteKey";
 import { setSelectedApiKey, setApiKeys } from "../../features/apiKey/apiKeySlice";
 import { MdFilterAltOff, MdSearchOff } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -157,7 +157,7 @@ function ApiKeys() {
                             setIsDrawerOpen(true);
                         }}
                         className="hidden p-1 w-fit h-fit relative md:block sm:block text-[#8f8f8f] mb-6"
-                        id="small-open-sidebar-btn"
+                        id="toggle-nav-links-dialog-btn"
                     >
                         <RiMenu2Fill className="text-[23px]" />
                     </button>
@@ -195,7 +195,7 @@ function ApiKeys() {
                                     },
                                 }}
                                 variant="outlined"
-                                id="toggle-add-dashboard-dialog-btn"
+                                id="create-api-key-btn"
                             >
                                 Create Api Key
                             </Button>

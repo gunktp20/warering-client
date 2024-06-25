@@ -107,7 +107,7 @@ export default function ChangePasswordDialog({
                                 id="edit-device-title"
                                 className="text-[18px] mb-2 font-bold text-[#1D4469]"
                             >
-                                <div>Change password</div>
+                                <div className="change-password-title">Change password</div>
 
                             </div>
                             {showAlert && alertType && (

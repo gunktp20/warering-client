@@ -26,7 +26,7 @@ function MessageBox({
     useState<boolean>(false);
   return (
     <div id={widgetId} className="h-[150px] w-[100%] bg-white relative shadow-md flex justify-center items-center rounded-md hover:ring-2 overflow-hidden">
-      {!value && (
+      {((!value && value !== 0)) && (
         <div className=" bg-white z-10 flex absolute justify-center items-center font-bold text-[#0075ff]">
           IDLE
         </div>
@@ -65,7 +65,7 @@ function MessageBox({
           </button>
         </div>
       )}
-      {value && <div
+      {((value || value === 0)) && <div
         className={`text-[#1966fb] font-bold flex ${checkThaiLanguage(
           value !== null && typeof value !== "number" ? value : ""
         )

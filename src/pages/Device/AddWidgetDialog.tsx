@@ -21,6 +21,7 @@ import { displayAlert as displayWidgetAlert, clearAlert as clearWidgetAlert } fr
 import { useAppDispatch } from "../../app/hooks";
 import useTimeout from "../../hooks/useTimeout";
 import useAlert from "../../hooks/useAlert";
+import { IoMdCloseCircle } from "react-icons/io";
 
 interface IWidget {
   type?: string;
@@ -36,6 +37,12 @@ interface IConfigWidget {
   payload?: string;
   on_payload?: string | number;
   off_payload?: string | number;
+  value_1?: string,
+  value_2?: string,
+  value_3?: string,
+  value_4?: string,
+  keys?: string[];
+  colors?: string[];
 }
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -64,6 +71,10 @@ const initialState: {
   button_label: string;
   on_payload: string | number | undefined;
   off_payload: string | number | undefined;
+  value_1: string,
+  value_2: string,
+  value_3: string,
+  value_4: string,
 } = {
   label: "",
   value: "",
@@ -74,6 +85,10 @@ const initialState: {
   button_label: "",
   on_payload: "",
   off_payload: "",
+  value_1: "",
+  value_2: "",
+  value_3: "",
+  value_4: "",
 };
 
 export default function AddWidgetDialog(props: IProps) {
@@ -82,10 +97,21 @@ export default function AddWidgetDialog(props: IProps) {
   const [occupation, setOccupation] = useState<string>("");
   const axiosPrivate = useAxiosPrivate();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [chuckLength, setChunkLength] = useState<number>(1);
+  // values
+  const [colorValue1, setColorValue1] = useState<string>("#1966fb");
+  const [colorValue2, setColorValue2] = useState<string>("#19cefb");
+  const [colorValue3, setColorValue3] = useState<string>("#e119fb");
+  const [colorValue4, setColorValue4] = useState<string>("#fb8e19");
 
   const handleClose = () => {
     setOccupation("");
     setValues(initialState);
+    setChunkLength(1);
+    setColorValue1("#1966fb")
+    setColorValue2("#19cefb")
+    setColorValue3("#e119fb")
+    setColorValue4("#fb8e19")
     props.setIsAddWidgetShow(false);
   };
 
@@ -95,19 +121,27 @@ export default function AddWidgetDialog(props: IProps) {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
+
   const onSubmit = () => {
-    const { label, value, min, max, unit, payload, on_payload, off_payload } =
+    const { label, value, min, max, unit, payload, on_payload, off_payload, value_1, value_2, value_3, value_4 } =
       values;
     const widgetInfo: IWidget = {}
     if (
       occupation === "Gauge" &&
-      (!label || !value || min === null || !max || !unit)
+      (!label || !value || min === null || !max)
     ) {
       displayAlert({ msg: "Please provide all value", type: "error" })
       return;
     }
     if (occupation === "Gauge" && min > max) {
       displayAlert({ msg: "min value must be < max value", type: "error" })
+      return;
+    }
+    if (
+      occupation === "MessageBox" &&
+      (!label || !value)
+    ) {
+      displayAlert({ msg: "Please provide a value", type: "error" })
       return;
     }
     if (occupation === "ButtonControl" && (!label || !payload)) {
@@ -134,7 +168,7 @@ export default function AddWidgetDialog(props: IProps) {
     }
     if (
       occupation === "LineChart" &&
-      (!label || !value || min === null || !max)
+      (!label || !value_1 || min === null || !max || (chuckLength == 2 && !value_2) || (chuckLength == 3 && !value_3) || (chuckLength == 4 && !value_4))
     ) {
       displayAlert({ msg: "Please provide all value", type: "error" })
       return;
@@ -151,7 +185,7 @@ export default function AddWidgetDialog(props: IProps) {
           value: values.value,
           min: Number(values.min),
           max: Number(values.max),
-          unit: values.unit,
+          unit,
         };
         createWidget(widgetInfo);
         return;
@@ -160,7 +194,7 @@ export default function AddWidgetDialog(props: IProps) {
         widgetInfo.type = occupation;
         widgetInfo.configWidget = {
           value: values.value,
-          unit: values.unit,
+          unit,
         };
         createWidget(widgetInfo);
         return;
@@ -216,11 +250,38 @@ export default function AddWidgetDialog(props: IProps) {
           return;
         }
       case "LineChart":
+        switch (chuckLength) {
+          case 1:
+            widgetInfo.configWidget = {
+              keys: [value_1],
+              colors: [colorValue1]
+            };
+            break;
+          case 2:
+            widgetInfo.configWidget = {
+              keys: [value_1, value_2],
+              colors: [colorValue1, colorValue2]
+            };
+            break;
+          case 3:
+            widgetInfo.configWidget = {
+              keys: [value_1, value_2, value_3],
+              colors: [colorValue1, colorValue2, colorValue3]
+            };
+            break;
+          case 4:
+            widgetInfo.configWidget = {
+              keys: [value_1, value_2, value_3, value_4],
+              colors: [colorValue1, colorValue2, colorValue3, colorValue4]
+            };
+            break;
+
+        }
         try {
           widgetInfo.label = values?.label;
           widgetInfo.type = occupation;
           widgetInfo.configWidget = {
-            value: values.value,
+            ...widgetInfo.configWidget,
             min: Number(values.min),
             max: Number(values.max),
           };
@@ -240,7 +301,7 @@ export default function AddWidgetDialog(props: IProps) {
     setIsLoading(true);
     try {
       await axiosPrivate.post(`/widgets/${props.device_id}`, { ...widgetInfo, configWidget: { ...configWidget, value: configWidget?.value?.trim() } });
-      dispatch(displayWidgetAlert({ msg: "Created your widget successfully", type: "success" }))
+      dispatch(displayWidgetAlert({ msg: `Created your ${widgetInfo?.label} widget successfully`, type: "success" }))
       callClearWidgetAlert();
       setIsLoading(false);
       handleClose();
@@ -253,6 +314,24 @@ export default function AddWidgetDialog(props: IProps) {
       return;
     }
   };
+
+  const insertLabel = async () => {
+    if (chuckLength === 4) {
+      return;
+    } else {
+      setChunkLength((length) => {
+        return length + 1;
+      })
+    }
+  }
+
+  const decreaseLabel = async () => {
+    if (chuckLength <= 1) {
+      return;
+    } else {
+      setChunkLength(chuckLength - 1)
+    }
+  }
 
   return (
     <div>
@@ -344,7 +423,6 @@ export default function AddWidgetDialog(props: IProps) {
                 {(occupation === "Gauge" ||
                   occupation === "MessageBox" ||
                   occupation === "ToggleSwitch" ||
-                  occupation === "LineChart" ||
                   occupation === "RangeSlider") && (
                     <div className="w-[350px] sm:w-[100%] relative">
                       <FormRow
@@ -357,14 +435,23 @@ export default function AddWidgetDialog(props: IProps) {
                       />
                     </div>
                   )}
+                {occupation === "LineChart" && <div className="w-[350px] sm:w-[100%] relative">
+                  <FormRow
+                    type="text"
+                    name="min"
+                    labelText="min"
+                    value={values.min}
+                    handleChange={handleChange}
+                    marginTop="mt-[0.2rem]"
+                  />
+                </div>}
               </div>
             )}
 
             {occupation && (
               <div className="flex gap-10 mt-3 sm:flex-col sm:gap-0">
                 {(occupation === "Gauge" ||
-                  occupation === "RangeSlider" ||
-                  occupation === "LineChart") && (
+                  occupation === "RangeSlider") && (
                     <div className="w-[350px] sm:w-[100%]">
                       <FormRow
                         type="number"
@@ -390,6 +477,17 @@ export default function AddWidgetDialog(props: IProps) {
                       />
                     </div>
                   )}
+                {occupation === "LineChart" && <div className="w-[350px] sm:w-[100%]">
+                  <FormRow
+                    type="text"
+                    name="value_1"
+                    labelText="value 1"
+                    value={values.value_1}
+                    handleChange={handleChange}
+                    marginTop="mt-[0.2rem]"
+                  />
+                </div>}
+
                 {occupation === "ButtonControl" && (
                   <div className="w-[245px] sm:w-[100%]">
                     <FormRow
@@ -443,8 +541,109 @@ export default function AddWidgetDialog(props: IProps) {
                     />
                   </div>
                 )}
+                {(occupation === "LineChart" && chuckLength >= 2) && <div className="flex relative w-[245px] sm:w-[100%]">
+                  <FormRow
+                    type="text"
+                    name="value_2"
+                    labelText="value 2"
+                    value={values.value_2}
+                    handleChange={handleChange}
+                    marginTop="mt-[0.2rem]"
+                  />
+                  <IoMdCloseCircle onClick={decreaseLabel} className=" cursor-pointer absolute text-[#1d4469] end-0 text-[20px] bottom-[26px] hover:text-red-600" />
+                </div>}
+                {(occupation === "LineChart" && chuckLength >= 3) && <div className="flex relative w-[245px] sm:w-[100%]">
+                  <FormRow
+                    type="text"
+                    name="value_3"
+                    labelText="value 3"
+                    value={values.value_3}
+                    handleChange={handleChange}
+                    marginTop="mt-[0.2rem]"
+                  />
+                  <IoMdCloseCircle onClick={decreaseLabel} className=" cursor-pointer absolute text-[#1d4469] end-0 text-[20px] bottom-[26px] hover:text-red-600" />
+                </div>}
               </div>
             )}
+
+            {occupation && (
+              <div className="flex gap-10 mt-3 sm:flex-col sm:gap-0">
+
+
+                {(occupation === "LineChart" && chuckLength >= 4) && <div className="flex relative w-[245px] sm:w-[100%]">
+                  <FormRow
+                    type="text"
+                    name="value_4"
+                    labelText="value 4"
+                    value={values.value_4}
+                    handleChange={handleChange}
+                    marginTop="mt-[0.2rem]"
+                  />
+                  <IoMdCloseCircle onClick={decreaseLabel} className=" cursor-pointer absolute text-[#1d4469] end-0 text-[20px] bottom-[26px] hover:text-red-600" />
+                </div>}
+              </div>
+            )}
+
+            {/* {occupation === "LineChart" && <button
+              id="insert-label-btn"
+              className="mb-6 py-[0.4rem] text-nowrap text-[12px] border-[1px] border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white rounded-md px-6 transition-all"
+              onClick={() => {
+                insertLabel()
+              }}
+            >
+              Insert Label +
+            </button>} */}
+            {occupation === "LineChart" && <div className={`w-[100%] flex justify-end items-end mb-5`}>
+              {chuckLength < 4 &&
+                <button
+                  id="insert-label-btn"
+                  className=" h-[35px] text-nowrap text-[12px] border-[1px] border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white rounded-md px-6 transition-all"
+                  onClick={() => {
+                    insertLabel()
+                  }}
+                >
+                  Insert Label +
+                </button>
+              }
+
+              <div className={`h-[100%] w-[100%] flex gap-3 ${chuckLength < 4 ? "items-end justify-end" : "justify-start items-start"} `}>
+                {/* color picker value 1*/}
+                <div className="flex flex-col">
+                  <div className={`text-[11px] mb-1`}>color value 1</div>
+                  <input value={colorValue1} type="color" onChange={(event) => {
+                    setColorValue1(event.target.value)
+                  }} className={`h-[35px] w-[85px] relative`}>
+
+                  </input>
+                </div>
+                {/* color picker value 2 */}
+                {chuckLength >= 2 && <div className="flex flex-col">
+                  <div className={`text-[11px] mb-1`}>color value 2</div>
+                  <input value={colorValue2} type="color" onChange={(event) => {
+                    setColorValue2(event.target.value)
+                  }} className={`h-[35px] w-[85px] relative`}>
+                  </input>
+                </div>}
+                {/* color picker value 3 */}
+                {chuckLength >= 3 && <div className="flex flex-col">
+                  <div className={`text-[11px] mb-1`}>color value 3</div>
+                  <input value={colorValue3} type="color" onChange={(event) => {
+                    setColorValue3(event.target.value)
+                  }} className={`h-[35px] w-[85px] relative`}>
+                  </input>
+                </div>}
+                {/* color picker value 4 */}
+                {chuckLength >= 4 && <div className="flex flex-col">
+                  <div className={`text-[11px] mb-1`}>color value 4</div>
+                  <input value={colorValue4} type="color" onChange={(event) => {
+                    setColorValue4(event.target.value)
+                  }} className={`h-[35px] w-[85px] relative`}>
+                  </input>
+                </div>}
+
+              </div>
+            </div>}
+
 
             {occupation && (
               <div className=" w-[100%] flex flex-col">
@@ -496,8 +695,6 @@ export default function AddWidgetDialog(props: IProps) {
               <div className="flex gap-10 mt-5 sm:flex-col sm:gap-0 w-[100%]">
                 <LineChartPreview
                   label={values.label}
-                  min={values.min}
-                  max={values.max}
                 />
               </div>
             )}
@@ -569,6 +766,7 @@ export default function AddWidgetDialog(props: IProps) {
                 )}
               </div>
             )}
+
           </DialogContentText>
         </DialogContent>
       </Dialog>

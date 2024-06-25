@@ -13,6 +13,11 @@ export interface IWidgetProp {
   widgetPositionId?: string;
   dashboardId: string;
   onDeleteSuccess: () => void;
+  handleDragStart: (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    e: any,
+    widget: { id: string; column: string }
+  ) => void;
 }
 
 export interface IWidgetControlProp {
@@ -35,7 +40,6 @@ export interface IToggleSwitchDashboardProp
   value: number | null | string | MqttPublish;
   on_payload: string | number;
   off_payload: string | number;
-  editMode: boolean;
 }
 
 export interface IButtonControlDashboardProp
@@ -44,7 +48,6 @@ export interface IButtonControlDashboardProp
   widget: IWidget;
   button_label: string;
   payload: string;
-  editMode: boolean;
 }
 
 export interface IGaugeDashboardProp extends IWidgetProp, IWidgetDisplayProp {
@@ -54,17 +57,22 @@ export interface IGaugeDashboardProp extends IWidgetProp, IWidgetDisplayProp {
   min: number;
   max: number;
   unit: string;
-  editMode: boolean;
 }
 
-export interface ILineChartDashboardProp
-  extends IWidgetProp,
-    IWidgetDisplayProp {
-  widget: IWidget;
-  value: number | null | string | MqttPublish;
+export interface ILineChartDashboardProp extends IWidgetDisplayProp {
   min: number;
   max: number;
-  editMode: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  payload: any;
+  keys: string[];
+  colors: string[];
+  id?: string;
+  widgetId: string;
+  label: string;
+  column?: "column-1" | "column-2" | "column-3" | string;
+  widgetPositionId?: string;
+  dashboardId: string;
+  onDeleteSuccess: () => void;
 }
 
 export interface IMessageBoxDashboardProp
@@ -74,7 +82,6 @@ export interface IMessageBoxDashboardProp
   label: string;
   value: number | null | string | MqttPublish;
   unit?: string;
-  editMode: boolean;
 }
 
 export interface IRangeSliderDashboardProp
@@ -85,5 +92,4 @@ export interface IRangeSliderDashboardProp
   min: number;
   max: number;
   value: number | null | string | MqttPublish;
-  editMode: boolean;
 }

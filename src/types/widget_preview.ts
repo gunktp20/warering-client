@@ -12,8 +12,6 @@ export interface IGaugePreviewProp {
 
 export interface ILineChartPreviewProp {
   label: string;
-  min: number;
-  max: number;
 }
 
 export interface IMessageBoxPreviewProp {

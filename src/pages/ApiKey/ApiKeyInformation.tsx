@@ -147,7 +147,7 @@ function ApiKeyInformation() {
             {showAlert && (
                 <div className="block sm:hidden">
                     <SnackBar
-                        id="device-page-snackbar"
+                        id="api-key-info-page-snackbar"
                         severity={alertType}
                         showSnackBar={showAlert}
                         snackBarText={alertText}

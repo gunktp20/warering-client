@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
 import { RxDotsHorizontal } from "react-icons/rx";
 import React, { useState } from "react";
 import {
@@ -8,52 +10,29 @@ import {
   PointElement,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { ILineChartDashboardProp } from "../../types/widget_dashboard";
 import ConfirmDelete from "./ConfirmDeleteWidget";
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
 function LineChart({
-  widget,
   label,
-  value,
+  payload,
+  keys,
+  colors,
   widgetId,
   min,
   max,
   fetchAllWidgets,
   selectWidget,
-  editMode,
   dashboardId,
   onDeleteSuccess,
+  id,
 }: ILineChartDashboardProp) {
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
-  const [values, setValues] = useState<number[]>([]);
   const [timeStamps, setTimeStamps] = useState<string[]>([]);
-
-  const {
-    setNodeRef,
-    attributes,
-    listeners,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: widget.id,
-    data: {
-      type: "Task",
-      widget,
-    },
-  });
-
-  const style = {
-    transition,
-    transform: CSS.Transform.toString(transform),
-    cursor: editMode ? "grab" : "default",
-  };
-
+  id
   function getCurrentTime() {
     const now = new Date();
 
@@ -67,21 +46,105 @@ function LineChart({
     return timeString;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [values1, setValues1] = useState<any[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [values2, setValues2] = useState<any[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [values3, setValues3] = useState<any[]>([])
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [values4, setValues4] = useState<any[]>([])
+
+  function setOpacity50(color: string): string {
+    // Helper function to convert hex to RGB
+    const hexToRgb = (hex: string) => {
+      // Remove hash if present
+      hex = hex.replace(/^#/, '');
+
+      // If short form (#RGB), convert to long form (#RRGGBB)
+      if (hex.length === 3) {
+        hex = hex.split('').map(char => char + char).join('');
+      }
+
+      const bigint = parseInt(hex, 16);
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+
+      return { r, g, b };
+    };
+
+    // Check if the color is in hex format
+    if (color.startsWith("#")) {
+      const { r, g, b } = hexToRgb(color);
+      return `rgba(${r}, ${g}, ${b}, 0.5)`;
+    } else if (color.startsWith("rgb")) {
+      // Extract the numbers from rgb or rgba string
+      const values = color.match(/\d+/g);
+      if (values && values.length >= 3) {
+        const [r, g, b] = values;
+        return `rgba(${r}, ${g}, ${b}, 0.5)`;
+      }
+    }
+
+    throw new Error("Invalid color format. Please use hex (#RRGGBB) or rgb(r, g, b).");
+
+  }
+
+  const dataSet1 = {
+    label: keys[0],
+    data: values1,
+    backgroundColor: colors[0],
+    borderColor: setOpacity50(colors[0]),
+    pointBorderColor: colors[0],
+    fill: true,
+    tension: 0.4,
+    borderWidth: 1.5,
+    yAxisID: 'y1'
+  }
+
+  const dataSet2 = keys[1] ? {
+    label: keys[1],
+    data: values2,
+    backgroundColor: colors[1],
+    borderColor: setOpacity50(colors[1]),
+    pointBorderColor: colors[1],
+    fill: true,
+    tension: 0.4,
+    borderWidth: 1.5,
+    yAxisID: 'y2'
+  } : undefined
+
+  const dataSet3 = keys[2] ?
+    {
+      label: keys[2],
+      data: values3,
+      backgroundColor: colors[2],
+      borderColor: setOpacity50(colors[2]),
+      pointBorderColor: colors[2],
+      fill: false,
+      tension: 0.4,
+      borderWidth: 1.5,
+      yAxisID: 'y3'
+    } : undefined
+
+  const dataSet4 = keys[3] ? {
+    label: keys[3],
+    data: values4,
+    backgroundColor: colors[3],
+    borderColor: setOpacity50(colors[3]),
+    pointBorderColor: colors[3],
+    fill: true,
+    tension: 0.4,
+    borderWidth: 1.5,
+    yAxisID: 'y4'
+  } : undefined
+  const datasets = [dataSet1, dataSet2, dataSet3, dataSet4]
+  const filteredDatasets = datasets.filter((set) => set !== undefined)
+
   const data = {
     labels: [...timeStamps],
-    datasets: [
-      {
-        label: "",
-        data: [...values],
-        backgroundColor: "#1966fb",
-        borderColor: "#00000013",
-        border: "1px",
-        pointBorderColor: "#1966fb",
-        fill: true,
-        tension: 0.4,
-        borderWidth: 1.8,
-      },
-    ],
+    datasets: filteredDatasets,
   };
 
   const options = {
@@ -92,63 +155,147 @@ function LineChart({
     },
     plugins: {
       legend: {
-        display: false,
+        display: true,
       },
-      scales: {
-        y: {
-          min: Math.floor(min),
-          max: Math.floor(max),
+    },
+    scales: {
+      x: {
+        ticks: {
+          font: {
+            size: 9.6,
+          },
         },
+      },
+      y1: {
+        type: 'linear', // Ensure linear scale
+        position: 'left',
+        min: Math.floor(min),
+        max: Math.floor(max),
+        ticks: {
+          font: {
+            size: 9.6,
+          },
+        },
+      },
+      y2: {
+        type: 'linear', // Ensure linear scale
+        position: 'right',
+        min: Math.floor(min),
+        max: Math.floor(max),
+        ticks: {
+          font: {
+            size: 9.6,
+          },
+        },
+        grid: {
+          drawOnChartArea: false, // Avoid grid overlap
+        },
+      },
+      y3: {
+        type: 'linear', // Ensure linear scale
+        // position: 'right',
+        min: Math.floor(min),
+        max: Math.floor(max),
+        ticks: {
+          font: {
+            size: 9.6,
+          },
+        },
+        grid: {
+          drawOnChartArea: false, // Avoid grid overlap
+        },
+        display: false
+      },
+      y4: {
+        type: 'linear', // Ensure linear scale
+        // position: 'right',
+        min: Math.floor(min),
+        max: Math.floor(max),
+        ticks: {
+          font: {
+            size: 9.6,
+          },
+        },
+        grid: {
+          drawOnChartArea: false,
+        },
+        display: false
       },
     },
   };
 
-  const pushNumber = (number: number): void => {
-    setValues((prevNumbers) => {
-      const newNumbers = [...prevNumbers];
-      if (newNumbers.length === 6) {
-        newNumbers.shift();
-      }
-      newNumbers.push(number);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const pushPayload = (payload: any) => {
+    if (!payload) {
+      return;
+    }
+    if (payload[keys[0]]) {
+      setValues1((prevValues) => {
+        const newValues = [...prevValues];
 
-      return newNumbers;
-    });
+        if (newValues.length === 30) {
+          newValues.shift();
+        }
+
+        newValues.push(payload[keys[0]]);
+        return newValues;
+      });
+    }
+    if (payload[keys[1]]) {
+      setValues2((prevValues) => {
+        const newValues = [...prevValues];
+
+        if (newValues.length === 30) {
+          newValues.shift();
+        }
+
+        newValues.push(payload[keys[1]]);
+        return newValues;
+      });
+    }
+    if (payload[keys[2]]) {
+      setValues3((prevValues) => {
+        const newValues = [...prevValues];
+
+        if (newValues.length === 30) {
+          newValues.shift();
+        }
+
+        newValues.push(payload[keys[2]]);
+        return newValues;
+      });
+    }
+    if (payload[keys[3]]) {
+      setValues4((prevValues) => {
+        const newValues = [...prevValues];
+
+        if (newValues.length === 30) {
+          newValues.shift();
+        }
+
+        newValues.push(payload[keys[3]]);
+        return newValues;
+      });
+    }
+
     setTimeStamps((prevStamps) => {
       const newStamp = [...prevStamps];
-      if (newStamp.length === 6) {
+
+      if (newStamp.length === 30) {
         newStamp.shift();
       }
       newStamp.push(getCurrentTime());
-
       return newStamp;
     });
-  };
+  }
 
   React.useEffect(() => {
-    pushNumber(value as number);
-  }, [value]);
-
-  if (isDragging) {
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        className="
-        opacity-30
-      bg-mainBackgroundColor p-2.5 h-[150px] min-h-[100px] items-center flex text-left rounded-xl border-2 border-[#1966fb] cursor-grab relative
-      "
-      />
-    );
-  }
+    pushPayload(payload);
+  }, [payload]);
 
   return (
     <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...(editMode ? listeners : {})}
-      id={widgetId}
-      className="h-[150px] w-[100%] bg-white overflow-hidden relative rounded-md shadow-md flex justify-center items-center hover:ring-2"
+      id={id ? id : widgetId} className="z-[2] bg-white rounded-md w-[100%] relative pb-[2rem] transition-all h-[430px] px-5 flex justify-center items-center"
     >
       <div className="absolute left-2 top-2 text-[#1d4469] text-[12px]">
         {label}
@@ -162,9 +309,9 @@ function LineChart({
       >
         <RxDotsHorizontal />
       </div>
-      <div>
-        <div className="flex w-[100%] justify-center items-center relative h-[104px] md:w-[200px]">
-          <Line data={data} options={options}></Line>
+      <div className="w-[90%] h-[100%] flex justify-center items-center">
+        <div className="flex w-[100%] mt-10 justify-center items-center relative h-[350px]">
+          <Line data={data} options={options} />
         </div>
       </div>
       {isOptionOpen && (

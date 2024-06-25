@@ -138,7 +138,7 @@ function UserManagement() {
               setIsDrawerOpen(true);
             }}
             className="hidden p-1 w-fit h-fit relative md:block sm:block text-[#8f8f8f] mb-6"
-            id="small-open-sidebar-btn"
+            id="toggle-nav-links-dialog-btn"
           >
             <RiMenu2Fill className="text-[23px]" />
           </button>

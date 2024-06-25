@@ -131,7 +131,7 @@ function AddDevice() {
                 navigate("/device-list");
               }}
               className="flex cursor-pointer text-sm text-[#1D4469] font-bold items-center left-0 mb-10"
-              id="back-to-devices-list-btn"
+              id="back-to-api-key-list-btn"
             >
               <IoArrowBackSharp className="text-sm mr-2" />
               Back
@@ -165,7 +165,7 @@ function AddDevice() {
                     alignItems: "center",
                     marginTop: "2rem",
                   }}
-                  id="add-device-alert"
+                  id="api-keys-page-alert"
                 >
                   {alertText}
                 </Alert>
@@ -287,9 +287,9 @@ function AddDevice() {
               </Button>
             </div>
             {showAlert && (
-              <div id="add-device-snackbar" className="block sm:hidden">
+              <div id="api-key-page-snackbar" className="block sm:hidden">
                 <SnackBar
-                  id="add-device-snackbar"
+                  id="api-key-page-snackbar"
                   severity={alertType}
                   showSnackBar={showAlert}
                   snackBarText={alertText}

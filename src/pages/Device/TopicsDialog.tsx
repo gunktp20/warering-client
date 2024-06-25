@@ -89,7 +89,7 @@ export default function TopicsDialog(props: IProps) {
           {showAlert && (
             <div className="block sm:hidden">
               <SnackBar
-                id="device-page-snackbar"
+                id="topics-dialog-snackbar"
                 severity={alertType}
                 showSnackBar={showAlert}
                 snackBarText={alertText}

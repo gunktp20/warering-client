@@ -16,22 +16,25 @@ const client = mqtt.connect(url, options);
 
 client.on("connect", function () {
   console.log("เชื่อมต่อ mqtt สำเร็จ");
-  console.log("เชื่อมต่อ mqtt สำเร็จ");
   console.log(`ส่งข้อมูลจากอุปกรณ์ ไปยัง server แล้ว ✔️ `);
+
   setInterval(() => {
-    let tem_val = (Math.random() * 100).toFixed(2);
-    tem_val = map(tem_val, 0, 100, 23, 26).toFixed(2);
-    let speed_val = (Math.random() * 100).toFixed(2);
-    speed_val = map(speed_val, 0, 10000, 2000, 2500).toFixed(0);
+    const tem_val = Math.floor(Math.random() * 1001);
+    const speed_val = Math.floor(Math.random() * 5001);
     let brightness_val = (Math.random() * 10000).toFixed(0);
     brightness_val = map(brightness_val, 0, 10000, 500, 1200).toFixed(0);
+
+    console.log("tem_val", tem_val);
 
     client.publish(
       "665e1d8d8c80d27112e47fa8/tem-mqtt-1/publish",
       JSON.stringify({
-        tem_val,
-        speed_val,
-        brightness_val,
+        // tem_val: "tem_val",
+        tem_val: Number(tem_val),
+        // speed_val: "speed_val",
+        speed_val: Number(speed_val),
+        // brightness_val: "brightness_val",
+        brightness_val: Number(brightness_val),
       }),
       {
         qos: 0,
@@ -57,10 +60,6 @@ client.on("connect", function () {
     );
   }, 1000);
 });
-
-const test = {
-  led: 0,
-};
 
 // Receive messages
 client.on("message", function (topic, message) {
