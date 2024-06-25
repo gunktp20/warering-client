@@ -516,15 +516,6 @@ function DashboardTest() {
 
           {/* Column container */}
           {widgets.length > 0 && <div className=" gap-2 w-[100%] grid grid-cols-3 md:grid-cols-2 sm:grid-cols-1 mt-5">
-            {/* fetchAllWidgets={fetchAllWidgets}
-                                publishMQTT={
-                                    typeof matchedPayload?.mqttPublish === "function"
-                                        ? matchedPayload?.mqttPublish
-                                        : urgentMqttPublisher
-                                }
-                                selectWidget={selectWidget}
-                                dashboardId={dashboard_id}
-                                editMode={editMode} */}
             <Column
               column="column-1"
               payloadDevices={payloadDevices}
@@ -556,6 +547,7 @@ function DashboardTest() {
               selectWidget={selectWidget}
             />
           </div>}
+          {visualizationWidgets.length <= 0 && <div className='w-[100%] h-[40vh]'></div>}
           {/*  */}
           {/* widget visualization container */}
           {visualizationWidgets.length >= 1 && <div className="border-b-[#1d446931] mt-9 border-b-[1px] pb-3 text-[14px] font-bold text-[#1d4469]">visualization</div>}

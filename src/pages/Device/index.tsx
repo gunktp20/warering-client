@@ -190,7 +190,6 @@ function Device() {
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(`/widgets/${device_id}`);
-      console.log(data)
       setWidgets(data.filter((widget: { type: string; }) => widget.type !== "LineChart"));
       // new update 
       setVisualizationWidgets(data.filter((widget: IWidget) => {

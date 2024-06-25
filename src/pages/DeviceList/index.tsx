@@ -7,7 +7,7 @@ import {
   SnackBar,
 } from "../../components";
 import Wrapper from "../../assets/wrappers/DeviceList";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -122,9 +122,9 @@ function DeviceList() {
     duration: 500,
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
-  };
+  }, [values]);
 
   const setDevicePermission = async (deviceId: string, permission: string) => {
     setIsLoading(true);
