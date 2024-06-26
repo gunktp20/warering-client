@@ -5,11 +5,12 @@ import { NavLink, useNavigate } from "react-router-dom";
 
 interface IProp {
   isSidebarShow: boolean;
+  disableFixed?: boolean;
 }
 
 const NavLinkSidebar = (props: IProp) => {
   const navigate = useNavigate()
-  
+
   return (
     <div
       id="nav-links-side-bar"
@@ -17,7 +18,7 @@ const NavLinkSidebar = (props: IProp) => {
         }`}
     >
 
-      <div className="flex flex-col fixed">
+      <div className={`flex flex-col ${props.disableFixed ? "" : "fixed"}`}>
         <button
           onClick={() => {
             navigate("/home");

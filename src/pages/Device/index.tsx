@@ -399,7 +399,7 @@ function Device() {
           <div className="flex justify-between">
             <button
               onClick={() => {
-                // setIsDrawerOpen(true);
+                setIsDrawerOpen(true);
               }}
               className="hidden p-1 w-fit h-fit relative sm:block text-[#8f8f8f] mb-6"
               id="toggle-nav-links-dialog-btn"

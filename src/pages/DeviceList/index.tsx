@@ -205,7 +205,7 @@ function DeviceList() {
         isSidebarShow={isSidebarShow}
       />
       <div className="flex h-[100vh]">
-        <NavLinkSidebar isSidebarShow={isSidebarShow} />
+        <NavLinkSidebar isSidebarShow={isSidebarShow} disableFixed={true} />
         <NavDialog
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
