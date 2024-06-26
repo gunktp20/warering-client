@@ -155,7 +155,7 @@ function DashboardList() {
         setIsSidebarShow={setIsSidebarShow}
       />
       <div className="flex h-[100vh]">
-        <NavLinkSidebar isSidebarShow={isSidebarShow} disableFixed={true}/>
+        <NavLinkSidebar isSidebarShow={isSidebarShow} disableFixed={true} />
         <NavDialog
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}
