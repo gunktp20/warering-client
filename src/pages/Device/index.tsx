@@ -238,6 +238,7 @@ function Device() {
       });
     }
   };
+
   useEffect(() => {
     if (token) {
       fetchDeviceById();

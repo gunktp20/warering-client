@@ -19,6 +19,7 @@ import useTimeout from '../../hooks/useTimeout';
 import { MdSearchOff } from 'react-icons/md';
 import EditWidgetDialog from '../Dashboard/EditWidgetDialog';
 import DropIndicator from './DropIndicator';
+import { MqttClient } from 'mqtt';
 
 interface IConfigWidget {
   value: string;
@@ -47,7 +48,17 @@ interface IWidget {
   column: "column-1" | "column-2" | "column-3" | string
 }
 
-function DashboardTest() {
+const clients: MqttClient[] = [];
+
+const MqttDisconnect = () => {
+  if (clients.length > 0) {
+    clients.map((client) => {
+      client.end()
+    })
+  }
+}
+
+function Dashboard() {
   const navigate = useNavigate()
   const axiosPrivate = useAxiosPrivate()
   const dispatch = useAppDispatch()
@@ -82,7 +93,6 @@ function DashboardTest() {
     try {
       const { data } = await axiosPrivate.get(`/dashboards/${dashboard_id}`);
       setIsLoading(false);
-      console.log(data)
       setDashboardInfo(data);
 
       const formattedWidgets = await data?.widgets.map(
@@ -114,7 +124,6 @@ function DashboardTest() {
 
       const initialPayloadDevices = data?.devices.map(
         (device: { _id: string }) => {
-          console.log(device)
           return { deviceId: device._id };
         }
       );
@@ -131,6 +140,8 @@ function DashboardTest() {
           const { usernameDevice, password_law } = device;
 
           const client = await connectEMQX(usernameDevice, password_law)
+
+          clients.push(client);
 
           const mqttPublish = (payload: string): void => {
             if (client) {
@@ -206,7 +217,7 @@ function DashboardTest() {
 
   // Function to handle mouse wheel
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
-    e.preventDefault();
+    // e.preventDefault();
     if (e.deltaY < 0) {
       sliderRef.current?.slickPrev(); // Use optional chaining
     } else {
@@ -290,7 +301,6 @@ function DashboardTest() {
       setVisualizationWidgets(filteredVisualWidgets.map((widget: { widget: IWidget; }) => {
         return { ...widget.widget, id: widget.widget._id }
       }))
-
       return setIsLoading(false);
     } catch (err: unknown) {
       const msg = await getAxiosErrorMessage(err)
@@ -355,6 +365,13 @@ function DashboardTest() {
     if (token) {
       fetchDashboardById()
     }
+
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      MqttDisconnect()
+    };
   }, [])
 
   const onAddWidgetSuccess = async () => {
@@ -912,4 +929,4 @@ const AddCard = () => {
   );
 };
 
-export default DashboardTest
+export default Dashboard
