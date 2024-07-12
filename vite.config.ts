@@ -15,7 +15,7 @@ export default ({ mode }) => {
         ),
 
         "import.meta.env.VITE_API_DOMAIN": JSON.stringify(
-          process.env.VITE_API_DOMAIN || "https://warering.online/api/"
+          process.env.VITE_API_DOMAIN || "http://warering.online/api/"
         ),
         "import.meta.env.VITE_EMQX_PROTOCAL": JSON.stringify(
           process.env.VITE_API_DOMAIN || "ws"
