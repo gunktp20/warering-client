@@ -11,7 +11,7 @@ export default ({ mode }) => {
       plugins: [react()],
       define: {
         "import.meta.env.VITE_EMQX_DOMAIN": JSON.stringify(
-          process.env.VITE_EMQX_DOMAIN || "ws://13.229.135.29:8083/mqtt"
+          process.env.VITE_EMQX_DOMAIN || "ws://13.250.116.125:8083/mqtt"
         ),
 
         "import.meta.env.VITE_API_DOMAIN": JSON.stringify(
@@ -21,10 +21,10 @@ export default ({ mode }) => {
           process.env.VITE_API_DOMAIN || "ws"
         ),
         "import.meta.env.VITE_EMQX_HOST": JSON.stringify(
-          process.env.VITE_API_DOMAIN || "13.229.135.29"
+          process.env.VITE_API_DOMAIN || "13.250.116.125"
         ),
         "import.meta.env.VITE_MQTT_DOMAIN": JSON.stringify(
-          process.env.VITE_MQTT_DOMAIN || "http://13.229.135.29"
+          process.env.VITE_MQTT_DOMAIN || "http://13.250.116.125"
         ),
       },
     });
