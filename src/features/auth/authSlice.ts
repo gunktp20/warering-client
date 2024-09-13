@@ -40,6 +40,9 @@ const addUserToLocalStorage: AddUserFunc = (user, token) => {
 const addTokenToLocalStorage = (token: string) => {
   localStorage.setItem("token", token);
 };
+const addProfileImgToLocalStorage = (user : any, profile_img: string) => {
+  localStorage.setItem("user", JSON.stringify({ ...user, profileUrl: profile_img }));
+};
 
 export const removeUserFromLocalStorage = () => {
   localStorage.removeItem("user");
@@ -198,6 +201,7 @@ const AuthSlice = createSlice({
       };
     },
     setProfileImg: (state, action) => {
+      addProfileImgToLocalStorage(state.user, action.payload)
       return {
         ...state,
         profileImg: action.payload,
