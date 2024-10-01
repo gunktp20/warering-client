@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { RxDotsHorizontal } from "react-icons/rx";
 import { IMessageBoxDashboardProp } from "../../types/widget_dashboard";
 import ConfirmDelete from "./ConfirmDeleteWidget";
@@ -27,6 +27,9 @@ function MessageBox({
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
   const { editMode } = useAppSelector((state) => state.dashboard)
+
+  console.log('Message Box redered')
+
   return (
 
     <div className="mt-5">
@@ -104,4 +107,4 @@ function MessageBox({
   );
 }
 
-export default MessageBox;
+export default memo(MessageBox);

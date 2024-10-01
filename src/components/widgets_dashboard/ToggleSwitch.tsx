@@ -1,5 +1,5 @@
 import { RxDotsHorizontal } from "react-icons/rx";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { IToggleSwitchDashboardProp } from "../../types/widget_dashboard";
 import { styled } from "@mui/material/styles";
 import Switch, { SwitchProps } from "@mui/material/Switch";
@@ -27,6 +27,8 @@ function ToggleSwitch({
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
   const { editMode } = useAppSelector((state) => state.dashboard)
+
+  console.log('ToggleSwitch')
 
   return (
     <div className="mt-5">
@@ -169,4 +171,4 @@ const SwitchMui = styled((props: IProp) => (
   },
 }));
 
-export default ToggleSwitch;
+export default memo(ToggleSwitch);

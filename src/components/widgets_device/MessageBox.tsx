@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import { RxDotsHorizontal } from "react-icons/rx";
 import { IMessageBoxDeviceProp } from "../../types/widget_device";
 import DeleteConfirmDialog from "./DeleteConfirmDialog";
@@ -24,6 +24,7 @@ function MessageBox({
 
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
+
   return (
     <div id={widgetId} className="h-[150px] w-[100%] bg-white relative shadow-md flex justify-center items-center rounded-md hover:ring-2 overflow-hidden">
       {((!value && value !== 0)) && (
@@ -87,4 +88,4 @@ function MessageBox({
   );
 }
 
-export default MessageBox;
+export default memo(MessageBox);

@@ -20,6 +20,8 @@ import { MdSearchOff } from 'react-icons/md';
 import EditWidgetDialog from '../Dashboard/EditWidgetDialog';
 import DropIndicator from './DropIndicator';
 import { MqttClient } from 'mqtt';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 interface IConfigWidget {
   value: string;

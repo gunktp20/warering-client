@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
 import { RxDotsHorizontal } from "react-icons/rx";
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 import {
   Chart as ChartJS,
   LineElement,
@@ -293,6 +293,8 @@ function LineChart({
     pushPayload(payload);
   }, [payload]);
 
+  console.log('Line Chart redered')
+
   return (
     <div
       id={id ? id : widgetId} className="z-[2] bg-white rounded-md w-[100%] relative pb-[2rem] transition-all h-[430px] px-5 flex justify-center items-center"
@@ -347,4 +349,4 @@ function LineChart({
   );
 }
 
-export default LineChart;
+export default memo(LineChart);

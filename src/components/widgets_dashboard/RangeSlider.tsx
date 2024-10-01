@@ -23,7 +23,7 @@ const CustomSliderStyles = {
   "& .MuiSlider-active": {},
 };
 
-export default function RangeSlider({
+function RangeSlider({
   label,
   min,
   max,
@@ -46,16 +46,18 @@ export default function RangeSlider({
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     React.useState<boolean>(false);
 
+  console.log('Range Slider redered')
+
   return (
     <div className="mt-5">
-      <DropIndicator beforeId={widgetId} column={column ? column: "column-1"} />
+      <DropIndicator beforeId={widgetId} column={column ? column : "column-1"} />
       <motion.div
         draggable={editMode}
         onDragStart={(e) => {
           if (!editMode) {
             return;
           }
-          handleDragStart(e, { id: widgetId, column: column ? column: "column-1"  })
+          handleDragStart(e, { id: widgetId, column: column ? column : "column-1" })
         }}
         className={`bg-white h-[150px] ${editMode ? "cursor-grab active:cursor-grabbing" : ""} relative rounded-md shadow-md flex justify-center items-center hover:ring-2 overflow-hidden`}
       >
@@ -123,4 +125,6 @@ export default function RangeSlider({
     </div>
   );
 }
+
+export default React.memo(RangeSlider)
 

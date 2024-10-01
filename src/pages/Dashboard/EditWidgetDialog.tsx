@@ -194,87 +194,152 @@ export default function EditWidgetDialog(props: IProps) {
   };
 
   const onSubmit = () => {
-    const { label, value, min, max, unit, payload, on_payload, off_payload, value_1, value_2, value_3, value_4 } =
+    const { label, value, min, max, unit, payload, on_payload, button_label, off_payload, value_1, value_2, value_3, value_4 } =
       values;
     const widgetInfo: IWidgetInfo = {
       label: "",
       type: "",
       configWidget: initialState,
     };
-    if (
-      occupation === "Gauge" &&
-      (!label || !value || min === null || !max)
-    ) {
-      displayAlert({
-        msg: "Please provide all values",
-        type: "error",
-      });
-      return;
+    if (occupation === "Gauge") {
+
+      if (!label.trim()) {
+        displayAlert({ msg: "label is required", type: "error" })
+        return;
+      }
+      if (!value.trim()) {
+        displayAlert({ msg: "value is required", type: "error" })
+        return;
+      }
+      if (min === null) {
+        displayAlert({ msg: "min value is required", type: "error" })
+        return;
+      }
+      if (!max) {
+        displayAlert({ msg: "max value is required", type: "error" })
+        return;
+      }
+      if (min > max) {
+        displayAlert({ msg: "min value must be < max value", type: "error" })
+        return;
+      }
     }
-    if (
-      occupation === "Gauge" &&
-      (min !== undefined ? min : 0) > (max !== undefined ? max : 0)
-    ) {
-      displayAlert({
-        msg: "min value must be < max value",
-        type: "error",
-      });
-      return;
+
+    if (occupation === "MessageBox") {
+      if (!label.trim()) {
+        displayAlert({ msg: "label is required", type: "error" })
+        return;
+      }
+      if (!value.trim()) {
+        displayAlert({ msg: "value is required", type: "error" })
+        return;
+      }
     }
-    if (
-      occupation === "MessageBox" &&
-      (!label || !value)
-    ) {
-      displayAlert({ msg: "Please provide all values", type: "error" })
-      return;
+
+    if (occupation === "ButtonControl") {
+      if (!label.trim()) {
+        displayAlert({ msg: "label is required", type: "error" })
+        return;
+      }
+      if (!payload.trim()) {
+        displayAlert({ msg: "payload is required", type: "error" })
+        return;
+      }
+      if (!button_label.trim()) {
+        displayAlert({ msg: "button label is required", type: "error" })
+        return;
+      }
     }
-    if (occupation === "ButtonControl" && (!label || !payload)) {
-      displayAlert({
-        msg: "Please provide all values",
-        type: "error",
-      });
-      return;
+    if (occupation === "ToggleSwitch") {
+      if (!label.trim()) {
+        displayAlert({ msg: "label is required", type: "error" })
+        return;
+      }
+      if (!value.trim()) {
+        displayAlert({ msg: "value is required", type: "error" })
+        return;
+      }
+
+      if (on_payload === null) {
+        displayAlert({ msg: "on payload is required", type: "error" })
+        return;
+      }
+      if (typeof on_payload === "string") {
+        if (!on_payload.trim()) {
+          displayAlert({ msg: "on payload is required", type: "error" })
+          return;
+        }
+      }
+
+      if (off_payload === null) {
+        displayAlert({ msg: "off payload is required", type: "error" })
+        return;
+      }
+      if (typeof off_payload === "string") {
+        if (!off_payload.trim()) {
+          displayAlert({ msg: "off payload is required", type: "error" })
+          return;
+        }
+      }
+
     }
-    if (
-      occupation === "ToggleSwitch" &&
-      (!label || on_payload === null || off_payload === null || !value)
-    ) {
-      displayAlert({
-        msg: "Please provide all values",
-        type: "error",
-      });
-      return;
+
+    if (occupation === "RangeSlider") {
+      if (!label.trim()) {
+        displayAlert({ msg: "label is required", type: "error" })
+        return;
+      }
+      if (!value.trim()) {
+        displayAlert({ msg: "value is required", type: "error" })
+        return;
+      }
+      if (min === null) {
+        displayAlert({ msg: "min value is required", type: "error" })
+        return;
+      }
+      if (!max) {
+        displayAlert({ msg: "max value is required", type: "error" })
+        return;
+      }
+      if (min > max) {
+        displayAlert({ msg: "min value must be < max value", type: "error" })
+        return;
+      }
     }
-    if (
-      occupation === "RangeSlider" &&
-      (!label || !value || min === null || !max)
-    ) {
-      displayAlert({
-        msg: "Please provide all values",
-        type: "error",
-      });
-      return;
-    }
-    if (
-      occupation === "RangeSlider" &&
-      (min !== undefined ? min : 0) > (max !== undefined ? max : 0)
-    ) {
-      displayAlert({
-        msg: "min value must be < max value",
-        type: "error",
-      });
-      return;
-    }
-    if (
-      occupation === "LineChart" &&
-      (!label || !value_1 || min === null || !max || (chuckLength == 2 && !value_2) || (chuckLength == 3 && !value_3) || (chuckLength == 4 && !value_4))
-    ) {
-      displayAlert({ msg: "Please provide all value", type: "error" })
-      return;
-    }
-    if (occupation === "LineChart" && min > max) {
-      displayAlert({ msg: "min value must be < max value", type: "error" })
-      return;
+
+    if (occupation === "LineChart") {
+      if (!label.trim()) {
+        displayAlert({ msg: "label is required", type: "error" })
+        return;
+      }
+      if (min === null) {
+        displayAlert({ msg: "min value is required", type: "error" })
+        return;
+      }
+      if (!max) {
+        displayAlert({ msg: "max value is required", type: "error" })
+        return;
+      }
+      if (!value_1.trim()) {
+        displayAlert({ msg: "value 1 is required", type: "error" })
+        return;
+      }
+      if (chuckLength == 2 && !value_2.trim()) {
+        displayAlert({ msg: "value 2 is required", type: "error" })
+        return;
+      }
+      if (chuckLength == 3 && !value_3.trim()) {
+        displayAlert({ msg: "value 3 is required", type: "error" })
+        return;
+      }
+      if (chuckLength == 4 && !value_4.trim()) {
+        displayAlert({ msg: "value 4 is required", type: "error" })
+        return;
+      }
+      if (min > max) {
+        displayAlert({ msg: "min value must be < max value", type: "error" })
+        return;
+      }
     }
     switch (occupation) {
       case "Gauge":

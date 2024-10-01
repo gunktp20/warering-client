@@ -22,6 +22,7 @@ import { useAppDispatch } from "../../app/hooks";
 import useTimeout from "../../hooks/useTimeout";
 import useAlert from "../../hooks/useAlert";
 import { IoMdCloseCircle } from "react-icons/io";
+import { memo } from "react";
 
 interface IWidget {
   type?: string;
@@ -91,7 +92,7 @@ const initialState: {
   value_4: "",
 };
 
-export default function AddWidgetDialog(props: IProps) {
+export default memo(function AddWidgetDialog(props: IProps) {
   const dispatch = useAppDispatch()
   const { showAlert, alertText, alertType, displayAlert } = useAlert()
   const [occupation, setOccupation] = useState<string>("");
@@ -121,9 +122,8 @@ export default function AddWidgetDialog(props: IProps) {
     setValues({ ...values, [e.target.name]: e.target.value });
   };
 
-
   const onSubmit = () => {
-    const { label, value, min, max, unit, payload, button_label,on_payload, off_payload, value_1, value_2, value_3, value_4 } =
+    const { label, value, min, max, unit, payload, button_label, on_payload, off_payload, value_1, value_2, value_3, value_4 } =
       values;
     const widgetInfo: IWidget = {}
     if (occupation === "Gauge") {
@@ -185,23 +185,23 @@ export default function AddWidgetDialog(props: IProps) {
         return;
       }
 
-      if(on_payload === null){
+      if (on_payload === null) {
         displayAlert({ msg: "on payload is required", type: "error" })
         return;
       }
       if (typeof on_payload === "string") {
-        if(!on_payload.trim()){
+        if (!on_payload.trim()) {
           displayAlert({ msg: "on payload is required", type: "error" })
           return;
         }
       }
 
-      if(off_payload === null){
+      if (off_payload === null) {
         displayAlert({ msg: "off payload is required", type: "error" })
         return;
       }
       if (typeof off_payload === "string") {
-        if(!off_payload.trim()){
+        if (!off_payload.trim()) {
           displayAlert({ msg: "off payload is required", type: "error" })
           return;
         }
@@ -249,15 +249,15 @@ export default function AddWidgetDialog(props: IProps) {
         displayAlert({ msg: "value 1 is required", type: "error" })
         return;
       }
-      if(chuckLength == 2 && !value_2.trim()){
+      if (chuckLength == 2 && !value_2.trim()) {
         displayAlert({ msg: "value 2 is required", type: "error" })
         return;
       }
-      if(chuckLength == 3 && !value_3.trim()){
+      if (chuckLength == 3 && !value_3.trim()) {
         displayAlert({ msg: "value 3 is required", type: "error" })
         return;
       }
-      if(chuckLength == 4 && !value_4.trim()){
+      if (chuckLength == 4 && !value_4.trim()) {
         displayAlert({ msg: "value 4 is required", type: "error" })
         return;
       }
@@ -862,4 +862,4 @@ export default function AddWidgetDialog(props: IProps) {
       </Dialog>
     </div>
   );
-}
+})

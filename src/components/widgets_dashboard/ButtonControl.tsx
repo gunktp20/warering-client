@@ -1,6 +1,6 @@
 import { RxDotsHorizontal } from "react-icons/rx";
 import { Button } from "@mui/material";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { IButtonControlDashboardProp } from "../../types/widget_dashboard";
 import ConfirmDelete from "./ConfirmDeleteWidget";
 import { motion } from "framer-motion"
@@ -24,7 +24,7 @@ function ButtonControl({
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
   const { editMode } = useAppSelector((state) => state.dashboard)
-
+  console.log('Button Control rendered')
   return (
     <div className="mt-5">
       <DropIndicator beforeId={widgetId} column={column ? column : "column-1"} />
@@ -108,4 +108,4 @@ function ButtonControl({
 
   );
 }
-export default ButtonControl;
+export default memo(ButtonControl);

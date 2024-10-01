@@ -1,5 +1,5 @@
 import { RxDotsHorizontal } from "react-icons/rx";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { IToggleSwitchDeviceProp } from "../../types/widget_device";
 import { styled } from "@mui/material/styles";
 import Switch, { SwitchProps } from "@mui/material/Switch";
@@ -22,6 +22,8 @@ function ToggleSwitch({
   const [isActive, setIsActive] = useState<boolean>(true);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
+
+    console.log("Toggle switch rendered")
 
   return (
     <div id={widgetId} className="h-[150px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2">
@@ -148,4 +150,4 @@ const SwitchMui = styled((props: IProp) => (
   },
 }));
 
-export default ToggleSwitch;
+export default memo(ToggleSwitch);

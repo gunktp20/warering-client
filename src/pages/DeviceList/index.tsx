@@ -26,6 +26,7 @@ import Pagination from "./Pagination";
 import useAlert from "../../hooks/useAlert";
 import Tooltip from "../../components/ToolTip";
 import { IoMdCloseCircle } from "react-icons/io";
+import { debounce } from 'lodash';
 
 function DeviceList() {
   const navigate = useNavigate();
@@ -99,6 +100,7 @@ function DeviceList() {
   }
 
   const fetchAllDevice = async () => {
+    console.log("fetchAllDevice")
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(
@@ -117,10 +119,12 @@ function DeviceList() {
     }
   };
 
-  const { callHandler: callFetchAllDevice } = useTimeout({
-    executeAction: fetchAllDevice,
-    duration: 500,
-  });
+  const debouncedFetchDevices = useCallback(
+    debounce(() => {
+      fetchAllDevice();
+    }, 500),
+    [numOfPage , values.search_device]
+  );
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
@@ -146,7 +150,6 @@ function DeviceList() {
   }, [
     numOfPage,
     sortCreatedAt,
-    values.search_device,
     filterByPermission,
     filterByisSaveData,
   ]);
@@ -155,7 +158,7 @@ function DeviceList() {
     if (isFirstRender.current) {
       isFirstRender.current = false
     } else {
-      callFetchAllDevice()
+      debouncedFetchDevices()
     }
   }, [values.search_device])
 

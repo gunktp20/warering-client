@@ -22,7 +22,7 @@ const CustomSliderStyles = {
   "& .MuiSlider-active": {},
 };
 
-export default function RangeSlider({
+function RangeSlider({
   label,
   min,
   max,
@@ -40,6 +40,8 @@ export default function RangeSlider({
   const [isOptionOpen, setIsOptionOpen] = React.useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     React.useState<boolean>(false);
+
+    console.log('Range slider')
   return (
     <div id={widgetId} className="h-[150px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2">
       <div className="absolute left-2 top-2 text-[#1d4469] text-[12px]">
@@ -101,4 +103,6 @@ export default function RangeSlider({
     </div>
   );
 }
+
+export default React.memo(RangeSlider)
 

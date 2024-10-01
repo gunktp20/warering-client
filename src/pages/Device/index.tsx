@@ -5,7 +5,7 @@ import {
   AccountUserDrawer,
   SnackBar,
 } from "../../components";
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo } from "react";
 import { IoMdCheckmark } from "react-icons/io";
 import { RiMenu2Fill } from "react-icons/ri";
 import { IoArrowBackSharp } from "react-icons/io5";
@@ -51,6 +51,8 @@ import useTimeout from "../../hooks/useTimeout";
 import connectEMQX from "../../utils/connectEMQX";
 import copy from "copy-to-clipboard";
 import Tooltip from "../../components/ToolTip";
+import lodash from "lodash"
+
 ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
 
 interface IDevice {
@@ -127,6 +129,10 @@ function Device() {
     }
   };
 
+  const memoizedConfigWidgetsDevice = useMemo(() => {
+    return configWidgetsDevice;
+  }, [configWidgetsDevice]);
+
   // Function to disable scroll
   const disableScroll = () => {
     document.body.classList.add('no-scroll');
@@ -169,24 +175,26 @@ function Device() {
     ]
   };
 
-  const fetchDeviceById = async () => {
-    setIsLoading(true);
-    try {
-      const { data } = await axiosPrivate.get(`/devices/${device_id}`);
-      setDeviceInfo(data);
-      setPublishTopic(data?.topics[1]);
-      setSubScribeTopic(data?.topics[0]);
-      setQos(data?.qos);
-      connectMQTTServer(data);
-      setIsLoading(false);
-    } catch (err: unknown) {
-      const msg = await getAxiosErrorMessage(err);
-      displayAlert({ msg, type: "error" })
-      setIsLoading(false);
+  const fetchDeviceById = useCallback(
+    async () => {
+      setIsLoading(true);
+      try {
+        const { data } = await axiosPrivate.get(`/devices/${device_id}`);
+        setDeviceInfo(data);
+        setPublishTopic(data?.topics[1]);
+        setSubScribeTopic(data?.topics[0]);
+        setQos(data?.qos);
+        connectMQTTServer(data);
+        setIsLoading(false);
+      } catch (err: unknown) {
+        const msg = await getAxiosErrorMessage(err);
+        displayAlert({ msg, type: "error" })
+        setIsLoading(false);
+      }
     }
-  };
+    , []);
 
-  const fetchAllWidgets = async () => {
+  const fetchAllWidgets = useCallback(async () => {
     setIsLoading(true);
     try {
       const { data } = await axiosPrivate.get(`/widgets/${device_id}`);
@@ -203,9 +211,9 @@ function Device() {
       displayAlert({ msg, type: "error" })
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const mqttPublish = (payload: string) => {
+  const mqttPublish = useCallback((payload: string) => {
     if (client) {
       client.publish(
         publishTopic,
@@ -221,7 +229,7 @@ function Device() {
         }
       );
     }
-  };
+  }, [client,publishTopic])
 
   const connectMQTTServer = useCallback(
     async (data: { usernameDevice: string; password: string }) => {
@@ -274,7 +282,7 @@ function Device() {
           const payload = { topic, message: message.toString() };
           try {
             const payloadObject = JSON.parse(payload.message.replace(/'/g, '"'));
-            setConfigWidgetsDevice(payloadObject);
+            setConfigWidgetsDevice(payloadObject)
             setPayload(payloadObject);
           } catch (error) {
             // console.log(error);
@@ -288,10 +296,10 @@ function Device() {
     };
   }, [client]);
 
-  const selectWidget = async (widgetID: string) => {
+  const selectWidget = useCallback(async (widgetID: string) => {
     setSelectedWidget(widgetID);
     setIsEditDisplayShow(true);
-  };
+  }, []);
 
   const getAllPayload = async () => {
     try {

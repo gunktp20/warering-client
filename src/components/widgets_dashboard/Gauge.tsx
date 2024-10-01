@@ -1,5 +1,5 @@
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { RxDotsHorizontal } from "react-icons/rx";
 import { IGaugeDashboardProp } from "../../types/widget_dashboard";
 import ConfirmDelete from "./ConfirmDeleteWidget";
@@ -27,6 +27,7 @@ function Gauge({
   handleDragStart,
   column,
 }: IGaugeDashboardProp) {
+  console.log('Gauge rendered')
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
@@ -103,4 +104,4 @@ function Gauge({
   );
 }
 
-export default Gauge;
+export default memo(Gauge);

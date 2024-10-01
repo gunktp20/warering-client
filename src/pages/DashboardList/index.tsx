@@ -7,7 +7,7 @@ import {
   SnackBar,
 } from "../../components";
 import Wrapper from "../../assets/wrappers/DashboardList";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { RiMenu2Fill } from "react-icons/ri";
 import { IoSearchOutline } from "react-icons/io5";
 import { Button } from "@mui/material";
@@ -23,7 +23,7 @@ import { setDashboards, setSelectedDashboard, clearAlert as clearDashboardAlert 
 import useAlert from "../../hooks/useAlert";
 import { IoMdCloseCircle } from "react-icons/io";
 import Tooltip from "../../components/ToolTip";
-import useTimeout from "../../hooks/useTimeout";
+import { debounce } from "lodash"
 
 function DashboardList() {
   const navigate = useNavigate();
@@ -95,10 +95,12 @@ function DashboardList() {
     );
   }
 
-  const { callHandler: callFetchAllDashboards } = useTimeout({
-    executeAction: fetchAllDashboards,
-    duration: 500,
-  });
+  const debouncedFetchAllDashboards = useCallback(
+    debounce(() => {
+      fetchAllDashboards();
+    }, 500),
+    [numOfPage , values.search_dashboard]
+  );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [e.target.name]: e.target.value });
@@ -128,7 +130,7 @@ function DashboardList() {
     if (isFirstRender.current) {
       isFirstRender.current = false
     } else {
-      callFetchAllDashboards()
+      debouncedFetchAllDashboards()
     }
   }, [values.search_dashboard])
 
@@ -155,7 +157,7 @@ function DashboardList() {
         setIsSidebarShow={setIsSidebarShow}
       />
       <div className="flex h-[100vh]">
-      <NavLinkSidebar isSidebarShow={isSidebarShow} disableFixed={true}/>
+        <NavLinkSidebar isSidebarShow={isSidebarShow} disableFixed={true} />
         <NavDialog
           isDrawerOpen={isDrawerOpen}
           setIsDrawerOpen={setIsDrawerOpen}

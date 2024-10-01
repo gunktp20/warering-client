@@ -1,5 +1,5 @@
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { RxDotsHorizontal } from "react-icons/rx";
 import { IGaugeDeviceProp } from "../../types/widget_device";
 import DeleteConfirmDialog from "./DeleteConfirmDialog";
@@ -26,7 +26,7 @@ function Gauge({
   const [isOptionOpen, setIsOptionOpen] = useState<boolean>(false);
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
-
+  console.log('Gauge rendered')
   return (
     <div id={widgetId} className="h-[150px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2 overflow-hidden">
       {((!value && value !== 0) || !canConvertToNumber(value)) && (
@@ -83,4 +83,4 @@ function Gauge({
   );
 }
 
-export default Gauge;
+export default memo(Gauge);

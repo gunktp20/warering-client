@@ -59,13 +59,16 @@ export default function ChangePasswordDialog({
     const onSubmit = async () => {
         const { current_password, new_password, confirm_new_password } = values
 
-
-        if (!current_password || !new_password || !confirm_new_password) {
-            return displayAlert({ msg: "Please provide all value", type: "error" })
+        if (!current_password || !current_password.trim()) {
+            return displayAlert({ msg: "current password is required", type: "error" });
+        } else if (!new_password || !new_password.trim()) {
+            return displayAlert({ msg: "new password is required", type: "error" });
+        } else if (!confirm_new_password || !confirm_new_password.trim()) {
+            return displayAlert({ msg: "confirm new password is required", type: "error" });
         }
 
         if (new_password !== confirm_new_password) {
-            return displayAlert({ msg: "Confirm password must be the same with new password", type: "error" })
+            return displayAlert({ msg: "confirm password must be the same with new password", type: "error" })
         }
 
         return changePassword()

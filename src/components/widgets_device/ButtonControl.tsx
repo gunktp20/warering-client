@@ -1,6 +1,6 @@
 import { RxDotsHorizontal } from "react-icons/rx";
 import { Button } from "@mui/material";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { IButtonControlDeviceProp } from "../../types/widget_device";
 import DeleteConfirmDialog from "./DeleteConfirmDialog";
 import { useAppDispatch } from "../../app/hooks";
@@ -19,6 +19,8 @@ function ButtonControl({
   const dispatch = useAppDispatch()
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] =
     useState<boolean>(false);
+
+    console.log('Button Control')
 
   return (
     <div id={widgetId} className="h-[150px] w-[100%] bg-white relative rounded-md shadow-md flex justify-center items-center hover:ring-2">
@@ -88,4 +90,4 @@ function ButtonControl({
   );
 }
 
-export default ButtonControl;
+export default memo(ButtonControl);
