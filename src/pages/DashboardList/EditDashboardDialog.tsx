@@ -9,6 +9,7 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useAlert from "../../hooks/useAlert";
 import getAxiosErrorMessage from "../../utils/getAxiosErrorMessage";
 import { useAppSelector } from "../../app/hooks";
+import { Alert } from "@mui/material";
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
@@ -152,6 +153,21 @@ export default function EditDashboardDialog({ isEditDialogOpen, setEditDialogOpe
                 Fill in the information to add a Dashboard from your device.
               </div>
             </div>
+            {showAlert && alertType && (
+              <div className="hidden sm:block">
+                <Alert
+                  severity={alertType}
+                  sx={{
+                    fontSize: "11.8px",
+                    alignItems: "center",
+                    marginTop: "2rem",
+                  }}
+                  id="api-keys-page-alert"
+                >
+                  {alertText}
+                </Alert>
+              </div>
+            )}
             <div className="flex gap-10 mt-9 sm:flex-col sm:gap-0 md:flex-col md:gap-0">
               <div className="w-[350px] sm:w-[100%]">
                 <FormRow

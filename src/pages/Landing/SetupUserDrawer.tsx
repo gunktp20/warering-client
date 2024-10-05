@@ -58,18 +58,36 @@ function SetupUserDrawer(props: IDrawer) {
       await dispatch(forgetPassword(email_forget_password));
       return;
     }
-
-    if (
-      !username ||
-      !password ||
-      (!firstName && !isMember) ||
-      (!lastName && !isMember) ||
-      (!email && !isMember) ||
-      (!confirm_password && !isMember)
-    ) {
-      showDisplayAlert("error", "Please provide all value");
+    
+    if(!username){
+      showDisplayAlert("error", "Username is required");
       return;
     }
+    if(!password){
+      showDisplayAlert("error", "Password is required");
+      return;
+    }
+
+    if(!firstName && !isMember){
+      showDisplayAlert("error", "E-mail is required");
+      return;
+    }
+
+    if(!lastName && !isMember){
+      showDisplayAlert("error", "E-mail is required");
+      return;
+    }
+
+    if(!email && !isMember){
+      showDisplayAlert("error", "E-mail is required");
+      return;
+    }
+
+    if(!confirm_password && !isMember){
+      showDisplayAlert("error", "Confirm password is required");
+      return;
+    }
+
     if (!isMember && confirm_password !== password) {
       showDisplayAlert("error", "Confirm password should be the same password");
       return;

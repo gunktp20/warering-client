@@ -74,6 +74,19 @@ function AddDevice() {
   const onSubmit = async () => {
     const { nameDevice, usernameDevice, password, description, topics } =
       values;
+    if(!nameDevice || !nameDevice.trim()){
+      return displayAlert({ msg:"name of device is required",type:"error"});
+    }
+    if(!usernameDevice || !usernameDevice.trim()){
+      return displayAlert({ msg:"username of device is required",type:"error"});
+    }
+    if(!password || !password.trim()){
+      return displayAlert({ msg:"password of device is required",type:"error"});
+    }
+    if(!topics || !topics.trim()){
+      return displayAlert({ msg:"topic of device is required",type:"error"});
+    }
+  
     if (
       !nameDevice ||
       !usernameDevice ||
