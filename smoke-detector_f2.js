@@ -1,4 +1,4 @@
-import mqtt from "mqtt";
+const mqtt = require('mqtt')
 console.log("เริ่มต้น mqtt client");
 
 const url = "ws://localhost:8083/mqtt";
@@ -29,27 +29,27 @@ client.on("connect", function () {
 
     const smoke_val_f2 = Math.floor(Math.random() * (100 - 10 + 1)) + 10
     const tem_val_f2 = Math.floor(Math.random() * (100 - 60 + 1)) + 60
-    // const status_f2 = Math.floor(Math.random() * 3) + 0
-    const status_f2 = 1
+    const status_f2 = Math.floor(Math.random() * 3) + 0
+    // const status_f2 = 1
 
     client.publish(
-      "66d5f29f12bc1206279c63b5/smdtt-f2/publish",
+      "66db28fbe5816c419067409f/smtt-f2/publish",
       JSON.stringify({
         // รายงานควันจากชั้นที่ 2
         smoke_val_f2: statusList[Number(status_f2)] == statusList[1] || statusList[Number(status_f2)] == statusList[2] ? 5 : Number(smoke_val_f2),
         tem_val_f2: statusList[Number(status_f2)] == statusList[1] ? 30 : Number(tem_val_f2) ,
-        status_f2: statusList[Number(status_f2)] || "ไม่พบควัน",
+        status_f2: statusList[Number(status_f2)] ? "ไม่พบควัน 🔴" : "ตรวจพบควัน 🟢",
       }),
       {
         qos: 0,
         retain: true,
       }
     );
-  }, 2500);
+  }, 1000);
 
   setInterval(() => {
     client.subscribe(
-      "66d5f29f12bc1206279c63b5/smdtt-f2/subscribe",
+      "66db28fbe5816c419067409f/smtt-f2/subscribe",
       {
         qos: 0,
         retain: true,
